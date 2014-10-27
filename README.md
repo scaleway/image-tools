@@ -10,5 +10,5 @@ Upgrade a running image
 -----------------------
 
 ```bash
-tar --strip=2 -C / -xzvf <(wget -qO - https://github.com/online-labs/ocs-scripts/archive/master.tar.gz)
+curl https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | bash
 ```
