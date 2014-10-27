@@ -1,0 +1,70 @@
+#!/bin/bash
+
+METADATA_CACHE=`mktemp -u`
+
+get_metadata() {
+    if [ ! -f $METADATA_CACHE ]; then
+        /usr/local/bin/oc-metadata > $METADATA_CACHE
+    fi
+}
+
+get_value() {
+  # Get value from metadata
+  key="$1"
+  grep "^$key=" "$METADATA_CACHE" | cut -d= -f2 | sed "s/^['\"]//;s/['\"]$//"
+}
+
+get_nbd_client_conf() {
+  keys=$(get_value VOLUMES)
+
+cat <<EOF
+# If you don't want to reconfigure this package after installing, uncomment
+# the following line:
+#AUTO_GEN="n"
+# If you don't want the init script to kill nbd-client devices that aren't
+# specified in this configuration file, set the following to "false":
+KILLALL="false"
+# Note that any statical settings in this file will be preserved
+# regardless of the setting of AUTO_GEN, so its use is only recommended
+# if you set things in a dynamical way (e.g., through a database)
+EOF
+  conf_id=0
+  for key in $keys; do
+    # Do not include the rootfs in nbd configuration file. It has been mounted
+    # from the initramfs, we won't want it to be disconnected when
+    # /etc/rc6.d/K34nbd-client is executed.
+    test $key -eq 0 && continue
+
+
+# NBD_TYPE[x]=r => raw (no other setup than to run the client)
+    cat <<EOF
+#
+NBD_TYPE[$conf_id]=r
+NBD_DEVICE[$conf_id]=/dev/nbd$key
+NBD_HOST[$conf_id]=$(get_value VOLUMES_${key}_EXPORT_URI | sed 's|nbd://\(.*\):.*|\1|')
+NBD_PORT[$conf_id]=$(get_value VOLUMES_${key}_EXPORT_URI | sed 's|nbd://.*:\(.*\)|\1|')
+EOF
+    conf_id=$((conf_id + 1))
+
+  done
+}
+
+nbd_clients_connection() {
+  /etc/init.d/nbd-client start
+
+  keys=$(get_value VOLUMES)
+  for key in $keys; do
+    test $key -eq 0 && continue
+    NBD_DEVICE=/dev/nbd$key
+    until nbd-client -c $NBD_DEVICE
+    do
+      /etc/init.d/nbd-client start
+      sleep 5
+    done
+  done
+}
+
+get_metadata
+get_nbd_client_conf > /etc/nbd-client
+nbd_clients_connection
+rm $METADATA_CACHE

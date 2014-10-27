@@ -1,0 +1,15 @@
+#!/bin/sh
+# description "executable which retrieves server metadata (JSON)"
+# author "Online Labs Cloud Team <cloud-team@labs.online.net>"
+
+CODE=0
+while [ $CODE -ne 200 ]
+do
+    RESPONSE=$(curl --silent --write-out "\n%{http_CODE}\n" http://169.254.42.42/conf?format=json)
+    CODE=$(echo "$RESPONSE" | sed -n '$p')
+    BODY=$(echo "$RESPONSE" | sed '$d')
+    test $CODE -eq 200 && break
+    sleep 5 
+done
+
+echo "$BODY"

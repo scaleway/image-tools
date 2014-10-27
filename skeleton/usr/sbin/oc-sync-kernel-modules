@@ -1,0 +1,29 @@
+#!/bin/sh
+# description "synchronizes kernel module"
+# author "Online Labs Cloud Team <cloud-team@labs.online.net>"
+
+DIR=/lib/modules
+mkdir -p $DIR
+TMP_DIR=`mktemp -d -p $DIR`
+KVERSION=`uname -r`
+TIMEOUT=10
+
+clean() {
+    rm -rf "$TMP_DIR" 2>/dev/null
+}
+trap 'clean' INT TERM EXIT
+
+if [ ! -d $DIR/${KVERSION} ]
+then
+  wget --timeout=${TIMEOUT} --quiet --no-check-certificate -r --no-parent \
+     --reject "index.html*" --reject "robots.txt" \
+     --no-host-directories --cut-dirs 3 --directory-prefix \
+     $TMP_DIR http://mirror.cloud.online.net/kernel/${KVERSION}/modules/${KVERSION}/
+
+  if [ $? -eq 0 ]
+  then
+    mkdir -p $DIR/${KVERSION}
+    mv $TMP_DIR/${KVERSION} $DIR
+  fi
+fi
+
