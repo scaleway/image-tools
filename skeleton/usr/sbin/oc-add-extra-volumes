@@ -30,10 +30,12 @@ KILLALL="false"
 EOF
   conf_id=0
   for key in $keys; do
-    # Do not include the rootfs in nbd configuration file. It has been mounted
-    # from the initramfs, we won't want it to be disconnected when
-    # /etc/rc6.d/K34nbd-client is executed.
-    test $key -eq 0 && continue
+    if [ "$1" != "--include-nbd0" ]; then
+      # Do not include the rootfs in nbd configuration file. It has been mounted
+      # from the initramfs, we won't want it to be disconnected when
+      # /etc/rc6.d/K34nbd-client is executed.
+      test $key -eq 0 && continue
+    fi
 
 
 # NBD_TYPE[x]=r => raw (no other setup than to run the client)
@@ -65,6 +67,6 @@ nbd_clients_connection() {
 }
 
 get_metadata
-get_nbd_client_conf > /etc/nbd-client
+get_nbd_client_conf $@ > /etc/nbd-client
 nbd_clients_connection
 rm $METADATA_CACHE
