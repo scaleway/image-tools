@@ -22,6 +22,12 @@ case "$RUNLEVEL" in
         ;;
 esac
 
+if [ -e /usr/sbin/xnbd-client ]; then
+    NBD_CLIENT=/usr/sbin/xnbd-client
+else
+    NBD_CLIENT=/sbin/nbd-client
+fi
+
 disconnect() {
     # Stop trapping
     trap - 0 HUP INT QUIT KILL SEGV PIPE TERM
@@ -30,7 +36,7 @@ disconnect() {
     echo "nbd-disconnect executing: " >&2
     # Cache the command in order to use it after nbd-client disconnects
     $command --version >/dev/null 2>&1
-    nbd-client -d "$root"
+    $NBD_CLIENT -d "$root"
     $command
 
     # Hopefully this should never be reached
@@ -42,7 +48,7 @@ while read device etc; do
     case "$device" in
         /dev/nbd[0-9])
             swapoff "$device"
-            nbd-client -d "$device"
+            NBD_CLIENT -d "$device"
             ;;
         /dev/mapper/swap[0-9])
             nbd_device=$(cryptsetup status "$device" | awk '/device:/{print $2}')
@@ -50,7 +56,7 @@ while read device etc; do
             cryptsetup remove "$device"
             case "$nbd_device" in
                 /dev/nbd[1-9])
-                    nbd-client -d "$nbd_device"
+                    NBD_CLIENT -d "$nbd_device"
                     ;;
             esac
             ;;

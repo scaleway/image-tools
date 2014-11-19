@@ -4,6 +4,12 @@ METADATA_CACHE=`mktemp -u`
 
 export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
 
+if [ -e /usr/sbin/xnbd-client ]; then
+    NBD_CLIENT=/usr/sbin/xnbd-client
+else
+    NBD_CLIENT=/sbin/nbd-client
+fi
+
 get_metadata() {
     if [ ! -f $METADATA_CACHE ]; then
         /usr/local/bin/oc-metadata > $METADATA_CACHE
@@ -60,7 +66,7 @@ nbd_clients_connection() {
   for key in $keys; do
     test $key -eq 0 && continue
     NBD_DEVICE=/dev/nbd$key
-    until nbd-client -c $NBD_DEVICE
+    until $NBD_CLIENT -c $NBD_DEVICE
     do
       /etc/init.d/nbd-client start
       sleep 5
