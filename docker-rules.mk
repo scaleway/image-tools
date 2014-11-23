@@ -3,6 +3,9 @@ DISK ?= /dev/nbd1
 S3_URL ?= s3://test-images
 IS_LATEST ?= 0
 BUILDDIR ?= /tmp/build/$(NAME)-$(VERSION)/
+HELP_URL ?= https://community.cloud.online.net
+TITLE ?= $(NAME)
+DESCRIPTION ?= $(TITLE)
 
 
 .PHONY: build release install_on_disk publish_on_s3 clean shell re all
@@ -74,6 +77,11 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	tar -C $(BUILDDIR)rootfs.tmp -xf $(BUILDDIR)export.tar
 	rm -f $(BUILDDIR)rootfs.tmp/.dockerenv $(BUILDDIR)rootfs.tmp/.dockerinit
 	rm -rf $(BUILDDIR)rootfs
+	echo "IMAGE_ID=\"$(TITLE)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
+	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
+	echo "IMAGE_CODENAME=$(NAME)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
+	echo "IMAGE_DESCRIPTION=\"$(DESCRIPTION)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
+	echo "IMAGE_HELP_URL=\"$(HELP_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	mv $(BUILDDIR)rootfs.tmp $(BUILDDIR)rootfs
 
 
