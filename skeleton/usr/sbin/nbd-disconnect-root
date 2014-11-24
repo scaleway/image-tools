@@ -5,6 +5,8 @@
 # doesn't terminate.
 # Called by init scripts on reboot or shutdown.
 
+export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
+
 case "$RUNLEVEL" in
     0)
         key="o"

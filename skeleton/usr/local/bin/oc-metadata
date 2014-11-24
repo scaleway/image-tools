@@ -2,6 +2,8 @@
 # description "executable which retrieves server metadata (TEXT)"
 # author "Online Labs Cloud Team <cloud-team@labs.online.net>"
 
+export PATH="${PATH:+$PATH:}/usr/bin:/bin"
+
 CODE=0
 while [ $CODE -ne 200 ]
 do

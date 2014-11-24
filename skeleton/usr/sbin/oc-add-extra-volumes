@@ -2,6 +2,8 @@
 
 METADATA_CACHE=`mktemp -u`
 
+export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
+
 get_metadata() {
     if [ ! -f $METADATA_CACHE ]; then
         /usr/local/bin/oc-metadata > $METADATA_CACHE

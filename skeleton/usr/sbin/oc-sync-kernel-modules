@@ -8,6 +8,8 @@ TMP_DIR=`mktemp -d -p $DIR`
 KVERSION=`uname -r`
 TIMEOUT=10
 
+export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
+
 clean() {
     rm -rf "$TMP_DIR" 2>/dev/null
 }
@@ -26,4 +28,3 @@ then
     mv $TMP_DIR/${KVERSION} $DIR
   fi
 fi
-
