@@ -67,15 +67,14 @@ EOF
 }
 
 nbd_clients_connection() {
-  /etc/init.d/xnbd-common start
-
   keys=$(get_value VOLUMES)
   for key in $keys; do
     test $key -eq 0 && continue
     NBD_DEVICE=/dev/nbd$key
     until $NBD_CLIENT -c $NBD_DEVICE
     do
-      /etc/init.d/xnbd-common force-reload
+      /etc/init.d/xnbd-common stop
+      /etc/init.d/xnbd-common start
       sleep 5
     done
   done
