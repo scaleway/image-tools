@@ -1,0 +1,35 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:                 nbd-add-extra-volumes
+# Required-Start:           $remote_fs $local_fs
+# Required-Stop:
+# Default-Start:            S
+# Default-Stop:
+# Short-Description:        NBD add extra volumes
+### END INIT INFO
+
+set -e
+
+nbdaddextravolumes_start() {
+    /usr/sbin/oc-add-extra-volumes
+}
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start)
+        nbdaddextravolumes_start
+        ;;
+  reload|force-reload)
+        nbdaddextravolumes_start
+        ;;
+  restart)
+        nbdaddextravolumes_start
+        ;;
+  *)
+        log_action_msg "Usage: /etc/init.d/nbd-add-extra-volumes {start|restart}" || true
+        exit 1
+esac
+
+exit 0

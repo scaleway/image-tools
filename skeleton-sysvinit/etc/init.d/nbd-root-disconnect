@@ -1,0 +1,31 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:		nbd-disconnect-root
+# Required-Start:
+# Required-Stop:
+# Default-Start:
+# Default-Stop:         0 6
+# Short-Description:	NBD disconnect root
+### END INIT INFO
+
+set -e
+
+nbddisconnectroot_stop() {
+    if [ -x /usr/sbin/nbd-disconnect-root ]; then
+        /usr/sbin/nbd-disconnect-root&
+    fi
+}
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  stop)
+	nbddisconnectroot_stop
+	;;
+  *)
+	log_action_msg "Usage: /etc/init.d/nbd-root-disconnect stop" || true
+	exit 1
+esac
+
+exit 0

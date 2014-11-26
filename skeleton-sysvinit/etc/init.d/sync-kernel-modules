@@ -1,0 +1,35 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		sync-kernel-modules
+# Required-Start:	$remote_fs
+# Required-Stop:	$remote_fs
+# Default-Start:	2 3 4 5
+# Default-Stop:
+# Short-Description:	Sync kernel modules
+### END INIT INFO
+
+set -e
+
+synckernelmodules_start() {
+    /usr/sbin/oc-sync-kernel-modules
+}
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start)
+	synckernelmodules_start
+	;;
+  reload|force-reload)
+	synckernelmodules_start
+	;;
+  restart)
+	synckernelmodules_start
+	;;
+  *)
+	log_action_msg "Usage: /etc/init.d/sync-kernel-modules {start|restart}" || true
+	exit 1
+esac
+
+exit 0

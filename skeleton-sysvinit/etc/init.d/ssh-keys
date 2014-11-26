@@ -1,0 +1,44 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		sshkeys
+# Required-Start:	$remote_fs $sshd
+# Required-Stop:	$remote_fs $sshd
+# Default-Start:	2 3 4 5
+# Default-Stop:
+# Short-Description:	SSH Keys
+### END INIT INFO
+
+set -e
+
+export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/sbin"
+
+sshkey_start() {
+    if [ ! -f /root/.ssh/authorized_keys ]
+    then
+        mkdir -p /root/.ssh/
+	chmod 700 /root/.ssh
+    fi
+    oc-metadata | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' > /root/.ssh/authorized_keys
+
+    if [ ! -f /etc/ssh/ssh_host_rsa_key ]
+    then
+        ssh-keygen -t rsa -b 4096 -N '' -f /etc/ssh/ssh_host_rsa_key
+        ssh-keygen -t dsa -N '' -f /etc/ssh/ssh_host_dsa_key
+        ssh-keygen -t ecdsa -N '' -f /etc/ssh/ssh_host_ecdsa_key
+        ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key || true
+    fi
+}
+
+
+
+case "$1" in
+  start|reload|force-reload|restart)
+	sshkey_start
+	;;
+  *)
+	log_action_msg "Usage: /etc/init.d/ssh-keys {start|restart}" || true
+	exit 1
+esac
+
+exit 0
