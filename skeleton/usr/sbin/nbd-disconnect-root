@@ -76,8 +76,3 @@ done
 test -n "$root" || exit 0
 
 trap "disconnect" 0 HUP INT QUIT KILL SEGV PIPE TERM
-sync
-# Give up to 5 seconds for other services to be called.
-# If they finish before that time, process termination will start, and the trap
-# will be called.
-sleep 5
