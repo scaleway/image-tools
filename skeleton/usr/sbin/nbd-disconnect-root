@@ -39,9 +39,8 @@ disconnect() {
     # $NBD_CLIENT -d "$root"
     # $command
 
-    # UGLY!
+    # Hack
     $NBD_CLIENT -d "$root"
-    # Hopefully this should never be reached
     echo "$key" > /proc/sysrq-trigger
 }
 
