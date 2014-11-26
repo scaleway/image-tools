@@ -66,24 +66,9 @@ cat <<EOF
 EOF
 }
 
-nbd_clients_connection() {
-  keys=$(get_value VOLUMES)
-  for key in $keys; do
-    test $key -eq 0 && continue
-    NBD_DEVICE=/dev/nbd$key
-    until $NBD_CLIENT -c $NBD_DEVICE
-    do
-      /etc/init.d/xnbd-common stop
-      /etc/init.d/xnbd-common start
-      sleep 5
-    done
-  done
-}
-
 get_metadata
 get_nbd_client_conf > /etc/xnbd.conf
 tac /etc/xnbd.conf | sed  "2 s/},/}/" | tac > /etc/xnbd.conf.new
 mv /etc/xnbd.conf.new /etc/xnbd.conf
-# nbd_clients_connection
 rm $METADATA_CACHE
 
