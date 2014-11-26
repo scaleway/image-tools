@@ -5,7 +5,7 @@
 # Required-Stop:     umountroot
 # Default-Start:
 # Default-Stop:      0 6
-# Short-Description: Turn off swap and unmount all local file systems.
+# Short-Description: Turn off swap and disconnect nbd clients.
 # Description:
 ### END INIT INFO
 
