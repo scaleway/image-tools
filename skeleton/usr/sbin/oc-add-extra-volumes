@@ -84,6 +84,6 @@ get_metadata
 get_nbd_client_conf > /etc/xnbd.conf
 tac /etc/xnbd.conf | sed  "2 s/},/}/" | tac > /etc/xnbd.conf.new
 mv /etc/xnbd.conf.new /etc/xnbd.conf
-nbd_clients_connection
+# nbd_clients_connection
 rm $METADATA_CACHE
 
