@@ -1,0 +1,38 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          disconnectnbdroot
+# Required-Start:
+# Required-Stop:
+# Default-Start:
+# Default-Stop:      0 6
+# Short-Description: Disconnect nbd root device
+# Description:
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+. /lib/init/vars.sh
+
+. /lib/lsb/init-functions
+
+umask 022
+
+case "$1" in
+  start)
+    # No-op
+    ;;
+  stop)
+        if [ -x /usr/sbin/nbd-disconnect-root ]; then
+          /usr/sbin/nbd-disconnect-root
+        fi
+    ;;
+  restart|reload|force-reload)
+        echo "$NAME does not support restarting." >&2
+        exit 1
+    ;;
+  *)
+    echo "Usage: $0 start|stop" >&2
+    exit 1
+    ;;
+esac
+
+:

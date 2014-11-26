@@ -29,9 +29,6 @@ else
 fi
 
 disconnect() {
-    # Stop trapping
-    trap - 0 HUP INT QUIT KILL SEGV PIPE TERM
-
     # ltsp-client-core.upstart needs "console output" to show stderr
     echo "nbd-disconnect executing: " >&2
     # Cache the command in order to use it after nbd-client disconnects /!\ Doesn't work
@@ -75,4 +72,3 @@ for param in $(cat /proc/cmdline); do
 done
 test -n "$root" || exit 0
 
-trap "disconnect" 0 HUP INT QUIT KILL SEGV PIPE TERM
