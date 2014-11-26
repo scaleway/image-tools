@@ -34,11 +34,13 @@ disconnect() {
 
     # ltsp-client-core.upstart needs "console output" to show stderr
     echo "nbd-disconnect executing: " >&2
-    # Cache the command in order to use it after nbd-client disconnects
-    $command --version >/dev/null 2>&1
-    $NBD_CLIENT -d "$root"
-    $command
+    # Cache the command in order to use it after nbd-client disconnects /!\ Doesn't work
+    # $command --version >/dev/null 2>&1
+    # $NBD_CLIENT -d "$root"
+    # $command
 
+    # UGLY!
+    $NBD_CLIENT -d "$root"
     # Hopefully this should never be reached
     echo "$key" > /proc/sysrq-trigger
 }
@@ -48,7 +50,7 @@ while read device etc; do
     case "$device" in
         /dev/nbd[0-9])
             swapoff "$device"
-            NBD_CLIENT -d "$device"
+            $NBD_CLIENT -d "$device"
             ;;
         /dev/mapper/swap[0-9])
             nbd_device=$(cryptsetup status "$device" | awk '/device:/{print $2}')
@@ -56,7 +58,7 @@ while read device etc; do
             cryptsetup remove "$device"
             case "$nbd_device" in
                 /dev/nbd[1-9])
-                    NBD_CLIENT -d "$nbd_device"
+                    $NBD_CLIENT -d "$nbd_device"
                     ;;
             esac
             ;;
