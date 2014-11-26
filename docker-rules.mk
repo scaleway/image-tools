@@ -1,11 +1,13 @@
-DOCKER_NAMESPACE ?= armbuild/
-DISK ?= /dev/nbd1
-S3_URL ?= s3://test-images
-IS_LATEST ?= 0
-BUILDDIR ?= /tmp/build/$(NAME)-$(VERSION)/
-HELP_URL ?= https://community.cloud.online.net
-TITLE ?= $(NAME)
-DESCRIPTION ?= $(TITLE)
+DOCKER_NAMESPACE ?=	armbuild/
+DISK ?=			/dev/nbd1
+S3_URL ?=		s3://test-images
+IS_LATEST ?=		0
+BUILDDIR ?=		/tmp/build/$(NAME)-$(VERSION)/
+SOURCE_URL ?=		https://github.com/online-labs/image-builder
+DOC_URL ?=		https://doc.cloud.online.net
+HELP_URL ?=		https://community.cloud.online.net
+TITLE ?=		$(NAME)
+DESCRIPTION ?=		$(TITLE)
 
 
 .PHONY: build release install_on_disk publish_on_s3 clean shell re all
@@ -82,6 +84,8 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	echo "IMAGE_CODENAME=$(NAME)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	echo "IMAGE_DESCRIPTION=\"$(DESCRIPTION)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	echo "IMAGE_HELP_URL=\"$(HELP_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
+	echo "IMAGE_SOURCE_URL=\"$(SOURCE_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
+	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	mv $(BUILDDIR)rootfs.tmp $(BUILDDIR)rootfs
 
 
