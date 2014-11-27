@@ -5,6 +5,7 @@
 # Required-Stop:
 # Default-Start:
 # Default-Stop:      6
+# X-Stop-After: umountroot
 # Short-Description: Disconnect nbd root device
 # Description:
 ### END INIT INFO
