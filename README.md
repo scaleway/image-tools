@@ -10,5 +10,26 @@ Upgrade a running image
 -----------------------
 
 ```bash
-curl https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | bash
+wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | bash
+```
+
+Using flavors
+-------------
+
+```bash
+# upstart
+wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | FLAVORS=upstart bash
+```
+
+```bash
+# sysvinit
+wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | FLAVORS=sysvinit bash
+```
+
+Using branches
+--------------
+
+```bash
+# flavor=upstart on branch=feature-xxx
+wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | FLAVORS=upstart BRANCH=feature-xxx bash
 ```
