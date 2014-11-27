@@ -28,7 +28,7 @@ case "$1" in
     fi
     ;;
   restart|reload|force-reload)
-    echo "$NAME does not support restarting." >&2
+    echo "disconnectnbd does not support restarting." >&2
     exit 1
     ;;
   *)
