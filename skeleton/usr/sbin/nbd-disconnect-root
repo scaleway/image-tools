@@ -1,23 +1,16 @@
 #!/bin/sh
 # Thanks to the LTSP project
-# If the root /dev/nbd0 device is unmounted on shutdown then nbd read
+# If the root /dev/nbd0 device is unmounted on reboot then nbd read
 # errors occur, and if it isn't, then # the nbd-server process on the server
 # doesn't terminate.
-# Called by init scripts on reboot or shutdown.
-
-export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
+# Called by init scripts on reboot.
 
 case "$RUNLEVEL" in
-    0)
-        key="o"
-        command="poweroff -f"
-        ;;
     6)
         key="b"
-        command="reboot -d -f -i"
         ;;
     *)
-        echo "nbd-disconnect should only be called by initscripts on reboot/shutdown." >&2
+        echo "nbd-disconnect should only be called by initscripts on reboot." >&2
         exit 1
         ;;
 esac
@@ -29,14 +22,6 @@ else
 fi
 
 disconnect() {
-    # ltsp-client-core.upstart needs "console output" to show stderr
-    echo "nbd-disconnect executing: " >&2
-    # Cache the command in order to use it after nbd-client disconnects /!\ Doesn't work
-    # $command --version >/dev/null 2>&1
-    # $NBD_CLIENT -d "$root"
-    # $command
-
-    # Hack
     $NBD_CLIENT -d "$root"
     echo "$key" > /proc/sysrq-trigger
 }
@@ -61,7 +46,6 @@ while read device etc; do
     esac
 done < /proc/swaps
 
-# If we're not using an nbd root, exit
 unset root
 for param in $(cat /proc/cmdline); do
     case "$param" in
@@ -71,4 +55,4 @@ for param in $(cat /proc/cmdline); do
     esac
 done
 test -n "$root" || exit 0
-
+disconnect

@@ -1,10 +1,10 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          disconnectnbdroot
+# Provides:          disconnectnbd
 # Required-Start:
 # Required-Stop:
 # Default-Start:
-# Default-Stop:      0 6
+# Default-Stop:      6
 # Short-Description: Disconnect nbd root device
 # Description:
 ### END INIT INFO
@@ -21,13 +21,14 @@ case "$1" in
     # No-op
     ;;
   stop)
-        if [ -x /usr/sbin/nbd-disconnect-root ]; then
-          /usr/sbin/nbd-disconnect-root
-        fi
+    log_daemon_msg "Disconnect nbd root volume"
+    if [ -x /usr/sbin/nbd-disconnect-root ]; then
+      /usr/sbin/nbd-disconnect-root
+    fi
     ;;
   restart|reload|force-reload)
-        echo "$NAME does not support restarting." >&2
-        exit 1
+    echo "$NAME does not support restarting." >&2
+    exit 1
     ;;
   *)
     echo "Usage: $0 start|stop" >&2

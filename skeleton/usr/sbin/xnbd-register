@@ -115,8 +115,8 @@ def call(command, description):
 def start_client(device, data):
 	start_cmd = [XNBD_CLIENT, '/dev/%s' % (device), '--connect']
 	if ('name' in data):
-		start_cmd.append("--exportname")
 		start_cmd.append("--retry=0")
+		start_cmd.append("--exportname")
 		start_cmd.append(data['name'])
 
 	start_cmd.append(data['host'])

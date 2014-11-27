@@ -45,13 +45,7 @@ cat <<EOF
 {
 EOF
   for key in $keys; do
-    # Do not include the rootfs in nbd configuration file. It has been mounted
-    # from the initramfs, we won't want it to be disconnected when
-    # /etc/rc6.d/K34(x)nbd-client is executed.
     test $key -eq 0 && continue
-
-
-# NBD_TYPE[x]=r => raw (no other setup than to run the client)
     cat <<EOF
   "nbd$key": {
     "host": "$(get_value VOLUMES_${key}_EXPORT_URI | sed 's|nbd://\(.*\):.*|\1|')",
