@@ -2,6 +2,9 @@
 
 METADATA_CACHE=`mktemp -u`
 
+include_nbd0=no
+[ "$1" = "--include-nbd0" ] && include_nbd0=yes
+
 export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
 
 if [ -e /usr/sbin/xnbd-client ]; then
@@ -45,7 +48,12 @@ cat <<EOF
 {
 EOF
   for key in $keys; do
-    test $key -eq 0 && continue
+    if [ "$include_nbd0" = "no" ]; then
+      # Do not include the rootfs in nbd configuration file. It has been mounted
+      # from the initramfs, we won't want it to be disconnected when
+      # /etc/rc6.d/K34nbd-client is executed.
+      test $key -eq 0 && continue
+    fi
     cat <<EOF
   "nbd$key": {
     "host": "$(get_value VOLUMES_${key}_EXPORT_URI | sed 's|nbd://\(.*\):.*|\1|')",
