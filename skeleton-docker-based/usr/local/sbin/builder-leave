@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# This script will clean the rootfs for a normal usage.
+# Globally, it will cancel effects of the builder-enter script.
+# It also clean rootfs to make image "forkable"
+
+set -e
+
+# unprevent init scripts from running during install/update
+dpkg-divert --remove /sbin/initctl
+rm -f /usr/sbin/policy-rc.d /sbin/initctl /sbin/initctl.distrib
+mv /sbin/initctl.orig /sbin/initctl
+chmod 755 /sbin/initctl
+
+# Ensure /dev as the minimum devices set
+test -c /dev/null     || mknod -m 0666 /dev/null     c 1 3
+test -c /dev/zero     || mknod -m 0666 /dev/zero     c 1 5
+test -c /dev/full     || mknod -m 0666 /dev/full     c 1 7
+test -c /dev/tty      || mknod -m 0666 /dev/tty      c 5 0
+test -c /dev/tty0     || mknod -m 0640 /dev/tty0     c 4 0
+test -c /dev/urandom  || mknod -m 0666 /dev/urandom  c 1 9
+test -c /dev/random   || mknod -m 0666 /dev/random   c 1 8
+test -c /dev/console  || mknod -m 0600 /dev/console  c 5 1
+
+
+# remove potentially existing docker aptitude tuning
+rm -f /etc/apt/apt.conf.d/docker-*
+#rm -f /.dockerenv /.dockerinit
+
+# remove ssh host keys so they are regenerated on first boot
+rm -f /etc/ssh/*_key*
+
+# clean history
+rm -f /root/.history /root/.bash_history
+
+# clean aptitude
+rm -f /var/cache/apt/*.bin /var/cache/apt/archives/partial/*.deb \
+      /var/cache/apt/archives/*.deb
+
+# clean debootstrap
+rm -f /var/log/bootstrap.log
+
+# Update locate cache
+updatedb || true
