@@ -28,6 +28,9 @@ get_value() {
 get_nbd_client_conf() {
   keys=$(get_value VOLUMES)
 
+# Ensure /etc/nbd-client contains KILLALL=false
+(cat /etc/nbd-client | grep -v '^KILLALL'; echo KILLALL=false) > /tmp/nbd-client.tmp; mv /tmp/nbd-client.tmp /etc/nbd-client
+
 cat <<EOF
 # xnbd.conf - xnbd-register configuration file
 
