@@ -19,9 +19,14 @@ case "$lsb_dist" in
                 update-rc.d disconnectnbd defaults
                 exit 0
                 ;;
+            *)
+                    echo "Unsupported $lsb_dist release ($lsb_release)" >&2
+                    exit 1
+                ;;
         esac
         ;;
+    *)
+        echo "Unsupported distribution $lsb_dist ($lsb_release)" >&2
+        exit 1
+        ;;
 esac
-
-echo "Unsupported distribution $lsb_dist ($lsb_release)" >&2
-exit 1
