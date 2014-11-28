@@ -1,11 +1,11 @@
 #!/bin/bash
-
-# This script will prepare the rootfs for the image-builder toolsuite
+# This script will prepare the rootfs for the docker-based image-builder toolsuite
 
 set -e
 
 lsb_dist="$(. /etc/lsb-release && echo "$DISTRIB_ID")"
 lsb_release="$(. /etc/lsb-release && echo "$DISTRIB_RELEASE")"
+
 case "$lsb_dist" in
     Ubuntu)
         # prevent init scripts from running during install/update
