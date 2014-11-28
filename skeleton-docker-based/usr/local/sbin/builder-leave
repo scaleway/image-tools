@@ -7,10 +7,24 @@
 set -e
 
 # unprevent init scripts from running during install/update
-dpkg-divert --remove /sbin/initctl
-rm -f /usr/sbin/policy-rc.d /sbin/initctl /sbin/initctl.distrib
-mv /sbin/initctl.orig /sbin/initctl
-chmod 755 /sbin/initctl
+lsb_dist="$(. /etc/lsb-release && echo "$DISTRIB_ID")"
+lsb_release="$(. /etc/lsb-release && echo "$DISTRIB_RELEASE")"
+case "$lsb_dist" in
+    Ubuntu)
+        dpkg-divert --remove /sbin/initctl
+        rm -f /usr/sbin/policy-rc.d /sbin/initctl /sbin/initctl.distrib
+        mv /sbin/initctl.orig /sbin/initctl
+        chmod 755 /sbin/initctl
+        ;;
+    Debian)
+        dpkg-divert --remove /sbin/initctl
+        rm -f /usr/sbin/policy-rc.d /sbin/initctl /sbin/initctl.distrib
+        ;;
+    *)
+        echo "Unsupported distribution $lsb_dist ($lsb_release)" >&2
+        exit 1
+        ;;
+esac
 
 # Ensure /dev as the minimum devices set
 test -c /dev/null     || mknod -m 0666 /dev/null     c 1 3

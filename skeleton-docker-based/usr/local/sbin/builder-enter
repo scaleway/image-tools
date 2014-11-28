@@ -4,11 +4,25 @@
 
 set -e
 
-# prevent init scripts from running during install/update
-printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
-if [ -f /sbin/initctl.distrib ]; then
-    mv /sbin/initctl.distrib /sbin/initctl
-fi
-cp /sbin/initctl /sbin/initctl.orig
-printf '#!/bin/sh\nexit 0\n' > /sbin/initctl
-dpkg-divert --local --rename --add /sbin/initctl
+lsb_dist="$(. /etc/lsb-release && echo "$DISTRIB_ID")"
+lsb_release="$(. /etc/lsb-release && echo "$DISTRIB_RELEASE")"
+case "$lsb_dist" in
+    Ubuntu)
+        # prevent init scripts from running during install/update
+        printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
+        if [ -f /sbin/initctl.distrib ]; then
+            mv /sbin/initctl.distrib /sbin/initctl
+        fi
+        cp /sbin/initctl /sbin/initctl.orig
+        printf '#!/bin/sh\nexit 0\n' > /sbin/initctl
+        dpkg-divert --local --rename --add /sbin/initctl
+        ;;
+    Debian)
+        # prevent init scripts from running during install/update
+        printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
+        ;;
+    *)
+        echo "Unsupported distribution $lsb_dist ($lsb_release)" >&2
+        exit 1
+        ;;
+esac
