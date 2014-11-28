@@ -23,5 +23,5 @@ case "$lsb_dist" in
         ;;
 esac
 
-echo "Unsupported distribution $DISTRIB_ID ($DISTRIB_RELEASE)" >&2
+echo "Unsupported distribution $lsb_dist ($lsb_release)" >&2
 exit 1
