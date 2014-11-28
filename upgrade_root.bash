@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BRANCH=${BRANCH:-master}
-FLAVORS=${FLAVORS:-$@}
+FLAVORS=$(echo ${FLAVORS:-$@} | tr "," " ")
 
 apply_flavor() {
     flavor="$1"
