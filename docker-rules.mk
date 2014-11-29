@@ -67,7 +67,7 @@ shell:  .docker-container.built
 
 
 .docker-container.built: Dockerfile
-	-find patches -name '*~' -delete
+	-find patches -name '*~' -delete || true
 	docker build -t $(NAME):$(VERSION) .
 	docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
 	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > .docker-container.built
