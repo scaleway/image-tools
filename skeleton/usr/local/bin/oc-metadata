@@ -4,17 +4,25 @@
 
 export PATH="${PATH:+$PATH:}/usr/bin:/bin"
 
-CODE=0
-while [ $CODE -ne 200 ]
-do
-    METADATA_URL=${METADATA_URL:-"http://169.254.42.42/conf"}
-    RESPONSE=$(curl --silent --write-out "\n%{http_CODE}\n" $METADATA_URL)
-    CODE=$(echo "$RESPONSE" | sed -n '$p')
-    BODY=$(echo "$RESPONSE" | sed '$d')
+CACHE_FILE=/var/run/oc-metadata.cache
 
-    test $CODE -eq 200 && break
-    sleep 5
-done
+if [ "$1" = "--cached" -a -f $CACHE_FILE ]; then
+    shift
+    BODY=$(cat $CACHE_FILE)
+else
+    CODE=0
+    while [ $CODE -ne 200 ]
+    do
+        METADATA_URL=${METADATA_URL:-"http://169.254.42.42/conf"}
+        RESPONSE=$(curl --silent --write-out "\n%{http_CODE}\n" $METADATA_URL)
+        CODE=$(echo "$RESPONSE" | sed -n '$p')
+        BODY=$(echo "$RESPONSE" | sed '$d')
+        echo "$BODY" > /var/run/oc-metadata.cache
+
+        test $CODE -eq 200 && break
+        sleep 5
+    done
+fi
 
 if [ "$#" -ne 1 ]; then
     echo "$BODY"
