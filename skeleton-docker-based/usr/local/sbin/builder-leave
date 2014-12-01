@@ -7,8 +7,8 @@
 set -e
 
 # unprevent init scripts from running during install/update
-lsb_dist="$(. /etc/lsb-release && echo "$DISTRIB_ID")"
-lsb_release="$(. /etc/lsb-release && echo "$DISTRIB_RELEASE")"
+lsb_dist="$(lsb_release -si || (. /etc/lsb-release && echo "$DISTRIB_ID"))"
+lsb_release="$(lsb_release -sr || (. /etc/lsb-release && echo "$DISTRIB_RELEASE"))"
 case "$lsb_dist" in
     Ubuntu)
         dpkg-divert --remove /sbin/initctl
