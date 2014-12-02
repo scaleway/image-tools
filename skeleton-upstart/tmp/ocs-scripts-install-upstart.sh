@@ -9,8 +9,10 @@ lsb_release="$(. /etc/lsb-release && echo "$DISTRIB_RELEASE")"
 rm -f /etc/init/nbd-root-disconnect.conf
 
 # Use xnbd-client instead of nbd-client
-mv /usr/bin/nbd-client /usr/bin/nbd-client.orig
-ln -s /usr/bin/xnbd-client /usr/bin/nbd-client
+NBD_CLIENT=$(which nbd-client)
+XNBD_CLIENT=$(which xnbd-client)
+mv $NBD_CLIENT $NBD_CLIENT.orig
+ln -s $XNBD_CLIENT $NBD_CLIENT
 # FIXME: add a dpkg-divert to be upgrade-proof
 
 case "$lsb_dist" in
