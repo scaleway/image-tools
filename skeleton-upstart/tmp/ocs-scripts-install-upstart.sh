@@ -8,6 +8,11 @@ lsb_release="$(. /etc/lsb-release && echo "$DISTRIB_RELEASE")"
 # When using this script to upgrade an old image, we need to clean some old files
 rm -f /etc/init/nbd-root-disconnect.conf
 
+# Use xnbd-client instead of nbd-client
+mv /usr/bin/nbd-client /usr/bin/nbd-client.orig
+ln -s /usr/bin/xnbd-client /usr/bin/nbd-client
+# FIXME: add a dpkg-divert to be upgrade-proof
+
 case "$lsb_dist" in
     Ubuntu)
         case "$lsb_release" in
