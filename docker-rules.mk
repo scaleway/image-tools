@@ -78,6 +78,7 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	-mkdir -p $(BUILDDIR)rootfs.tmp
 	tar -C $(BUILDDIR)rootfs.tmp -xf $(BUILDDIR)export.tar
 	rm -f $(BUILDDIR)rootfs.tmp/.dockerenv $(BUILDDIR)rootfs.tmp/.dockerinit
+	chmod 1777 $(BUILDDIR)rootfs.tmp/tmp/
 	rm -rf $(BUILDDIR)rootfs
 	echo "IMAGE_ID=\"$(TITLE)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
