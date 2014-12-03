@@ -22,7 +22,7 @@ case "$lsb_dist" in
                 ln -s /etc/init.d/disconnectnbd /etc/rc6.d/S89disconnectnbd
                 exit 0
                 ;;
-            14.10)
+            14.10|15.04)
                 update-rc.d disconnectnbd defaults
                 exit 0
                 ;;
