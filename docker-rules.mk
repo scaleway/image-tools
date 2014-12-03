@@ -74,12 +74,14 @@ shell:  .docker-container.built
 
 
 $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
-	-rm -rf $(BUILDDIR)rootfs.tmp
+	-rm -rf $(BUILDDIR)rootfs $(BUILDDIR)rootfs.tmp
 	-mkdir -p $(BUILDDIR)rootfs.tmp
 	tar -C $(BUILDDIR)rootfs.tmp -xf $(BUILDDIR)export.tar
 	rm -f $(BUILDDIR)rootfs.tmp/.dockerenv $(BUILDDIR)rootfs.tmp/.dockerinit
-	chmod 1777 $(BUILDDIR)rootfs.tmp/tmp/
-	rm -rf $(BUILDDIR)rootfs
+	chmod 1777 $(BUILDDIR)rootfs.tmp/tmp
+	chmod 755 $(BUILDDIR)rootfs.tmp/etc $(BUILDDIR)rootfs.tmp/usr $(BUILDDIR)rootfs.tmp/usr/local $(BUILDDIR)rootfs.tmp/usr/sbin
+	chmod 555 $(BUILDDIR)rootfs.tmp/sys
+	-mv $(BUILDDIR)rootfs.tmp/etc/hosts.default $(BUILDDIR)rootfs.tmp/etc/hosts || true
 	echo "IMAGE_ID=\"$(TITLE)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	echo "IMAGE_CODENAME=$(NAME)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
