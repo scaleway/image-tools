@@ -37,8 +37,13 @@ Official images are available when creating a new server
   - [Ubuntu](https://github.com/online-labs/image-ubuntu) (14.04, 14.10, 15.04)
   - [Debian](https://github.com/online-labs/image-debian) (wheezy)
 - Apps
+  - [Docker](https://github.com/online-labs/image-app-docker)
+  - [Ghost](https://github.com/online-labs/image-app-ghost)
+  - [Owncloud](https://github.com/online-labs/image-app-owncloud)
+  - [Pydio](https://github.com/online-labs/image-app-pydio)
   - [Wordpress](https://github.com/online-labs/image-app-wordpress)
 - Services
+  - [Try-it](https://github.com/online-labs/image-service-tryit)
   - [Rescue](https://github.com/online-labs/image-service-rescue)
 
 Unofficial images
