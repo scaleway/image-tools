@@ -34,17 +34,17 @@ Official images
 Official images are available when creating a new server
 
 - Distributions
-  - [Ubuntu](https://github.com/online-labs/image-ubuntu) (14.04, 14.10, 15.04)
-  - [Debian](https://github.com/online-labs/image-debian) (wheezy)
+  - [Ubuntu](https://github.com/online-labs/image-ubuntu): Ubuntu with init scripts and common packages (available tags: 14.04, 14.10, 15.04)
+  - [Debian](https://github.com/online-labs/image-debian): Debian with init scripts and common packages
 - Apps
-  - [Docker](https://github.com/online-labs/image-app-docker)
-  - [Ghost](https://github.com/online-labs/image-app-ghost)
-  - [Owncloud](https://github.com/online-labs/image-app-owncloud)
-  - [Pydio](https://github.com/online-labs/image-app-pydio)
-  - [Wordpress](https://github.com/online-labs/image-app-wordpress)
-- Services
-  - [Try-it](https://github.com/online-labs/image-service-tryit)
-  - [Rescue](https://github.com/online-labs/image-service-rescue)
+  - [Docker](https://github.com/online-labs/image-app-docker): Ready-to use docker 1.3.2 + fig + nsenter + gosu + pipework
+  - [Ghost](https://github.com/online-labs/image-app-ghost): [Ghost blogging platform](https://ghost.org) InstantApp
+  - [Owncloud](https://github.com/online-labs/image-app-owncloud): [Owncloud](http://owncloud.org) InstantApp
+  - [Pydio](https://github.com/online-labs/image-app-pydio): [Pydio](https://pyd.io) InstantApp
+  - [Wordpress](https://github.com/online-labs/image-app-wordpress): [Wordpress blogging system](https://www.wordpress.com) InstantApp
+- Services: this image are not available when creating a new server
+  - [Try-it](https://github.com/online-labs/image-service-tryit): The image running on servers used on the [http://labs.online.net/](try-it page). Contains docker and a tty.js daemon to expose a shell on the web
+  - [Rescue](https://github.com/online-labs/image-service-rescue): This image is only available using the rescue bootscript and will be fully loaded in RAM at boot
 
 Unofficial images
 -----------------
