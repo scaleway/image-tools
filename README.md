@@ -10,6 +10,36 @@ Getting start
 
 You can look the docker-based build [example](https://github.com/online-labs/image-tools/tree/master/examples)
 
+
+Official images
+---------------
+
+Official images are available when creating a new server
+
+- Distributions
+  - [Ubuntu](https://github.com/online-labs/image-ubuntu): Ubuntu with init scripts and common packages (available tags: 14.04, 14.10, 15.04)
+  - [Debian](https://github.com/online-labs/image-debian): Debian with init scripts and common packages
+- Apps
+  - [Docker](https://github.com/online-labs/image-app-docker): Ready-to use docker 1.3.2 + fig + nsenter + gosu + pipework
+  - [Ghost](https://github.com/online-labs/image-app-ghost): [Ghost blogging platform](https://ghost.org) InstantApp
+  - [Owncloud](https://github.com/online-labs/image-app-owncloud): [Owncloud](http://owncloud.org) InstantApp
+  - [Pydio](https://github.com/online-labs/image-app-pydio): [Pydio](https://pyd.io) InstantApp
+  - [Wordpress](https://github.com/online-labs/image-app-wordpress): [Wordpress blogging system](https://www.wordpress.com) InstantApp
+- Services: this image are not available when creating a new server
+  - [Try-it](https://github.com/online-labs/image-service-tryit): The image running on servers used on the [http://labs.online.net/](try-it page). Contains docker and a tty.js daemon to expose a shell on the web
+  - [Rescue](https://github.com/online-labs/image-service-rescue): This image is only available using the rescue bootscript and will be fully loaded in RAM at boot
+
+Unofficial images
+-----------------
+
+Unofficial images are only available to those who build them.
+
+For the one using the Docker-based builder, they can also be used as a parent image.
+
+- [moul's devbox](https://github.com/moul/ocs-image-devbox): Based on the [official Docker image](https://github.com/online-labs/image-app-docker)
+- [mxs' 3.2 perf](https://github.com/aimxhaisse/image-ocs-perf-3.2): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
+- [mxs' 3.17 perf](https://github.com/aimxhaisse/image-ocs-perf-3.17): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
+
 Builders
 --------
 
@@ -60,32 +90,3 @@ docker-rules.mk:
 wget -qO - https://raw.githubusercontent.com/online-labs/image-tools/master/install.sh | bash
 -include docker-rules.mk
 ```
-
-Official images
----------------
-
-Official images are available when creating a new server
-
-- Distributions
-  - [Ubuntu](https://github.com/online-labs/image-ubuntu): Ubuntu with init scripts and common packages (available tags: 14.04, 14.10, 15.04)
-  - [Debian](https://github.com/online-labs/image-debian): Debian with init scripts and common packages
-- Apps
-  - [Docker](https://github.com/online-labs/image-app-docker): Ready-to use docker 1.3.2 + fig + nsenter + gosu + pipework
-  - [Ghost](https://github.com/online-labs/image-app-ghost): [Ghost blogging platform](https://ghost.org) InstantApp
-  - [Owncloud](https://github.com/online-labs/image-app-owncloud): [Owncloud](http://owncloud.org) InstantApp
-  - [Pydio](https://github.com/online-labs/image-app-pydio): [Pydio](https://pyd.io) InstantApp
-  - [Wordpress](https://github.com/online-labs/image-app-wordpress): [Wordpress blogging system](https://www.wordpress.com) InstantApp
-- Services: this image are not available when creating a new server
-  - [Try-it](https://github.com/online-labs/image-service-tryit): The image running on servers used on the [http://labs.online.net/](try-it page). Contains docker and a tty.js daemon to expose a shell on the web
-  - [Rescue](https://github.com/online-labs/image-service-rescue): This image is only available using the rescue bootscript and will be fully loaded in RAM at boot
-
-Unofficial images
------------------
-
-Unofficial images are only available to those who build them.
-
-For the one using the Docker-based builder, they can also be used as a parent image.
-
-- [moul's devbox](https://github.com/moul/ocs-image-devbox): Based on the [official Docker image](https://github.com/online-labs/image-app-docker)
-- [mxs' 3.2 perf](https://github.com/aimxhaisse/image-ocs-perf-3.2): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
-- [mxs' 3.17 perf](https://github.com/aimxhaisse/image-ocs-perf-3.17): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
