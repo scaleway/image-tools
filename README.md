@@ -22,28 +22,44 @@ Commands
 
     # build the image in a rootfs directory
     $ make rootfs
-    
+
     # build a tarball of the image
     $ make rootfs.tar
-    
+
     # build a squashfs of the image
     $ make rootfs.sqsh
-    
+
     # push the rootfs.tar on s3
     $ make publish_on_s3.tar
-    
+
     # push the rootfs.sqsh on s3
     $ make publish_on_s3.sqsh
-    
+
     # write the image to /dev/nbd1
     $ make install_on_disk
-    
+
     # push the image on docker registry
     $ make release
-    
+
     # clean
     $ make clean
 
+
+Install .mk files
+-----------------
+
+    # From a shell
+    wget -qO - https://raw.githubusercontent.com/online-labs/image-tools/master/install.sh | bash
+
+Of in a Makefile ([example](https://github.com/online-labs/image-tools/blob/master/examples/Makefile))
+
+```makefile
+## Image tools  (https://github.com/online-labs/image-tools)
+all:    docker-rules.mk
+docker-rules.mk:
+wget -qO - https://raw.githubusercontent.com/online-labs/image-tools/master/install.sh | bash
+-include docker-rules.mk
+```
 
 Official images
 ---------------
