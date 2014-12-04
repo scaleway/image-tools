@@ -31,6 +31,8 @@ Commands
 Official images
 ---------------
 
+Official images are available when creating a new server
+
 - Distributions
   - [Ubuntu](https://github.com/online-labs/image-ubuntu) (14.04, 14.10, 15.04)
   - [Debian](https://github.com/online-labs/image-debian) (wheezy)
@@ -38,3 +40,12 @@ Official images
   - [Wordpress](https://github.com/online-labs/image-app-wordpress)
 - Services
   - [Rescue](https://github.com/online-labs/image-service-rescue)
+
+Unofficial images
+-----------------
+
+Unofficial images are only available to those who build them.
+
+For the one using the Docker-based builder, they can also be used as a parent image.
+
+- [moul's devbox](https://github.com/moul/ocs-image-devbox): Based on the [official Docker image](https://github.com/online-labs/image-app-docker)
