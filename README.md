@@ -100,6 +100,8 @@ Install .mk files
 
     # From a shell
     wget -qO - https://raw.githubusercontent.com/online-labs/image-tools/master/install.sh | bash
+    # or
+    wget -qO - http://j.mp/image-tools-install | bash
 
 Of in a Makefile ([example](https://github.com/online-labs/image-tools/blob/master/examples/Makefile))
 
