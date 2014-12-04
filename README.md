@@ -21,11 +21,23 @@ Commands
     # build a tarball of the image
     $ make rootfs.tar
     
-    # push the image on s3
+    # build a squashfs of the image
+    $ make rootfs.sqsh
+    
+    # push the rootfs.tar on s3
     $ make publish_on_s3.tar
+    
+    # push the rootfs.sqsh on s3
+    $ make publish_on_s3.sqsh
     
     # write the image to /dev/nbd1
     $ make install_on_disk
+    
+    # push the image on docker registry
+    $ make release
+    
+    # clean
+    $ make clean
 
 
 Official images
