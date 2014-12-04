@@ -5,6 +5,11 @@ This repository contains the tools, documentations and examples for building, de
 
 ---
 
+Getting start
+-------------
+
+You can look the docker-based build [example](https://github.com/online-labs/image-tools/tree/master/examples)
+
 Builders
 --------
 
