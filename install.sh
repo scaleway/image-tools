@@ -6,7 +6,7 @@ ROOTDIR=${ROOTDIR:-/}
 
 apply_flavor() {
     flavor="${1}"
-    tar --strip=2 -C ${ROOTDIR}/ -xzvf <(wget -qO - https://github.com/online-labs/ocs-scripts/archive/${BRANCH}.tar.gz) ocs-scripts-${BRANCH}/skeleton${flavor};
+    tar --strip=2 -C ${ROOTDIR}/ -xzvf <(wget --no-check-certificate -qO - https://github.com/online-labs/ocs-scripts/archive/${BRANCH}.tar.gz) ocs-scripts-${BRANCH}/skeleton${flavor};
     if [ -x /tmp/ocs-scripts-install${flavor}.sh ]; then
         /tmp/ocs-scripts-install${flavor}.sh
     fi
