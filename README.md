@@ -8,7 +8,7 @@ This repository contains the tools, documentations and examples for building, de
 Getting start
 -------------
 
-You can look the docker-based build [example](https://github.com/online-labs/image-tools/tree/master/examples)
+You can look the docker-based [hello-world](https://github.com/online-labs/image-helloworld) image.
 
 
 Official images
@@ -121,7 +121,7 @@ Install .mk files
     # or
     wget -qO - http://j.mp/image-tools-install | bash
 
-Of in a Makefile ([example](https://github.com/online-labs/image-tools/blob/master/examples/Makefile))
+Or from a Makefile ([example](https://github.com/online-labs/image-helloworld/blob/master/Makefile))
 
 ```makefile
 ## Image tools  (https://github.com/online-labs/image-tools)
