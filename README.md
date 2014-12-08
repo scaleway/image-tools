@@ -45,10 +45,28 @@ Builders
 
 We currently have two kind of builders: Docker and Scripts
 
-FIXME
+Docker-based builder
+--------------------
+
+We use the [Docker's building system](https://docs.docker.com/reference/builder/) to build, debug and even run the generated images.
+
+We added some small hacks to let the image be fully runnable on a C1 server without Docker.
+
+FIXME: add technical information about hacks
+
+The advantages are :
+
+- Lots of available base images and examples on the [Docker's official registry](https://registry.hub.docker.com)
+- Easy inheritance between images ([app-timemachine](https://github.com/online-labs/image-app-timemachine) image inherits from [app-openvpn](https://github.com/online-labs/image-app-openvpn) image which inherits from [ubuntu](https://github.com/online-labs/image-ubuntu) image)
+- Easy debug with `docker run ...`
+- A well-known build format file (Dockerfile)
+- Docker's amazing builder advantages (speed, cache, tagging system)
 
 Commands
 --------
+
+    # Clone the hello world docker-based app
+    git clone https://github.com/online-labs/image-helloworld.git
 
     # build the image in a rootfs directory
     $ make rootfs
