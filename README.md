@@ -6,6 +6,11 @@ Scripts are built-in official images and some of them are also used in the offic
 
 It is planned to to create packages (.deb) for distributions.
 
+---
+
+The official images built with [image-tools](https://github.com/online-labs/image-tools) are using this repositoty.
+(i.e. [Ubuntu](https://github.com/online-labs/image-ubuntu), [Debian](https://github.com/online-labs/image-debian), [Docker app](https://github.com/online-labs/image-app-docker), [Wordpress app](https://github.com/online-labs/image-app-wordpress), ...
+
 Upgrade a running image
 -----------------------
 
