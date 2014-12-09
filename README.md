@@ -1,4 +1,4 @@
-ocs-scripts
+OCS scripts
 ===========
 
 This repository contains the scripts used to boot an image on [Online.net's cloud services](http://labs.online.net/).
