@@ -49,6 +49,10 @@ publish_on_s3.tar: $(BUILDDIR)rootfs.tar
 	s3cmd put --acl-public $(BUILDDIR)rootfs.tar $(S3_URL)/$(NAME)-$(VERSION).tar
 
 
+publish_on_s3.tar.gz: $(BUILDDIR)rootfs.tar.gz
+	s3cmd put --acl-public $(BUILDDIR)rootfs.tar.gz $(S3_URL)/$(NAME)-$(VERSION).tar.gz
+
+
 publish_on_s3.sqsh: $(BUILDDIR)rootfs.sqsh
 	s3cmd put --acl-public $(BUILDDIR)rootfs.sqsh $(S3_URL)/$(NAME)-$(VERSION).sqsh
 
@@ -90,6 +94,11 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	echo "IMAGE_SOURCE_URL=\"$(SOURCE_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
 	mv $(BUILDDIR)rootfs.tmp $(BUILDDIR)rootfs
+
+
+$(BUILDDIR)rootfs.tar.gz: $(BUILDDIR)rootfs
+	tar --format=gnu -C $(BUILDDIR)rootfs -czf $(BUILDDIR)rootfs.tar.gz.tmp .
+	mv $(BUILDDIR)rootfs.tar.gz.tmp $(BUILDDIR)rootfs.tar.gz
 
 
 $(BUILDDIR)rootfs.tar: $(BUILDDIR)rootfs
