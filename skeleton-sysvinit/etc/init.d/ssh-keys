@@ -19,15 +19,18 @@ sshkey_start() {
         mkdir -p /root/.ssh/
 	chmod 700 /root/.ssh
     fi
-    oc-metadata | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' > /root/.ssh/authorized_keys
 
-    if [ ! -f /etc/ssh/ssh_host_rsa_key ]
-    then
-        ssh-keygen -t rsa -b 4096 -N '' -f /etc/ssh/ssh_host_rsa_key
-        ssh-keygen -t dsa -N '' -f /etc/ssh/ssh_host_dsa_key
-        ssh-keygen -t ecdsa -N '' -f /etc/ssh/ssh_host_ecdsa_key
-        ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key || true
-    fi
+    (
+	oc-metadata | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' > /root/.ssh/authorized_keys &
+        if [ ! -f /etc/ssh/ssh_host_rsa_key ]
+        then
+                ssh-keygen -t rsa -b 2048 -N '' -f /etc/ssh/ssh_host_rsa_key &
+                ssh-keygen -t dsa -N '' -f /etc/ssh/ssh_host_dsa_key &
+                ssh-keygen -t ecdsa -N '' -f /etc/ssh/ssh_host_ecdsa_key &
+                ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key || true &
+        fi
+        wait `jobs -p` || true
+    )
 }
 
 
