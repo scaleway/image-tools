@@ -27,7 +27,7 @@ run: build
 	docker run -it --rm $(NAME):$(VERSION) /bin/bash
 
 
-release:
+release: build
 	docker tag  $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
 	docker tag  $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(shell date +%Y-%m-%d)
 	docker push $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
