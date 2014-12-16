@@ -38,7 +38,7 @@ release: build
 	fi
 
 
-install_on_disk: $(BUILDDIR)rootfs.tar /mnt/$(DISK)
+install_on_disk: /mnt/$(DISK)
 	tar -C /mnt/$(DISK) -xf $(BUILDDIR)rootfs.tar
 
 
@@ -118,7 +118,7 @@ $(BUILDDIR)export.tar: .docker-container.built
 	mv $(BUILDDIR)export.tar.tmp $(BUILDDIR)export.tar
 
 
-/mnt/$(DISK):
+/mnt/$(DISK): $(BUILDDIR)rootfs.tar
 	umount $(DISK) || true
 	mkfs.ext4 $(DISK)
 	mkdir -p /mnt/$(DISK)
