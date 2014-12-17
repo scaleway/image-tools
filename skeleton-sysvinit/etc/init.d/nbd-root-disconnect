@@ -12,8 +12,8 @@
 set -e
 
 nbddisconnectroot_stop() {
-    if [ -x /usr/sbin/nbd-disconnect-root ]; then
-        /usr/sbin/nbd-disconnect-root&
+    if [ -x /usr/sbin/oc-nbd-disconnect-root ]; then
+        /usr/sbin/oc-nbd-disconnect-root&
     fi
 }
 

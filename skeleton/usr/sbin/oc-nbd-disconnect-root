@@ -10,7 +10,7 @@ case "$RUNLEVEL" in
         key="b"
         ;;
     *)
-        echo "nbd-disconnect should only be called by initscripts on reboot." >&2
+        echo "oc-nbd-disconnect-root should only be called by initscripts on reboot." >&2
         exit 1
         ;;
 esac
