@@ -2,6 +2,8 @@
 # description "synchronizes kernel module"
 # author "Online Labs Cloud Team <cloud-team@labs.online.net>"
 
+set -e
+
 DIR=/lib/modules
 mkdir -p $DIR
 TMP_DIR=`mktemp -d -p $DIR`
