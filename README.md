@@ -30,6 +30,8 @@ Official images are available when creating a new server
   - [Pydio](https://github.com/online-labs/image-app-pydio): [Pydio](https://pyd.io) InstantApp
   - [Wordpress](https://github.com/online-labs/image-app-wordpress): [Wordpress blogging system](https://www.wordpress.com) InstantApp
   - [OpenVPN](https://github.com/online-labs/image-app-openvpn): Work in progress
+  - [Seedbox](https://github.com/online-labs/image-app-seedbox): Work in progress
+  - [Timemachine](https://github.com/online-labs/image-app-timemachine): Work in progress
   - [Mesos](https://github.com/online-labs/image-app-mesos): Work in progress
 - Services: this image are not available when creating a new server
   - [Try-it](https://github.com/online-labs/image-service-tryit): The image running on servers used on the [http://labs.online.net/](try-it page). Contains docker and a tty.js daemon to expose a shell on the web
