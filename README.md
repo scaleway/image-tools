@@ -19,12 +19,18 @@ Official images are available when creating a new server
 - Distributions
   - [Ubuntu](https://github.com/online-labs/image-ubuntu): Ubuntu with init scripts and common packages (available tags: 14.04, 14.10, 15.04)
   - [Debian](https://github.com/online-labs/image-debian): Debian with init scripts and common packages
+  - [Fedora](https://github.com/online-labs/image-fedora): Fedora with init scripts and common packages
+  - [Archlinux](https://github.com/online-labs/image-archlinux): Work in progress
+  - [Opensuse](https://github.com/online-labs/image-opensuse): Work in progress
+  - [Slackware](https://github.com/online-labs/image-slackware): Work in progress
 - Apps
-  - [Docker](https://github.com/online-labs/image-app-docker): Ready-to use docker 1.3.2 + fig + nsenter + gosu + pipework
+  - [Docker](https://github.com/online-labs/image-app-docker): Ready-to use docker with fig, nsenter, gosu and pipework
   - [Ghost](https://github.com/online-labs/image-app-ghost): [Ghost blogging platform](https://ghost.org) InstantApp
   - [Owncloud](https://github.com/online-labs/image-app-owncloud): [Owncloud](http://owncloud.org) InstantApp
   - [Pydio](https://github.com/online-labs/image-app-pydio): [Pydio](https://pyd.io) InstantApp
   - [Wordpress](https://github.com/online-labs/image-app-wordpress): [Wordpress blogging system](https://www.wordpress.com) InstantApp
+  - [OpenVPN](https://github.com/online-labs/image-app-openvpn): Work in progress
+  - [Mesos](https://github.com/online-labs/image-app-mesos): Work in progress
 - Services: this image are not available when creating a new server
   - [Try-it](https://github.com/online-labs/image-service-tryit): The image running on servers used on the [http://labs.online.net/](try-it page). Contains docker and a tty.js daemon to expose a shell on the web
   - [Rescue](https://github.com/online-labs/image-service-rescue): This image is only available using the rescue bootscript and will be fully loaded in RAM at boot
