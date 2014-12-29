@@ -70,11 +70,15 @@ shell:  .docker-container.built
 	docker run --rm -it $(NAME):$(VERSION) /bin/bash
 
 
-.docker-container.built: Dockerfile
+.docker-container.built: Dockerfile patches
 	-find patches -name '*~' -delete || true
 	docker build -t $(NAME):$(VERSION) .
 	docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
 	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > .docker-container.built
+
+
+patches:
+	mkdir patches
 
 
 $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
