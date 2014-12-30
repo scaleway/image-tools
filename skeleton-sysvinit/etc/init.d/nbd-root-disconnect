@@ -4,9 +4,10 @@
 # Provides:		nbd-disconnect-root
 # Required-Start:
 # Required-Stop:
+# X-Stop-After:		umountroot
 # Default-Start:
 # Default-Stop:         0 6
-# Short-Description:	NBD disconnect root
+# Short-Description:NBD disconnect root
 ### END INIT INFO
 
 set -e
