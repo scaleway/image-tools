@@ -2,7 +2,7 @@
 
 ### BEGIN INIT INFO
 # Provides:		sync-kernel-modules
-# Required-Start:	$remote_fs
+# Required-Start:	$remote_fs oc-force-dhclient
 # Required-Stop:	$remote_fs
 # Default-Start:	2 3 4 5
 # Default-Stop:
