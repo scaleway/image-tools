@@ -82,21 +82,31 @@ Commands
 --------
 
     # Clone the hello world docker-based app
-    git clone https://github.com/online-labs/image-helloworld.git
+    $ git clone https://github.com/online-labs/image-helloworld.git
+
+    # Run the image in Docker
+    $ make shell
 
     # push the rootfs.tar on s3 (requires `s3cmd`)
-    $ make publish_on_s3.tar S3_URL=s3://my-bucket/my-subdir/
+    $ make publish_on_s3 S3_URL=s3://my-bucket/my-subdir/
+
+    # push the image on docker registry
+    $ make release DOCKER_NAMESPACE=myusername
+    
+    # remove build directories
+    $ make clean
+    
+    # remove build directories and docker images
+    $ make fclean
+
+
+Debug commands
+
+    # push the rootfs.tar.gz on s3 (requires `s3cmd`)
+    $ make publish_on_s3.tar.gz S3_URL=s3://my-bucket/my-subdir/
 
     # push the rootfs.sqsh on s3 (requires `s3cmd`)
     $ make publish_on_s3.sqsh S3_URL=s3://my-bucket/my-subdir/
-    
-    # push the image on docker registry
-    $ make release DOCKER_NAMESPACE=myusername
-
-    # clean
-    $ make clean
-
-Debug commands
 
     # build the image in a rootfs directory
     $ make build
