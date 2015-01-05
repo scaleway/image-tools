@@ -70,35 +70,42 @@ The advantages are :
 - A well-known build format file (Dockerfile)
 - Docker's amazing builder advantages (speed, cache, tagging system)
 
+Install
+-------
+
+The minimal command to install an image on an attached volume :
+
+    # write the image to /dev/nbd1
+    $ make install
+
 Commands
 --------
 
     # Clone the hello world docker-based app
     git clone https://github.com/online-labs/image-helloworld.git
 
+    # push the rootfs.tar on s3 (requires `s3cmd`)
+    $ make publish_on_s3.tar S3_URL=s3://my-bucket/my-subdir/
+
+    # push the rootfs.sqsh on s3 (requires `s3cmd`)
+    $ make publish_on_s3.sqsh S3_URL=s3://my-bucket/my-subdir/
+    
+    # push the image on docker registry
+    $ make release DOCKER_NAMESPACE=myusername
+
+    # clean
+    $ make clean
+
+Debug commands
+
     # build the image in a rootfs directory
-    $ make rootfs
+    $ make build
 
     # build a tarball of the image
     $ make rootfs.tar
 
     # build a squashfs of the image
-    $ make rootfs.sqsh
-
-    # push the rootfs.tar on s3
-    $ make publish_on_s3.tar
-
-    # push the rootfs.sqsh on s3
-    $ make publish_on_s3.sqsh
-
-    # write the image to /dev/nbd1
-    $ make install_on_disk
-
-    # push the image on docker registry
-    $ make release
-
-    # clean
-    $ make clean
+    $ make rootfs.sqsh  
 
 Image check list
 ----------------
