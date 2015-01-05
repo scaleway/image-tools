@@ -10,11 +10,14 @@ TITLE ?=		$(NAME)
 DESCRIPTION ?=		$(TITLE)
 
 
-.PHONY: build release install_on_disk publish_on_s3 clean shell re all
+.PHONY: build release install install_on_disk publish_on_s3 clean shell re all
 .PHONY: publish_on_s3.tar publish_on_s3.sqsh
 
 
-all: install_on_disk
+all: build
+
+
+install: install_on_disk
 
 
 re: clean build
