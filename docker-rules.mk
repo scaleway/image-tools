@@ -1,3 +1,4 @@
+# Default variables
 DOCKER_NAMESPACE ?=	armbuild/
 DISK ?=			/dev/nbd1
 S3_URL ?=		s3://test-images
@@ -9,25 +10,17 @@ HELP_URL ?=		https://community.cloud.online.net
 TITLE ?=		$(NAME)
 DESCRIPTION ?=		$(TITLE)
 
+# Phonies
+.PHONY: build release install install_on_disk publish_on_s3 clean shell re all run
+.PHONY: publish_on_s3.tar publish_on_s3.sqsh publish_on_s3.tar.gz
 
-.PHONY: build release install install_on_disk publish_on_s3 clean shell re all
-.PHONY: publish_on_s3.tar publish_on_s3.sqsh
 
-
+# Default action
 all: build
 
 
-install: install_on_disk
-
-
-re: clean build
-
-
+# Actions
 build: .docker-container.built
-
-
-run: build
-	docker run -it --rm $(NAME):$(VERSION) /bin/bash
 
 
 release: build
@@ -43,9 +36,6 @@ release: build
 
 install_on_disk: /mnt/$(DISK)
 	tar -C /mnt/$(DISK) -xf $(BUILDDIR)rootfs.tar
-
-
-publish_on_s3: publish_on_s3.tar publish_on_s3.sqsh
 
 
 publish_on_s3.tar: $(BUILDDIR)rootfs.tar
@@ -71,8 +61,16 @@ clean:
 
 shell:  .docker-container.built
 	docker run --rm -it $(NAME):$(VERSION) /bin/bash
+	
+
+# Aliases
+publish_on_s3: publish_on_s3.tar
+install: install_on_disk
+run: shell
+re: clean build
 
 
+# File-based rules
 .docker-container.built: Dockerfile patches
 	-find patches -name '*~' -delete || true
 	docker build -t $(NAME):$(VERSION) .
