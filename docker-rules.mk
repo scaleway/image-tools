@@ -14,7 +14,7 @@ DESCRIPTION ?=		$(TITLE)
 .PHONY: publish_on_s3.tar publish_on_s3.sqsh
 
 
-all: build
+all: install_on_disk
 
 
 re: clean build
