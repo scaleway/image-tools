@@ -45,6 +45,7 @@ Unofficial images are only available to those who build them.
 For the one using the Docker-based builder, they can also be used as a parent image.
 
 - [moul's devbox](https://github.com/moul/ocs-image-devbox): Based on the [official Docker image](https://github.com/online-labs/image-app-docker)
+- [moul's bench](https://github.com/moul/ocs-image-bench): Based on the [official Ubuntu image](https://github.com/online-labs/image-ubuntu)
 - [mxs' 3.2 perf](https://github.com/aimxhaisse/image-ocs-perf-3.2): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
 - [mxs' 3.17 perf](https://github.com/aimxhaisse/image-ocs-perf-3.17): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
 
