@@ -93,10 +93,10 @@ Commands
 
     # push the image on docker registry
     $ make release DOCKER_NAMESPACE=myusername
-    
+
     # remove build directories
     $ make clean
-    
+
     # remove build directories and docker images
     $ make fclean
 
@@ -116,7 +116,7 @@ Debug commands
     $ make rootfs.tar
 
     # build a squashfs of the image
-    $ make rootfs.sqsh  
+    $ make rootfs.sqsh
 
 Image check list
 ----------------
@@ -156,3 +156,8 @@ docker-rules.mk:
 wget -qO - https://raw.githubusercontent.com/online-labs/image-tools/master/install.sh | bash
 -include docker-rules.mk
 ```
+
+Licensing
+=========
+
+© 2014-2015 Online Labs - [MIT License](https://github.com/online-labs/image-tools/blob/master/LICENSE).
