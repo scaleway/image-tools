@@ -61,7 +61,9 @@ clean:
 
 shell:  .docker-container.built
 	docker run --rm -it $(NAME):$(VERSION) /bin/bash
-	
+
+travis:
+	find . -name Dockerfile | xargs cat | grep -vi ^maintainer | bash -n
 
 # Aliases
 publish_on_s3: publish_on_s3.tar
