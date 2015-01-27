@@ -20,6 +20,7 @@ do_stop () {
         # Disabled by Online Labs, needed for root NBD device disconnection
         # log_action_msg "Will now restart"
 	# reboot -d -f -i
+	return
 }
 
 case "$1" in
