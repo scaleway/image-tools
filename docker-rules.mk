@@ -73,6 +73,13 @@ re: clean build
 
 
 # File-based rules
+Dockerfile:
+	@echo
+	@echo "You need a Dockerfile to build the image using this script."
+	@echo "Please give a look at https://github.com/online-labs/image-helloworld"
+	@echo
+	@exit 1
+
 .docker-container.built: Dockerfile patches $(shell find patches -type f)
 	-find patches -name '*~' -delete || true
 	docker build -t $(NAME):$(VERSION) .
