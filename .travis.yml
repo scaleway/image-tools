@@ -1,0 +1,3 @@
+language: bash
+sudo: false
+command: make -n -f docker-rules.mk
