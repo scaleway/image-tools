@@ -73,7 +73,7 @@ re: clean build
 
 
 # File-based rules
-.docker-container.built: Dockerfile patches
+.docker-container.built: Dockerfile patches $(shell find patches -type f)
 	-find patches -name '*~' -delete || true
 	docker build -t $(NAME):$(VERSION) .
 	docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
