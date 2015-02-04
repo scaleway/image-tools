@@ -44,5 +44,5 @@ if [ "$#" -ne 1 ]; then
     echo "$BODY"
 else
     key="$1"
-    echo "$BODY" | grep "^$key=" | cut -d= -f2 | sed "s/^['\"]//;s/['\"]$//"
+    echo "$BODY" | grep "^$key=" | sed 's/^[^=]*=//' | sed "s/^['\"]//;s/['\"]$//"
 fi
