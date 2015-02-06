@@ -5,7 +5,8 @@
 export PATH="${PATH:+$PATH:}/usr/bin:/bin"
 
 CACHE_FILE=/var/run/oc-metadata.cache
-METADATA_URL=${METADATA_URL:-"http://169.254.42.42/conf"}
+METADATA_IP=${METADATA_IP:-169.254.42.42}
+METADATA_URL=${METADATA_URL:-"http://${METADATA_IP}/conf"}
 
 if [ "$1" = "--cached" -a -f $CACHE_FILE ]; then
     shift
