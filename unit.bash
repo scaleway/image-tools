@@ -29,4 +29,10 @@ testMetadata() {
 }
 
 
+testHostname() {
+    local metadata_hostname=$(oc-metadata --cached HOSTNAME)
+    local local_hostname=$(hostname -f)
+    assertEquals "HOSTNAME from metadata not matching with local hostname" $metadata_hostname $local_hostname
+}
+
 . shunit2
