@@ -35,4 +35,10 @@ testHostname() {
     assertEquals "HOSTNAME from metadata not matching with local hostname" $metadata_hostname $local_hostname
 }
 
+
+testSysctl() {
+    assertEquals "sysctl vm.min_freekbytes misconfigured" $(sysctl -n vm.min_free_kbytes) 65536
+}
+
+
 . shunit2
