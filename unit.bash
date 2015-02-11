@@ -48,4 +48,11 @@ testXnbdClient() {
 }
 
 
+testOcsRelease() {
+    test -f /etc/ocs-release
+    returnCode=$?
+    assertEquals "/etc/ocs-release does not exist" 0 $returnCode
+}
+
+
 . shunit2
