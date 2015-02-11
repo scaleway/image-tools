@@ -12,7 +12,7 @@ DESCRIPTION ?=		$(TITLE)
 
 # Phonies
 .PHONY: build release install install_on_disk publish_on_s3 clean shell re all run
-.PHONY: publish_on_s3.tar publish_on_s3.sqsh publish_on_s3.tar.gz
+.PHONY: publish_on_s3.tar publish_on_s3.sqsh publish_on_s3.tar.gz travis
 
 
 # Default action
