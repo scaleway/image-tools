@@ -139,6 +139,13 @@ List of features, scripts and modifications to check for proper labs.online.net 
 
 Before making the image public, do not forget to check it boots, stops and restarts from the OS without any error (most notably kernel) since a failure could lead to deadlocked instances.
 
+Unit test running instance
+--------------------------
+
+At runtime, you can proceed to unit tests by calling
+
+    $ SCRIPT=$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $SCRIPT; bash $SCRIPT
+
 Install .mk files
 -----------------
 
