@@ -8,9 +8,11 @@ testRootPasswd() {
 
 
 testKernelModules() {
+    [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
     test -d "/lib/modules/$(uname -r)/kernel"
     returnCode=$?
     assertEquals "Kernel modules not downloaded" 0 $returnCode
+    [ -n "${SKIP_NON_DOCKER}" ] && endSkipping
 }
 
 
@@ -19,6 +21,7 @@ testMetadata() {
     returnCode=$?
     assertEquals "oc-metadata not found" 0 $returnCode
 
+    [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
     test -n "$(oc-metadata --cached)"
     returnCode=$?
     assertEquals "Cannot fetch metadata" 0 $returnCode
@@ -26,18 +29,23 @@ testMetadata() {
     local private_ip=$(ip addr list eth0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
     local metadata_ip=$(oc-metadata --cached PRIVATE_IP)
     assertEquals "PRIVATE_IP from metadata does not match eth0" $private_ip $metadata_ip
+    [ -n "${SKIP_NON_DOCKER}" ] && endSkipping
 }
 
 
 testHostname() {
+    [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
     local metadata_hostname=$(oc-metadata --cached HOSTNAME)
     local local_hostname=$(hostname -f)
     assertEquals "HOSTNAME from metadata not matching with local hostname" $metadata_hostname $local_hostname
+    [ -n "${SKIP_NON_DOCKER}" ] && endSkipping
 }
 
 
 testSysctl() {
+    [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
     assertEquals "sysctl vm.min_freekbytes misconfigured" $(sysctl -n vm.min_free_kbytes) 65536
+    [ -n "${SKIP_NON_DOCKER}" ] && endSkipping
 }
 
 
@@ -49,13 +57,16 @@ testXnbdClient() {
 
 
 testOcsRelease() {
+    [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
     test -f /etc/ocs-release
     returnCode=$?
     assertEquals "/etc/ocs-release does not exist" 0 $returnCode
+    [ -n "${SKIP_NON_DOCKER}" ] && endSkipping
 }
 
 
 testTty() {
+    [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
     test -n "$(ps auxwww | grep getty | grep ttyS0 | grep 9600 | grep vt102)"
     returnCode=$?
     assertEquals "No such getty instance on ttyS0" 0 $returnCode
@@ -63,6 +74,7 @@ testTty() {
     test -z "$(ps auxwww | grep getty | grep tty1)"
     returnCode=$?
     assertEquals "Useless getty instance on tty1" 0 $returnCode
+    [ -n "${SKIP_NON_DOCKER}" ] && endSkipping
 }
 
 
