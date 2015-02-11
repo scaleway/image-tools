@@ -144,7 +144,10 @@ Unit test running instance
 
 At runtime, you can proceed to unit tests by calling
 
+    # using curl
     $ SCRIPT=$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $SCRIPT; bash $SCRIPT
+    # using wget
+    $ SCRIPT=$(mktemp); wget -qO $SCRIPT https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash; bash $SCRIPT
 
 Install .mk files
 -----------------
