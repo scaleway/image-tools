@@ -55,4 +55,15 @@ testOcsRelease() {
 }
 
 
+testTty() {
+    test -n "$(ps auxwww | grep getty | grep ttyS0 | grep 9600 | grep vt102)"
+    returnCode=$?
+    assertEquals "No such getty instance on ttyS0" 0 $returnCode
+
+    test -z "$(ps auxwww | grep getty | grep tty1)"
+    returnCode=$?
+    assertEquals "Useless getty instance on tty1" 0 $returnCode
+}
+
+
 . shunit2
