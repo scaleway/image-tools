@@ -41,4 +41,11 @@ testSysctl() {
 }
 
 
+testXnbdClient() {
+    which xnbd-client >/dev/null
+    returnCode=$?
+    assertEquals "xnbd-client not found" 0 $returnCode
+}
+
+
 . shunit2
