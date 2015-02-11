@@ -1,4 +1,4 @@
-Image Tools - Scripts to build images on Online Labs
+Image Tools - Scripts to build images on Online Labs [![Build Status](https://travis-ci.org/online-labs/image-tools.svg?branch=master)](https://travis-ci.org/online-labs/image-tools)
 ====================================================
 
 This repository contains the tools, documentations and examples for building, debug and running images on Online Labs.
