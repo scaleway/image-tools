@@ -66,4 +66,11 @@ testTty() {
 }
 
 
+testSshd() {
+    grep '^PermitRootLogin without-password$' /etc/ssh/sshd_config >/dev/null
+    returnCode=$?
+    assertEquals "Accepting ssh with password" 0 $returnCode
+}
+
+
 . shunit2
