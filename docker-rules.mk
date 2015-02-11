@@ -63,7 +63,7 @@ shell:  .docker-container.built
 	docker run --rm -it $(NAME):$(VERSION) /bin/bash
 
 test:  .docker-container.built
-	docker run --rm -it $(NAME):$(VERSION) /bin/bash
+	docker run --rm -it $(NAME):$(VERSION) /bin/bash -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $SCRIPT; bash $SCRIPT'
 
 travis:
 	find . -name Dockerfile | xargs cat | grep -vi ^maintainer | bash -n
