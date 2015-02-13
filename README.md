@@ -33,6 +33,7 @@ Official images are available when creating a new server
   - [Seedbox](https://github.com/online-labs/image-app-seedbox): Work in progress
   - [Timemachine](https://github.com/online-labs/image-app-timemachine): Work in progress
   - [Mesos](https://github.com/online-labs/image-app-mesos): Work in progress
+  - [Proxy](https://github.com/online-labs/image-app-proxy): Work in progress
 - Services: this image are not available when creating a new server
   - [Try-it](https://github.com/online-labs/image-service-tryit): The image running on servers used on the [http://labs.online.net/](try-it page). Contains docker and a tty.js daemon to expose a shell on the web
   - [Rescue](https://github.com/online-labs/image-service-rescue): This image is only available using the rescue bootscript and will be fully loaded in RAM at boot
