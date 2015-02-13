@@ -39,15 +39,15 @@ install_on_disk: /mnt/$(DISK)
 
 
 publish_on_s3.tar: $(BUILDDIR)rootfs.tar
-	s3cmd put --acl-public $(BUILDDIR)rootfs.tar $(S3_URL)/$(NAME)-$(VERSION).tar
+	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar
 
 
 publish_on_s3.tar.gz: $(BUILDDIR)rootfs.tar.gz
-	s3cmd put --acl-public $(BUILDDIR)rootfs.tar.gz $(S3_URL)/$(NAME)-$(VERSION).tar.gz
+	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar.gz
 
 
 publish_on_s3.sqsh: $(BUILDDIR)rootfs.sqsh
-	s3cmd put --acl-public $(BUILDDIR)rootfs.sqsh $(S3_URL)/$(NAME)-$(VERSION).sqsh
+	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).sqsh
 
 
 fclean: clean
@@ -87,7 +87,7 @@ Dockerfile:
 	-find patches -name '*~' -delete || true
 	docker build -t $(NAME):$(VERSION) .
 	docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
-	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > .docker-container.built
+	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > $@
 
 
 patches:
@@ -95,48 +95,48 @@ patches:
 
 
 $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
-	-rm -rf $(BUILDDIR)rootfs $(BUILDDIR)rootfs.tmp
-	-mkdir -p $(BUILDDIR)rootfs.tmp
-	tar -C $(BUILDDIR)rootfs.tmp -xf $(BUILDDIR)export.tar
-	rm -f $(BUILDDIR)rootfs.tmp/.dockerenv $(BUILDDIR)rootfs.tmp/.dockerinit
-	chmod 1777 $(BUILDDIR)rootfs.tmp/tmp
-	chmod 755 $(BUILDDIR)rootfs.tmp/etc $(BUILDDIR)rootfs.tmp/usr $(BUILDDIR)rootfs.tmp/usr/local $(BUILDDIR)rootfs.tmp/usr/sbin
-	chmod 555 $(BUILDDIR)rootfs.tmp/sys
-	-mv $(BUILDDIR)rootfs.tmp/etc/hosts.default $(BUILDDIR)rootfs.tmp/etc/hosts || true
-	echo "IMAGE_ID=\"$(TITLE)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
-	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
-	echo "IMAGE_CODENAME=$(NAME)" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
-	echo "IMAGE_DESCRIPTION=\"$(DESCRIPTION)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
-	echo "IMAGE_HELP_URL=\"$(HELP_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
-	echo "IMAGE_SOURCE_URL=\"$(SOURCE_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
-	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $(BUILDDIR)rootfs.tmp/etc/ocs-release
-	mv $(BUILDDIR)rootfs.tmp $(BUILDDIR)rootfs
+	-rm -rf $@ $@.tmp
+	-mkdir -p $@.tmp
+	tar -C $@.tmp -xf $<
+	rm -f $@.tmp/.dockerenv $@.tmp/.dockerinit
+	chmod 1777 $@.tmp/tmp
+	chmod 755 $@.tmp/etc $@.tmp/usr $@.tmp/usr/local $@.tmp/usr/sbin
+	chmod 555 $@.tmp/sys
+	-mv $@.tmp/etc/hosts.default $@.tmp/etc/hosts || true
+	echo "IMAGE_ID=\"$(TITLE)\"" >> $@.tmp/etc/ocs-release
+	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $@.tmp/etc/ocs-release
+	echo "IMAGE_CODENAME=$(NAME)" >> $@.tmp/etc/ocs-release
+	echo "IMAGE_DESCRIPTION=\"$(DESCRIPTION)\"" >> $@.tmp/etc/ocs-release
+	echo "IMAGE_HELP_URL=\"$(HELP_URL)\"" >> $@.tmp/etc/ocs-release
+	echo "IMAGE_SOURCE_URL=\"$(SOURCE_URL)\"" >> $@.tmp/etc/ocs-release
+	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/ocs-release
+	mv $@.tmp $@
 
 
 $(BUILDDIR)rootfs.tar.gz: $(BUILDDIR)rootfs
-	tar --format=gnu -C $(BUILDDIR)rootfs -czf $(BUILDDIR)rootfs.tar.gz.tmp .
-	mv $(BUILDDIR)rootfs.tar.gz.tmp $(BUILDDIR)rootfs.tar.gz
+	tar --format=gnu -C $< -czf $@.tmp .
+	mv $@.tmp $@
 
 
 $(BUILDDIR)rootfs.tar: $(BUILDDIR)rootfs
-	tar --format=gnu -C $(BUILDDIR)rootfs -cf $(BUILDDIR)rootfs.tar.tmp .
-	mv $(BUILDDIR)rootfs.tar.tmp $(BUILDDIR)rootfs.tar
+	tar --format=gnu -C $< -cf $@.tmp .
+	mv $@.tmp $@
 
 
 $(BUILDDIR)rootfs.sqsh: $(BUILDDIR)rootfs
-	mksquashfs $(BUILDDIR)rootfs $(BUILDDIR)rootfs.sqsh -noI -noD -noF -noX
+	mksquashfs $< $@ -noI -noD -noF -noX
 
 
 $(BUILDDIR)export.tar: .docker-container.built
 	-mkdir -p $(BUILDDIR)
 	docker run --name $(NAME)-$(VERSION)-export --entrypoint /dontexists $(NAME):$(VERSION) 2>/dev/null || true
-	docker export $(NAME)-$(VERSION)-export > $(BUILDDIR)export.tar.tmp
+	docker export $(NAME)-$(VERSION)-export > $@.tmp
 	docker rm $(NAME)-$(VERSION)-export
-	mv $(BUILDDIR)export.tar.tmp $(BUILDDIR)export.tar
+	mv $@.tmp $@
 
 
 /mnt/$(DISK): $(BUILDDIR)rootfs.tar
 	umount $(DISK) || true
 	mkfs.ext4 $(DISK)
-	mkdir -p /mnt/$(DISK)
-	mount $(DISK) /mnt/$(DISK)
+	mkdir -p $@
+	mount $(DISK) $@
