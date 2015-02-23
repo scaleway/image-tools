@@ -19,6 +19,10 @@ Non-exhaustive list :
 
 - [Ubuntu](https://github.com/online-labs/image-ubuntu) (with FLAVORS=upstart,docker-based)
 - [Debian](https://github.com/online-labs/image-debian) (with FLAVORS=sysvinit,docker-based)
+- [ArchLinux](https://github.com/online-labs/image-archlinux) (with FLAVORS=systemd,docker-based)
+- [OpenSuse](https://github.com/online-labs/image-opensuse) (with FLAVORS=systemd,docker-based)
+- [fedora](https://github.com/online-labs/image-fedora) (with FLAVORS=systemd,docker-based)
+- [slackware](https://github.com/online-labs/image-slackware) (with FLAVORS=docker-based)
 - [Docker app](https://github.com/online-labs/image-app-docker) (with FLAVORS=upstart,docker-based, by inheriting the Ubuntu image)
 - ...
 
