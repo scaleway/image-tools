@@ -9,6 +9,7 @@ DOC_URL ?=		https://doc.cloud.online.net
 HELP_URL ?=		https://community.cloud.online.net
 TITLE ?=		$(NAME)
 DESCRIPTION ?=		$(TITLE)
+SHELL ?=		/bin/bash
 
 # Phonies
 .PHONY: build release install install_on_disk publish_on_s3 clean shell re all run
@@ -60,10 +61,10 @@ clean:
 
 
 shell:  .docker-container.built
-	docker run --rm -it $(NAME):$(VERSION) /bin/bash
+	docker run --rm -it $(NAME):$(VERSION) $(SHELL)
 
 test:  .docker-container.built
-	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) /bin/bash -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $$SCRIPT; bash $$SCRIPT'
+	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 travis:
 	find . -name Dockerfile | xargs cat | grep -vi ^maintainer | bash -n
