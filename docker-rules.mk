@@ -45,6 +45,13 @@ info:
 	@echo "- TITLE             $(TITLE)"
 	@echo "- VERSION           $(VERSION)"
 	@echo "- VERSION_ALIASES   $(VERSION_ALIASES)"
+	@echo
+	@echo "Computed information:"
+	@echo "---------------------"
+	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
+	@echo "- S3 URL            $(S3_URL)/$(NAME)-$(VERSION).tar"
+	@test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
+
 
 release: build
 	docker tag  $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
