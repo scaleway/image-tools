@@ -1,15 +1,19 @@
 # Default variables
-DOCKER_NAMESPACE ?=	armbuild/
-DISK ?=			/dev/nbd1
-S3_URL ?=		s3://test-images
-IS_LATEST ?=		0
-BUILDDIR ?=		/tmp/build/$(NAME)-$(VERSION)/
-SOURCE_URL ?=		https://github.com/online-labs/image-builder
-DOC_URL ?=		https://doc.cloud.online.net
-HELP_URL ?=		https://community.cloud.online.net
-TITLE ?=		$(NAME)
-DESCRIPTION ?=		$(TITLE)
-SHELL ?=		/bin/bash
+BUILDDIR ?=             /tmp/build/$(NAME)-$(VERSION)/
+DESCRIPTION ?=          $(TITLE)
+DISK ?=                 /dev/nbd1
+DOCKER_NAMESPACE ?=     armbuild/
+DOC_URL ?=              https://doc.cloud.online.net
+HELP_URL ?=             https://community.cloud.online.net
+IS_LATEST ?=            0
+NAME ?=                 $(shell basename $(PWD))
+S3_URL ?=               s3://test-images
+SHELL ?=                /bin/bash
+SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 's_git@github.com:_https://github.com/_'" || echo https://github.com/online-labs/image-tools)
+TITLE ?=                $(NAME)
+VERSION ?=              latest
+VERSION_ALIASES ?=
+
 
 # Phonies
 .PHONY: build release install install_on_disk publish_on_s3 clean shell re all run
