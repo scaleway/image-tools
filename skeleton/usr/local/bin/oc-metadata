@@ -30,7 +30,7 @@ else
     else
         # Using wget
         while [ true ]; do
-            BODY=$(wget -qO- $METADATA_URL)
+            BODY=$(wget --quiet -O- $METADATA_URL)
 	    echo "$BODY" | grep PRIVATE_IP >/dev/null
             if [ $? -eq 0 ]; then
 		echo "$BODY" > /var/run/oc-metadata.cache
