@@ -54,14 +54,10 @@ info:
 
 
 release: build
-	docker tag  $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
-	docker tag  $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(shell date +%Y-%m-%d)
-	docker push $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
-	docker push $(DOCKER_NAMESPACE)$(NAME):$(shell date +%Y-%m-%d)
-	if [ "x$(IS_LATEST)" = "x1" ]; then \
-	    docker tag  $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):latest; \
-	    docker push $(DOCKER_NAMESPACE)$(NAME):latest; \
-	fi
+	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
+	  echo docker push $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	  docker push $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	done
 
 
 install_on_disk: /mnt/$(DISK)
@@ -92,11 +88,14 @@ clean:
 shell:  .docker-container.built
 	docker run --rm -it $(NAME):$(VERSION) $(SHELL)
 
+
 test:  .docker-container.built
 	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
+
 travis:
 	find . -name Dockerfile | xargs cat | grep -vi ^maintainer | bash -n
+
 
 # Aliases
 publish_on_s3: publish_on_s3.tar
@@ -113,10 +112,14 @@ Dockerfile:
 	@echo
 	@exit 1
 
+
 .docker-container.built: Dockerfile patches $(shell find patches -type f)
 	-find patches -name '*~' -delete || true
 	docker build -t $(NAME):$(VERSION) .
-	docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(VERSION)
+	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
+	  echo docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	  docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	done
 	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > $@
 
 
