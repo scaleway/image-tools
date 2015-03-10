@@ -13,6 +13,7 @@ SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 
 TITLE ?=                $(NAME)
 VERSION ?=              latest
 VERSION_ALIASES ?=
+BUILD_OPTS ?=		
 
 
 # Phonies
@@ -25,8 +26,10 @@ all: build
 
 
 # Actions
-build: .docker-container.built
-
+build:	.docker-container.built
+rebuild:
+	rm -f .docker-container.built
+	$(MAKE) build BUILD_OPTS=--no-cache
 
 info:
 	@echo "Makefile variables:"
@@ -77,7 +80,11 @@ publish_on_s3.sqsh: $(BUILDDIR)rootfs.sqsh
 
 
 fclean: clean
-	-docker rmi $(NAME):$(VERSION) || true
+	$(eval IMAGE_ID := $(shell docker inspect -f '{{.Id}}' $(NAME):$(VERSION)))
+	$(eval PARENT_ID := $(shell docker inspect -f '{{.Parent}}' $(NAME):$(VERSION)))
+	-docker rmi -f $(IMAGE_ID)
+	-docker rmi -f $(IMAGE_ID)
+	-docker rmi -f $(PARENT_ID)
 
 
 clean:
@@ -115,7 +122,7 @@ Dockerfile:
 
 .docker-container.built: Dockerfile patches $(shell find patches -type f)
 	-find patches -name '*~' -delete || true
-	docker build -t $(NAME):$(VERSION) .
+	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
 	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
 	  echo docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
 	  docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
