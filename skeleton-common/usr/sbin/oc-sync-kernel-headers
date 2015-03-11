@@ -1,0 +1,13 @@
+#!/bin/sh
+# description "synchronizes kernel headers"
+# author "Online Labs Cloud Team <cloud-team@labs.online.net>"
+
+set -e
+
+DIR=/usr
+mkdir -p $DIR
+KVERSION=`uname -r`
+
+export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
+
+wget -q -O - http://mirror.cloud.online.net/kernel/${KVERSION}/include.tar | tar -C ${DIR} -xf -
