@@ -1,10 +1,9 @@
 #!/bin/bash
 
 BRANCH=${BRANCH:-master}
-FLAVORS=$(echo ${FLAVORS:-${@}} | tr "," " ")
-FLAVORS=${FLAVORS:-"common"}
+FLAVORS=$(echo ${FLAVORS:-${@:-"common"}} | tr "," " ")
 ROOTDIR=${ROOTDIR:-/}
-DL=${DL:-wget}
+DL=${DL:-$(hash curl 2>/dev/null && echo "curl" || echo "wget")}
 
 
 dl() {
