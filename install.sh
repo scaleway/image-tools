@@ -6,17 +6,16 @@ FLAVORS=${FLAVORS:-"common"}
 ROOTDIR=${ROOTDIR:-/}
 DL=${DL:-wget}
 
-dl_wget() {
-    wget -O - --no-check-certificate $@
-}
-
-dl_curl() {
-    curl -Lk $@
-}
 
 dl() {
-    dl_$DL $@
+    if [ "$DL" = "wget" ]; then
+        wget -O - --no-check-certificate $@
+    fi
+    if [ "$DL" = "curl" ]; then
+        curl -Lk $@
+    fi
 }
+
 
 apply_flavor() {
     flavor="${1}"
@@ -25,6 +24,7 @@ apply_flavor() {
         /tmp/ocs-scripts-install-${flavor}.sh
     fi
 }
+
 
 # Appply flavors if any
 for flavor in ${FLAVORS}; do
