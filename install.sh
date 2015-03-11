@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BRANCH=${BRANCH:-master}
-FLAVORS=$(echo ${FLAVORS:-${@}} | tr "," " ")
+FLAVORS=${$(echo ${FLAVORS:-${@}} | tr "," " "):-common}
 ROOTDIR=${ROOTDIR:-/}
 DL=${DL:-wget}
 
@@ -25,8 +25,7 @@ apply_flavor() {
     fi
 }
 
-# Apply default skeleton
-apply_flavor ""
-
 # Appply flavors if any
-for flavor in ${FLAVORS}; do apply_flavor -${flavor}; done
+for flavor in ${FLAVORS}; do
+    apply_flavor -${flavor}
+done
