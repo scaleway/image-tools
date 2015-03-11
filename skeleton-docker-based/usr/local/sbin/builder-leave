@@ -7,8 +7,8 @@
 set -e
 
 # unprevent init scripts from running during install/update
-lsb_dist="$(lsb_release -si 2>/dev/null || (test -f /etc/lsb-release && . /etc/lsb-release; echo ${DISTRIB_ID:-no_lsb})"
-lsb_release="$(lsb_release -sr 2>/dev/null || (test -f /etc/lsb-release && . /etc/lsb-release; echo ${DISTRIB_RELEASE:-no_lsb})"
+lsb_dist="$(lsb_release -si 2>/dev/null || (test -f /etc/lsb-release && . /etc/lsb-release; echo ${DISTRIB_ID:-no_lsb}))"
+lsb_release="$(lsb_release -sr 2>/dev/null || (test -f /etc/lsb-release && . /etc/lsb-release; echo ${DISTRIB_RELEASE:-no_lsb}))"
 
 case "$lsb_dist" in
     Ubuntu)
