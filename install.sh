@@ -1,7 +1,8 @@
 #!/bin/bash
 
 BRANCH=${BRANCH:-master}
-FLAVORS=${$(echo ${FLAVORS:-${@}} | tr "," " "):-common}
+FLAVORS=$(echo ${FLAVORS:-${@}} | tr "," " ")
+FLAVORS=${FLAVORS:-"common"}
 ROOTDIR=${ROOTDIR:-/}
 DL=${DL:-wget}
 
