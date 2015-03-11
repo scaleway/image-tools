@@ -23,6 +23,7 @@ Non-exhaustive list :
 - [OpenSuse](https://github.com/online-labs/image-opensuse) (with FLAVORS=systemd,docker-based)
 - [Fedora](https://github.com/online-labs/image-fedora) (with FLAVORS=systemd,docker-based)
 - [Slackware](https://github.com/online-labs/image-slackware) (with FLAVORS=docker-based)
+- [Alpine Linux](https://github.com/online-labs/image-alpine) (with FLAVORS=docker-based)
 - [Docker app](https://github.com/online-labs/image-app-docker) (with FLAVORS=upstart,docker-based, by inheriting the Ubuntu image)
 - ...
 
