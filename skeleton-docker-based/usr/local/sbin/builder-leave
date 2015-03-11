@@ -55,4 +55,4 @@ rm -f /var/cache/apt/*.bin /var/cache/apt/archives/partial/*.deb \
 rm -f /var/log/bootstrap.log
 
 # Update locate cache
-updatedb || true
+updatedb 2>/dev/null || true
