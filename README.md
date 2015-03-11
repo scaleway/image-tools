@@ -55,6 +55,13 @@ Using branches
 wget -qO - http://j.mp/ocs-scripts | FLAVORS=upstart BRANCH=feature-xxx bash
 ```
 
+Using curl
+----------
+
+```bash
+curl -L -q http://j.mp/ocs-scripts | DL=curl base
+```
+
 Alternative url
 ---------------
 
