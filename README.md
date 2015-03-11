@@ -17,14 +17,14 @@ The official images built with [image-tools](https://github.com/online-labs/imag
 
 Non-exhaustive list :
 
-- [Ubuntu](https://github.com/online-labs/image-ubuntu) (with FLAVORS=upstart,docker-based)
-- [Debian](https://github.com/online-labs/image-debian) (with FLAVORS=sysvinit,docker-based)
-- [ArchLinux](https://github.com/online-labs/image-archlinux) (with FLAVORS=systemd,docker-based)
-- [OpenSuse](https://github.com/online-labs/image-opensuse) (with FLAVORS=systemd,docker-based)
-- [Fedora](https://github.com/online-labs/image-fedora) (with FLAVORS=systemd,docker-based)
-- [Slackware](https://github.com/online-labs/image-slackware) (with FLAVORS=docker-based)
-- [Alpine Linux](https://github.com/online-labs/image-alpine) (with FLAVORS=docker-based)
-- [Docker app](https://github.com/online-labs/image-app-docker) (with FLAVORS=upstart,docker-based, by inheriting the Ubuntu image)
+- [Ubuntu](https://github.com/online-labs/image-ubuntu) (with FLAVORS=common,upstart,docker-based)
+- [Debian](https://github.com/online-labs/image-debian) (with FLAVORS=common,sysvinit,docker-based)
+- [ArchLinux](https://github.com/online-labs/image-archlinux) (with FLAVORS=common,systemd,docker-based)
+- [OpenSuse](https://github.com/online-labs/image-opensuse) (with FLAVORS=common,systemd,docker-based)
+- [Fedora](https://github.com/online-labs/image-fedora) (with FLAVORS=common,systemd,docker-based)
+- [Slackware](https://github.com/online-labs/image-slackware) (with FLAVORS=common,docker-based)
+- [Alpine Linux](https://github.com/online-labs/image-alpine) (with FLAVORS=common,docker-based)
+- [Docker app](https://github.com/online-labs/image-app-docker) (with FLAVORS=common,upstart,docker-based, by inheriting the Ubuntu image)
 - ...
 
 Upgrade a running image
@@ -68,3 +68,7 @@ Alternative url
 ```bash
 wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | ... bash -e
 ```
+
+---
+
+A project by [![Online Labs](https://raw.githubusercontent.com/online-labs/doc.cloud.online.net/master/www/documentation/docs_public/contents/images/logo_footer.png)](http://labs.online.net/)
