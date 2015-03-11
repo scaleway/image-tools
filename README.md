@@ -31,7 +31,7 @@ Upgrade a running image
 -----------------------
 
 ```bash
-wget -qO - http://j.mp/ocs-scripts | bash
+wget -qO - http://j.mp/ocs-scripts | bash -e
 ```
 
 Using flavors
@@ -39,12 +39,12 @@ Using flavors
 
 ```bash
 # upstart
-wget -qO - http://j.mp/ocs-scripts | FLAVORS=upstart bash
+wget -qO - http://j.mp/ocs-scripts | FLAVORS=upstart bash -e
 ```
 
 ```bash
 # sysvinit
-wget -qO - http://j.mp/ocs-scripts | FLAVORS=sysvinit bash
+wget -qO - http://j.mp/ocs-scripts | FLAVORS=sysvinit bash -e
 ```
 
 Using branches
@@ -52,19 +52,19 @@ Using branches
 
 ```bash
 # flavor=upstart on branch=feature-xxx
-wget -qO - http://j.mp/ocs-scripts | FLAVORS=upstart BRANCH=feature-xxx bash
+wget -qO - http://j.mp/ocs-scripts | FLAVORS=upstart BRANCH=feature-xxx bash -e
 ```
 
 Using curl
 ----------
 
 ```bash
-curl -L -q http://j.mp/ocs-scripts | DL=curl base
+curl -L -q http://j.mp/ocs-scripts | DL=curl bash -e
 ```
 
 Alternative url
 ---------------
 
 ```bash
-wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | ... bash
+wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgrade_root.bash | ... bash -e
 ```
