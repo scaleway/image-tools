@@ -7,8 +7,8 @@
 set -e
 
 # unprevent init scripts from running during install/update
-lsb_dist="$(lsb_release -si || (. /etc/lsb-release && echo "$DISTRIB_ID"))"
-lsb_release="$(lsb_release -sr || (. /etc/lsb-release && echo "$DISTRIB_RELEASE"))"
+lsb_dist="$(lsb_release -si 2>/dev/null || (. /etc/lsb-release && echo "${DISTRIB_ID:-no_lsb}"))"
+lsb_release="$(lsb_release -sr 2>/dev/null || (. /etc/lsb-release && echo "${DISTRIB_RELEASE:-no_lsb}"))"
 case "$lsb_dist" in
     Ubuntu)
         dpkg-divert --remove /sbin/initctl
@@ -21,8 +21,7 @@ case "$lsb_dist" in
         rm -f /usr/sbin/policy-rc.d /sbin/initctl /sbin/initctl.distrib
         ;;
     *)
-        echo "Unsupported distribution $lsb_dist ($lsb_release)" >&2
-        exit 1
+        echo "Warning: unsupported distribution $lsb_dist ($lsb_release)" >&2
         ;;
 esac
 
