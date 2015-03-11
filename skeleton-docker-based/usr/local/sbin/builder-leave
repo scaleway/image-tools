@@ -26,16 +26,6 @@ case "$lsb_dist" in
         ;;
 esac
 
-# Ensure /dev as the minimum devices set
-test -c /dev/null     || mknod -m 0666 /dev/null     c 1 3
-test -c /dev/zero     || mknod -m 0666 /dev/zero     c 1 5
-test -c /dev/full     || mknod -m 0666 /dev/full     c 1 7
-test -c /dev/tty      || mknod -m 0666 /dev/tty      c 5 0
-test -c /dev/tty0     || mknod -m 0640 /dev/tty0     c 4 0
-test -c /dev/urandom  || mknod -m 0666 /dev/urandom  c 1 9
-test -c /dev/random   || mknod -m 0666 /dev/random   c 1 8
-test -c /dev/console  || mknod -m 0600 /dev/console  c 5 1
-
 
 # remove potentially existing docker aptitude tuning
 rm -f /etc/apt/apt.conf.d/docker-*

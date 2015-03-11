@@ -1,5 +1,7 @@
 #!/bin/bash
-# This script will prepare the rootfs for the docker-based image-builder toolsuite
+
+# This script will prepare the rootfs for the docker-based image-builder
+# toolsuite
 
 set -e
 
@@ -9,7 +11,8 @@ lsb_release="$(lsb_release -sr 2>/dev/null || (test -f /etc/lsb-release && . /et
 case "$lsb_dist" in
     Ubuntu)
         # prevent init scripts from running during install/update
-        printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
+        printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && \
+            chmod +x /usr/sbin/policy-rc.d
         if [ -f /sbin/initctl.distrib ]; then
             mv /sbin/initctl.distrib /sbin/initctl
         fi
@@ -19,9 +22,21 @@ case "$lsb_dist" in
         ;;
     Debian)
         # prevent init scripts from running during install/update
-        printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && chmod +x /usr/sbin/policy-rc.d
+        printf '#!/bin/sh\nexit 101\n' > /usr/sbin/policy-rc.d && \
+            chmod +x /usr/sbin/policy-rc.d
         ;;
     *)
         echo "Warning: unsupported distribution $lsb_dist ($lsb_release)" >&2
         ;;
 esac
+
+
+# Ensure /dev as the minimum devices set
+test -c /dev/null     || mknod -m 0666 /dev/null     c 1 3
+test -c /dev/zero     || mknod -m 0666 /dev/zero     c 1 5
+test -c /dev/full     || mknod -m 0666 /dev/full     c 1 7
+test -c /dev/tty      || mknod -m 0666 /dev/tty      c 5 0
+test -c /dev/tty0     || mknod -m 0640 /dev/tty0     c 4 0
+test -c /dev/urandom  || mknod -m 0666 /dev/urandom  c 1 9
+test -c /dev/random   || mknod -m 0666 /dev/random   c 1 8
+test -c /dev/console  || mknod -m 0600 /dev/console  c 5 1
