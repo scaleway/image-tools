@@ -71,4 +71,15 @@ wget -qO - https://raw.githubusercontent.com/online-labs/ocs-scripts/master/upgr
 
 ---
 
+Misc commands
+-------------
+
+Run unit test suite
+
+```bash
+curl -L -q http://j.mp/ocs-scripts | bash && oc-image-unit
+```
+
+---
+
 A project by [![Online Labs](https://raw.githubusercontent.com/online-labs/doc.cloud.online.net/master/www/documentation/docs_public/contents/images/logo_footer.png)](http://labs.online.net/)
