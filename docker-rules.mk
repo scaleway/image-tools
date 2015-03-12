@@ -8,7 +8,7 @@ HELP_URL ?=             https://community.cloud.online.net
 IS_LATEST ?=            0
 NAME ?=                 $(shell basename $(PWD))
 S3_URL ?=               s3://test-images
-SHELL ?=                /bin/bash
+SHELL_BIN ?=            /bin/bash
 SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 's_git@github.com:_https://github.com/_'" || echo https://github.com/online-labs/image-tools)
 TITLE ?=                $(NAME)
 VERSION ?=              latest
@@ -43,7 +43,7 @@ info:
 	@echo "- IS_LATEST         $(IS_LATEST)"
 	@echo "- NAME              $(NAME)"
 	@echo "- S3_URL            $(S3_URL)"
-	@echo "- SHELL             $(SHELL)"
+	@echo "- SHELL_BIN         $(SHELL_BIN)"
 	@echo "- SOURCE_URL        $(SOURCE_URL)"
 	@echo "- TITLE             $(TITLE)"
 	@echo "- VERSION           $(VERSION)"
@@ -93,11 +93,11 @@ clean:
 
 
 shell:  .docker-container.built
-	docker run --rm -it $(NAME):$(VERSION) $(SHELL)
+	docker run --rm -it $(NAME):$(VERSION) $(SHELL_BIN)
 
 
 test:  .docker-container.built
-	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $$SCRIPT; bash $$SCRIPT'
+	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
 travis:
