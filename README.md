@@ -36,6 +36,7 @@ Official images are available when creating a new server
   - [Timemachine](https://github.com/online-labs/image-app-timemachine) (Work in progress)
   - [Mesos](https://github.com/online-labs/image-app-mesos) (Work in progress)
   - [Proxy](https://github.com/online-labs/image-app-proxy) (Work in progress)
+  - [Node.js](https://github.com/online-labs/image-app-nodejs) (Work in progress)
   - Discourse (Planned)
   - Gitlab (Planned)
 - Services (those images are not available when creating a new server)
