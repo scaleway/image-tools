@@ -139,9 +139,10 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	-mkdir -p $@.tmp
 	tar -C $@.tmp -xf $<
 	rm -f $@.tmp/.dockerenv $@.tmp/.dockerinit
-	chmod 1777 $@.tmp/tmp
-	chmod 755 $@.tmp/etc $@.tmp/usr $@.tmp/usr/local $@.tmp/usr/sbin
-	chmod 555 $@.tmp/sys
+	-chmod 1777 $@.tmp/tmp
+	-chmod 755 $@.tmp/etc $@.tmp/usr $@.tmp/usr/local $@.tmp/usr/sbin
+	-chmod 555 $@.tmp/sys
+	-chmod 700 $@.tmp/root
 	-mv $@.tmp/etc/hosts.default $@.tmp/etc/hosts || true
 	echo "IMAGE_ID=\"$(TITLE)\"" >> $@.tmp/etc/ocs-release
 	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $@.tmp/etc/ocs-release
