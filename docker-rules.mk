@@ -124,8 +124,8 @@ Dockerfile:
 	-find patches -name '*~' -delete || true
 	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
 	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
-	  echo docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
-	  docker tag $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	  echo docker tag -f $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	  docker tag -f $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
 	done
 	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > $@
 
