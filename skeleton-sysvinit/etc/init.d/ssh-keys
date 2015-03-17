@@ -21,7 +21,7 @@ sshkey_start() {
     fi
 
     (
-	oc-metadata | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' > /root/.ssh/authorized_keys &
+	oc-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' > /root/.ssh/authorized_keys &
         if [ ! -f /etc/ssh/ssh_host_rsa_key ]
         then
                 ssh-keygen -t rsa -b 2048 -N '' -f /etc/ssh/ssh_host_rsa_key &
