@@ -4,4 +4,10 @@
 
 set -e
 
+if [ ! -f /root/.ssh/authorized_keys ]
+then
+    mkdir -p /root/.ssh
+    chmod 700 /root/.ssh
+fi
+
 /usr/local/bin/oc-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' > /root/.ssh/authorized_keys
