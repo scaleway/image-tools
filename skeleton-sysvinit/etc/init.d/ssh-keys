@@ -14,12 +14,6 @@ set -e
 export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/sbin"
 
 sshkey_start() {
-    if [ ! -f /root/.ssh/authorized_keys ]
-    then
-        mkdir -p /root/.ssh/
-	chmod 700 /root/.ssh
-    fi
-
     (
     	# Fetching /root/.ssh/authorized_keys from metadata
 	/usr/sbin/oc-fetch-ssh-keys &
