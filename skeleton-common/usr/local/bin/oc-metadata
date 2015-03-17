@@ -13,7 +13,7 @@ if [ "$1" = "--cached" -a -f $CACHE_FILE ]; then
     BODY=$(cat $CACHE_FILE)
 else
     [ "$1" = "--cached" ] && shift
-    if [ $(which curl) ]; then
+    if hash curl; then
         # Using curl
         CODE=0
         while [ $CODE -ne 200 ]; do
