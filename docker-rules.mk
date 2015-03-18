@@ -9,6 +9,7 @@ IS_LATEST ?=            0
 NAME ?=                 $(shell basename $(PWD))
 S3_URL ?=               s3://test-images
 SHELL_BIN ?=            /bin/bash
+SHELL_DOCKER_OPTS ?=
 SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 's_git@github.com:_https://github.com/_'" || echo https://github.com/online-labs/image-tools)
 TITLE ?=                $(NAME)
 VERSION ?=              latest
@@ -93,7 +94,7 @@ clean:
 
 
 shell:  .docker-container.built
-	docker run --rm -it $(NAME):$(VERSION) $(SHELL_BIN)
+	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
 
 
 test:  .docker-container.built
