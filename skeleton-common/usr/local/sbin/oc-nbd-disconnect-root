@@ -15,7 +15,9 @@ case "$RUNLEVEL" in
         ;;
 esac
 
-if [ -e /usr/sbin/xnbd-client ]; then
+if [ -e /usr/local/sbin/xnbd-client ]; then
+    NBD_CLIENT=/usr/local/sbin/xnbd-client
+elif [ -e /usr/sbin/xnbd-client ]; then
     NBD_CLIENT=/usr/sbin/xnbd-client
 else
     NBD_CLIENT=/sbin/nbd-client

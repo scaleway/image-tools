@@ -23,8 +23,8 @@ case "$1" in
     ;;
   stop)
     log_daemon_msg "Disconnect nbd root volume"
-    if [ -x /usr/sbin/oc-nbd-disconnect-root ]; then
-      /usr/sbin/oc-nbd-disconnect-root
+    if [ -x /usr/local/sbin/oc-nbd-disconnect-root ]; then
+      /usr/local/sbin/oc-nbd-disconnect-root
     fi
     ;;
   restart|reload|force-reload)

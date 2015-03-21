@@ -12,7 +12,7 @@
 set -e
 
 synckernelmodules_start() {
-    /usr/sbin/oc-sync-kernel-modules
+    /usr/local/sbin/oc-sync-kernel-modules
 }
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"

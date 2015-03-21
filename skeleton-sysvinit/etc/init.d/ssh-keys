@@ -16,7 +16,7 @@ export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sb
 sshkey_start() {
     (
     	# Fetching /root/.ssh/authorized_keys from metadata
-	/usr/sbin/oc-fetch-ssh-keys &
+	/usr/local/sbin/oc-fetch-ssh-keys &
 
 	# Generate ssh host keys
 	if [ ! -f /etc/ssh/ssh_host_rsa_key ]
