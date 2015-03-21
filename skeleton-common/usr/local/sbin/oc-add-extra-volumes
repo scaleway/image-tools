@@ -4,7 +4,7 @@ METADATA_CACHE=`mktemp -u`
 
 get_metadata() {
     if [ ! -f $METADATA_CACHE ]; then
-        /usr/local/bin/oc-metadata > $METADATA_CACHE
+        /usr/local/bin/oc-metadata --cached > $METADATA_CACHE
     fi
 }
 
