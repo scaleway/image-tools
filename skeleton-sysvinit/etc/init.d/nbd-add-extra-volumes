@@ -12,7 +12,7 @@
 set -e
 
 nbdaddextravolumes_start() {
-    /usr/sbin/oc-add-extra-volumes
+    /usr/local/sbin/oc-add-extra-volumes
 }
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
