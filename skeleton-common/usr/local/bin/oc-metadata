@@ -4,7 +4,7 @@
 
 export PATH="${PATH:+$PATH:}/usr/bin:/bin"
 
-CACHE_FILE=/var/run/oc-metadata.cache
+CACHE_FILE=/run/oc-metadata.cache
 METADATA_IP=${METADATA_IP:-169.254.42.42}
 METADATA_URL=${METADATA_URL:-"http://${METADATA_IP}/conf"}
 
@@ -22,7 +22,7 @@ else
             BODY=$(echo "$RESPONSE" | sed '$d')
 
             if [ $CODE -eq 200 ]; then
-                echo "$BODY" > /var/run/oc-metadata.cache
+                echo "$BODY" > /run/oc-metadata.cache
                 break
             fi
             sleep 5
@@ -33,7 +33,7 @@ else
             BODY=$(wget --quiet -O- $METADATA_URL)
 	    echo "$BODY" | grep PRIVATE_IP >/dev/null
             if [ $? -eq 0 ]; then
-		echo "$BODY" > /var/run/oc-metadata.cache
+		echo "$BODY" > /run/oc-metadata.cache
                 break
             fi
             sleep 5
