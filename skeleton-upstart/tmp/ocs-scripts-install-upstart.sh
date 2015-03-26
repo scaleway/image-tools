@@ -18,7 +18,7 @@ ln -s $XNBD_CLIENT $NBD_CLIENT
 case "$lsb_dist" in
     Ubuntu)
         case "$lsb_release" in
-            14.04)
+            12.04|14.04)
                 ln -s /etc/init.d/disconnectnbd /etc/rc6.d/S89disconnectnbd
                 exit 0
                 ;;
