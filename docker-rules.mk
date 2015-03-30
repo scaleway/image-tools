@@ -14,7 +14,8 @@ SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 
 TITLE ?=                $(NAME)
 VERSION ?=              latest
 VERSION_ALIASES ?=
-BUILD_OPTS ?=		
+BUILD_OPTS ?=
+HOST_ARCH ?=		$(shell uname -m)
 
 
 # Phonies
@@ -94,10 +95,12 @@ clean:
 
 
 shell:  .docker-container.built
+	test $(HOST_ARCH) = armv7l
 	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
 
 
 test:  .docker-container.built
+	test $(HOST_ARCH) = armv7l
 	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
@@ -122,6 +125,7 @@ Dockerfile:
 
 
 .docker-container.built: Dockerfile patches $(shell find patches -type f)
+	test $(HOST_ARCH) = armv7l
 	-find patches -name '*~' -delete || true
 	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
 	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
