@@ -2,7 +2,7 @@
 
 ### BEGIN INIT INFO
 # Provides:                 nbd-add-extra-volumes
-# Required-Start:           $remote_fs $local_fs
+# Required-Start:           checkroot-bootclean
 # Required-Stop:
 # Default-Start:            S
 # Default-Stop:
