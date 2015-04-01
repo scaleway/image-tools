@@ -10,11 +10,15 @@
 # Short-Description:NBD disconnect root
 ### END INIT INFO
 
+. /lib/lsb/init-functions
+
 set -e
 
 nbddisconnectroot_stop() {
     if [ -x /usr/local/sbin/oc-nbd-disconnect-root ]; then
+	log_action_begin_msg "Disconnecting root NBD device and rebooting"
         /usr/local/sbin/oc-nbd-disconnect-root
+	log_action_end_msg 0
     fi
 }
 

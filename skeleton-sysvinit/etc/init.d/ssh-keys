@@ -9,12 +9,15 @@
 # Short-Description:	SSH Keys
 ### END INIT INFO
 
+. /lib/lsb/init-functions
+
 set -e
 
 export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/sbin"
 
 sshkey_start() {
     (
+	log_action_begin_msg "Fetching SSH keys from the web console"
     	# Fetching /root/.ssh/authorized_keys from metadata
 	/usr/local/sbin/oc-fetch-ssh-keys &
 
@@ -27,8 +30,9 @@ sshkey_start() {
                 ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key || true &
         fi
 
-        # Wait for all jobs to finish
-        wait `jobs -p` || true
+	# Wait for all jobs to finish
+	wait `jobs -p` || true
+	log_action_end_msg 0
     )
 }
 

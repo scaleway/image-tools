@@ -9,10 +9,14 @@
 # Short-Description:        Ensure dhclient is running
 ### END INIT INFO
 
+. /lib/lsb/init-functions
+
 set -e
 
 forcedhclient_start() {
+    log_action_begin_msg "Ensuring dhclient is running on eth0"
     pgrep dhclient >/dev/null || dhclient eth0
+    log_action_end_msg 0
 }
 
 export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
