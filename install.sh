@@ -5,7 +5,7 @@ BRANCH=${BRANCH:-master}
 FLAVORS=$(echo ${FLAVORS:-${@:-"common"}} | tr "," " ")
 ROOTDIR=${ROOTDIR:-/}
 DL=${DL:-$(hash curl 2>/dev/null && echo "curl" || echo "wget")}
-TMPFILE=/tmp/ocs-scripts-temporary.tar
+TMPFILE=/tmp/image-tools-temporary.tar
 
 
 # Download with curl or wget
@@ -23,11 +23,11 @@ dl() {
 apply_flavor() {
     local flavor="${1}"
     echo "applying flavor '${flavor}'"
-    tar --strip=2 -C ${ROOTDIR}/ -xzf ${TMPFILE} ocs-scripts-${BRANCH}/skeleton-${flavor};
+    tar --strip=2 -C ${ROOTDIR}/ -xzf ${TMPFILE} image-tools-${BRANCH}/skeleton-${flavor};
 
     # Executes flavor's install script
-    if [ -x /tmp/ocs-scripts-install-${flavor}.sh ]; then
-        /tmp/ocs-scripts-install-${flavor}.sh
+    if [ -x /tmp/image-tools-install-${flavor}.sh ]; then
+        /tmp/image-tools-install-${flavor}.sh
     fi
 }
 
@@ -40,7 +40,7 @@ clean() {
 
 main() {
     # Download tarball
-    dl https://github.com/online-labs/ocs-scripts/archive/${BRANCH}.tar.gz > ${TMPFILE}
+    dl https://github.com/scaleway/image-tools/archive/${BRANCH}.tar.gz > ${TMPFILE}
 
     # Apply flavors
     for flavor in ${FLAVORS}; do
