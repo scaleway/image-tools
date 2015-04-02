@@ -3,14 +3,14 @@ BUILDDIR ?=             /tmp/build/$(NAME)-$(VERSION)/
 DESCRIPTION ?=          $(TITLE)
 DISK ?=                 /dev/nbd1
 DOCKER_NAMESPACE ?=     armbuild/
-DOC_URL ?=              https://doc.cloud.online.net
+DOC_URL ?=              https://scaleway.com/docs
 HELP_URL ?=             https://community.cloud.online.net
 IS_LATEST ?=            0
 NAME ?=                 $(shell basename $(PWD))
 S3_URL ?=               s3://test-images
 SHELL_BIN ?=            /bin/bash
 SHELL_DOCKER_OPTS ?=
-SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 's_git@github.com:_https://github.com/_'" || echo https://github.com/online-labs/image-tools)
+SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 's_git@github.com:_https://github.com/_'" || echo https://github.com/scaleway/image-tools)
 TITLE ?=                $(NAME)
 VERSION ?=              latest
 VERSION_ALIASES ?=
@@ -66,7 +66,7 @@ image:
 	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' \
 		|| $(MAKE) publish_on_s3.tar
 	test -f /tmp/create-image-from-s3.sh \
-		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/moul/onlinelabs-cli/raw/master/examples/create-image-from-s3.sh
+		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/moul/scaleway-cli/raw/master/examples/create-image-from-s3.sh
 	chmod +x /tmp/create-image-from-s3.sh
 	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(S3_PUBLIC_URL)
 
@@ -114,7 +114,7 @@ shell:  .docker-container.built
 
 test:  .docker-container.built
 	test $(HOST_ARCH) = armv7l
-	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > $$SCRIPT; bash $$SCRIPT'
+	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
 travis:
@@ -132,7 +132,7 @@ re: clean build
 Dockerfile:
 	@echo
 	@echo "You need a Dockerfile to build the image using this script."
-	@echo "Please give a look at https://github.com/online-labs/image-helloworld"
+	@echo "Please give a look at https://github.com/scaleway/image-helloworld"
 	@echo
 	@exit 1
 
@@ -162,13 +162,13 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	-chmod 555 $@.tmp/sys
 	-chmod 700 $@.tmp/root
 	-mv $@.tmp/etc/hosts.default $@.tmp/etc/hosts || true
-	echo "IMAGE_ID=\"$(TITLE)\"" >> $@.tmp/etc/ocs-release
-	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $@.tmp/etc/ocs-release
-	echo "IMAGE_CODENAME=$(NAME)" >> $@.tmp/etc/ocs-release
-	echo "IMAGE_DESCRIPTION=\"$(DESCRIPTION)\"" >> $@.tmp/etc/ocs-release
-	echo "IMAGE_HELP_URL=\"$(HELP_URL)\"" >> $@.tmp/etc/ocs-release
-	echo "IMAGE_SOURCE_URL=\"$(SOURCE_URL)\"" >> $@.tmp/etc/ocs-release
-	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/ocs-release
+	echo "IMAGE_ID=\"$(TITLE)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $@.tmp/etc/scw-release
+	echo "IMAGE_CODENAME=$(NAME)" >> $@.tmp/etc/scw-release
+	echo "IMAGE_DESCRIPTION=\"$(DESCRIPTION)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_HELP_URL=\"$(HELP_URL)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_SOURCE_URL=\"$(SOURCE_URL)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/scw-release
 	mv $@.tmp $@
 
 
