@@ -65,7 +65,7 @@ image:
 	test -f /tmp/create-image-from-s3.sh \
 		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/moul/onlinelabs-cli/raw/master/examples/create-image-from-s3.sh
 	chmod +x /tmp/create-image-from-s3.sh
-	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(S3_URL)/$(NAME)-$(VERSION).tar
+	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(shell s3cmd info $(S3_URL)/$(NAME)-$(VERSION).tar | grep URL | awk '{print $$2}')
 
 
 release: build
