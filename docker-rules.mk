@@ -17,6 +17,8 @@ VERSION_ALIASES ?=
 BUILD_OPTS ?=
 HOST_ARCH ?=		$(shell uname -m)
 IMAGE_VOLUME_SIZE ?=	50G
+S3_FULL_URL ?=		$(S3_URL)/$(NAME)-$(VERSION).tar
+S3_PUBLIC_URL ?=	$(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
 
 
 # Phonies
@@ -55,17 +57,18 @@ info:
 	@echo "Computed information:"
 	@echo "---------------------"
 	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
-	@echo "- S3 URL            $(S3_URL)/$(NAME)-$(VERSION).tar"
+	@echo "- S3 URL            $(S3_FULL_URL)"
+	@echo "- S3 pubilc URL     $(S3_PUBLIC_URL)"
 	@test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
 image:
-	s3cmd ls $(S3_URL)/$(NAME)-$(VERSION).tar | grep -q '.tar' \
+	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' \
 		|| $(MAKE) publish_on_s3.tar
 	test -f /tmp/create-image-from-s3.sh \
 		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/moul/onlinelabs-cli/raw/master/examples/create-image-from-s3.sh
 	chmod +x /tmp/create-image-from-s3.sh
-	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(shell s3cmd info $(S3_URL)/$(NAME)-$(VERSION).tar | grep URL | awk '{print $$2}')
+	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(S3_PUBLIC_URL)
 
 
 release: build
