@@ -82,4 +82,4 @@ curl -L -q http://j.mp/ocs-scripts | bash && oc-image-unit
 
 ---
 
-A project by [![Online Labs](https://raw.githubusercontent.com/online-labs/doc.cloud.online.net/master/www/documentation/docs_public/contents/images/logo_footer.png)](http://labs.online.net/)
+A project by [![Scaleway](https://avatars1.githubusercontent.com/u/5185491?v=3&s=42)](https://www.scaleway.com/)
