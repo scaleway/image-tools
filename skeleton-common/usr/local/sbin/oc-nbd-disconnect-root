@@ -32,6 +32,10 @@ disconnect() {
 while read device etc; do
     case "$device" in
         /dev/nbd[0-9])
+            if [ "device" = "/dev/nbd0" ]; then
+                # do not disconnect non-existing device (rescue)
+                pgrep -f '@xnbd-client.*/dev/nbd0' >/dev/null || continue
+            fi
             swapoff "$device"
             $NBD_CLIENT -d "$device"
             ;;
