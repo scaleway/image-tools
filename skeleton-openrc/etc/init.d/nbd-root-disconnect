@@ -1,0 +1,18 @@
+#!/sbin/runscript
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Disconnects NBD root volume."
+
+depend() {
+    need killprocs savecache mount-ro
+}
+
+start() {
+    # keep these binaries in cache
+    cat /sbin/{halt,reboot,shutdown} > /dev/null
+    ebegin "Disconnecting root NBD volume"
+    /usr/sbin/nbd-client -d /dev/nbd0
+    eend $?
+    echo b > /proc/sysrq-trigger
+}

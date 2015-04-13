@@ -1,0 +1,16 @@
+#!/sbin/runscript
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="SSH keys"
+
+depend() {
+    need root
+    before sshd
+}
+
+start() {
+    ebegin "Fetching SSH keys"
+    /usr/local/sbin/oc-fetch-ssh-keys
+    eend $?
+}

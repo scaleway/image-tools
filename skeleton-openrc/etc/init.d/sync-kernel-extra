@@ -1,0 +1,16 @@
+#!/sbin/runscript
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Downloads kernel modules/headers from SCW' mirror"
+
+depend() {
+    need root
+    before kmod-static-nodes
+}
+
+start() {
+    ebegin "Syncing kernel modules/headers"
+    /usr/local/sbin/oc-sync-kernel-modules
+    eend $?
+}
