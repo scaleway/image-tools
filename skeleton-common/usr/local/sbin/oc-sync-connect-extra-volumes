@@ -1,0 +1,29 @@
+#!/bin/bash
+
+get_metadata() {
+    /usr/local/bin/oc-metadata --cached
+}
+
+get_value() {
+    get_metadata | grep "^$1=" | cut -d= -f2 | sed "s/^['\"]//;s/['\"]$//"
+}
+
+sync_connect_extra_volumes() {
+    for nbd_id in $(get_value VOLUMES)
+    do
+	# ignore root nbd device, it is handled differently.
+	test $nbd_id -eq 0 && continue
+
+	export_uri=$(get_value "VOLUMES_${nbd_id}_EXPORT_URI")
+	nbd_host=$(echo $export_uri | sed 's|nbd://\(.*\):.*|\1|')
+	nbd_port=$(echo $export_uri | sed 's|nbd://.*:\(.*\)|\1|')
+
+	device="/dev/nbd${nbd_id}"
+	until (nbd-client -c $device &> /dev/null)
+	do
+	    (nbd-client $nbd_host $nbd_port -b 4096 $device || sleep 1) &> /dev/null
+	done
+    done
+}
+
+sync_connect_extra_volumes

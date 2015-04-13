@@ -1,0 +1,8 @@
+#!/bin/bash
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+for device in /dev/nbd[^0]*
+do
+    (nbd-client -c $device && nbd-client -d $device &> /dev/null) || true
+done
