@@ -1,6 +1,6 @@
 #!/bin/sh
 # description "synchronizes kernel headers"
-# author "Online Labs Cloud Team <cloud-team@labs.online.net>"
+# author "Scaleway <opensource@scaleway.com>"
 
 set -e
 
@@ -10,4 +10,4 @@ KVERSION=`uname -r`
 
 export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
 
-wget -q -O - http://mirror.cloud.online.net/kernel/${KVERSION}/include.tar | tar -C ${DIR} -xf -
+wget -q -O - http://mirror.scaleway.com/kernel/${KVERSION}/include.tar | tar -C ${DIR} -xf -

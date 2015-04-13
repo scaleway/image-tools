@@ -1,11 +1,11 @@
 #!/bin/sh
 # description "run image unit tests on current image"
-# author "Online Labs Cloud Team <cloud-team@labs.online.net>"
+# author "Scaleway <opensource@scaleway.com>"
 
 set -e
 
 export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
 
-curl -s https://raw.githubusercontent.com/online-labs/image-tools/master/unit.bash > /tmp/oc-image-unit-suite.bash
+curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/unit.bash > /tmp/oc-image-unit-suite.bash
 bash /tmp/oc-image-unit-suite.bash
 rm -f /tmp/oc-image-unit-suite.bash
