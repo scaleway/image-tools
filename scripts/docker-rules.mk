@@ -23,14 +23,26 @@ S3_PUBLIC_URL ?=	$(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}
 
 # Phonies
 .PHONY: build release install install_on_disk publish_on_s3 clean shell re all run
-.PHONY: publish_on_s3.tar publish_on_s3.sqsh publish_on_s3.tar.gz travis
+.PHONY: publish_on_s3.tar publish_on_s3.sqsh publish_on_s3.tar.gz travis help
 
 
 # Default action
-all: build
+all: help
 
 
 # Actions
+help:
+	@echo 'General purpose commands'
+	@echo ' build                   build the Docker image'
+	@echo ' image                   create a Scaleway image (requires a working `scaleway-cli`)'
+	@echo ' info                    print build information'
+	@echo ' install_on_disk         write the image to /dev/nbd1'
+	@echo ' publish_on_s3           push a tarball of the image on S3 (for rescue testing)'
+	@echo ' rebuild                 rebuild the Docker image without cache'
+	@echo ' release                 push the image on Docker registry'
+	@echo ' shell                   open a shell in the image using `docker run`'
+	@echo ' test                    run unit test using `docker run` (limited testing)'
+
 build:	.docker-container.built
 rebuild:
 	rm -f .docker-container.built
