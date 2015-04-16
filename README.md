@@ -22,44 +22,37 @@ This repository contains :
 
 Official images are available when creating a new server
 
-- Distributions
-  - [Ubuntu](https://github.com/scaleway/image-ubuntu) (available tags: **14.04**, **14.10**, **15.04**)
-  - [Debian](https://github.com/scaleway/image-debian)
-  - [Fedora](https://github.com/scaleway/image-fedora)
-  - [Alpine Linux](https://github.com/scaleway/image-alpine)
-  - [Archlinux](https://github.com/scaleway/image-archlinux)
-  - [Opensuse](https://github.com/scaleway/image-opensuse) (Work in progress)
-  - [Slackware](https://github.com/scaleway/image-slackware) (Work in progress)
-  - [Busybox](https://github.com/scaleway/image-busybox) (Work in progress)
-- Apps
-  - [Docker](https://github.com/scaleway/image-app-docker)
-  - [Ghost](https://github.com/online-labs/image-app-ghost)
-  - [Owncloud](https://github.com/online-labs/image-app-owncloud)
-  - [Pydio](https://github.com/online-labs/image-app-pydio)
-  - [Wordpress](https://github.com/online-labs/image-app-wordpress)
-  - [OpenVPN](https://github.com/online-labs/image-app-openvpn) (Work in progress)
-  - [Seedbox](https://github.com/online-labs/image-app-seedbox) (Work in progress)
-  - [Timemachine](https://github.com/online-labs/image-app-timemachine) (Work in progress)
-  - [Mesos](https://github.com/online-labs/image-app-mesos) (Work in progress)
-  - [Proxy](https://github.com/online-labs/image-app-proxy) (Work in progress)
-  - [Node.js](https://github.com/online-labs/image-app-nodejs) (Work in progress)
-  - Discourse (Planned)
-  - Gitlab (Planned)
-- Services (those images are not available when creating a new server)
-  - [Try-it](https://github.com/online-labs/image-service-tryit)
-  - [Rescue](https://github.com/online-labs/image-service-rescue)
-
-
-## Unofficial images built with **image-tools**
-
-Unofficial images are only available to those who build them.
-
-For the one using the Docker-based builder, they can also be used as a parent image.
-
-- [moul's devbox](https://github.com/moul/ocs-image-devbox): Based on the [official Docker image](https://github.com/online-labs/image-app-docker)
-- [moul's bench](https://github.com/moul/ocs-image-bench): Based on the [official Ubuntu image](https://github.com/online-labs/image-ubuntu)
-- [mxs' 3.2 perf](https://github.com/aimxhaisse/image-ocs-perf-3.2): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
-- [mxs' 3.17 perf](https://github.com/aimxhaisse/image-ocs-perf-3.17): Based on the [Ubuntu image](https://github.com/online-labs/image-ubuntu)
+Type      | Name           | State    | Versions                   | Parent | Links
+----------|----------------|----------|----------------------------|--------|---------
+distrib   | Ubuntu         | released | 12.04, 14.04, 14.10, 15.05 | n/a    | [Source](https://github.com/scaleway/image-ubuntu)
+distrib   | Debian         | released | wheezy                     | n/a    | [Source](https://github.com/scaleway/image-debian)
+distrib   | Fedora         | released | 21                         | n/a    | [Source](https://github.com/scaleway/image-fedora)
+distrib   | Alpine Linux   | released | 3.1                        | n/a    | [Source](https://github.com/scaleway/image-alpine)
+distrib   | Arch Linux     | released | n/a                        | n/a    | [Source](https://github.com/scaleway/image-archlinux)
+distrib   | Opensuse       | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-opensuse)
+distrib   | Slackware      | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-slackware)
+distrib   | Busybox        | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-busybox)
+app       | Docker         | released | 1.5                        | ubuntu | [Source](https://github.com/scaleway/image-app-docker)
+app       | Ghost          | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-ghost)
+app       | Owncloud       | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-owncloud)
+app       | Pydio          | released | 6                          | ubuntu | [Source](https://github.com/online-labs/image-app-pydio)
+app       | Wordpress      | released | 4                          | ubuntu | [Source](https://github.com/online-labs/image-app-wordpress)
+app       | OpenVPN        | wip      | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-openvpn)
+app       | TimeMachine    | wip      | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-timemachine)
+app       | SeedBox        | planned  | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-seedbox)
+app       | Mesos          | planned  | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-mesos)
+app       | Proxy          | planned  | n/a                        | n/a    | n/a
+app       | LEMP           | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-lemp)
+app       | Node.js        | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-node)
+app       | Python         | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-python)
+app       | Discourse      | planned  | n/a                        | n/a    | n/a
+app       | Gitlab         | planned  | n/a                        | n/a    | n/a
+service   | Try-it         | released | n/a                        | docker | [Source](https://github.com/scaleway/image-service-tryit)
+service   | Rescue         | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-service-rescue)
+community | moul' dev      | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-devbox)
+community | moul' bench    | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
+community | mxs' 3.2 perf  | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
+community | mxs' 3.17 perf | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
 
 
 # Builder
