@@ -15,7 +15,7 @@ See [Building images on Scaleway with Docker](http://www.slideshare.net/manfredt
 This repository contains :
 
 - [Common scripts](#how-to-download-the-common-scripts-on-a-target-image) used in the images (upstart, sysvinit, openrc, common helpers, etc)
-- The [Builder](https://github.com/scaleway/image-tools/tree/master/scripts)
+- The [Builder](https://github.com/scaleway/image-tools/tree/master/builder)
 
 
 ## Official images built with **image-tools**
@@ -127,7 +127,7 @@ Debug commands
 
 ```bash
 # From a shell
-wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/install.sh | bash
+wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
 # or
 wget -qO - http://j.mp/scw-image-tools | bash
 ```
@@ -149,9 +149,9 @@ At runtime, you can proceed to unit tests by calling
 
 ```bash
 # using curl
-SCRIPT=$(mktemp); curl -s -o ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/unit.bash && bash ${SCRIPT}
+SCRIPT=$(mktemp); curl -s -o ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash && bash ${SCRIPT}
 # using wget
-SCRIPT=$(mktemp); wget -qO ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/unit.bash && bash ${SCRIPT}
+SCRIPT=$(mktemp); wget -qO ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash && bash ${SCRIPT}
 ```
 
 # Image check list
@@ -196,7 +196,7 @@ wget -qO - http://j.mp/scw-skeleton | FLAVORS=upstart BRANCH=feature-xxx bash -e
 curl -L -q http://j.mp/scw-skeleton | DL=curl bash -e
 
 # Alternative URL
-wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/install.sh | ... bash -e
+wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/install.sh | ... bash -e
 ```
 
 A running instance can be updated by calling the same commands.

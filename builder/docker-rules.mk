@@ -126,7 +126,7 @@ shell:  .docker-container.built
 
 test:  .docker-container.built
 	test $(HOST_ARCH) = armv7l
-	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/unit.bash > $$SCRIPT; bash $$SCRIPT'
+	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
 travis:
