@@ -129,7 +129,7 @@ Debug commands
 # From a shell
 wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
 # or
-wget -qO - http://j.mp/scw-image-tools | bash
+wget -qO - http://j.mp/scw-builder | bash
 ```
 
 Or from a Makefile ([example](https://github.com/scaleway/image-helloworld/blob/master/Makefile))
@@ -138,7 +138,7 @@ Or from a Makefile ([example](https://github.com/scaleway/image-helloworld/blob/
 ## Image tools  (https://github.com/scaleway/image-tools)
 all:    docker-rules.mk
 docker-rules.mk:
-    wget -qO - http://j.mp/scw-image-tools | bash
+    wget -qO - http://j.mp/scw-builder | bash
 -include docker-rules.mk
 ```
 
