@@ -14,7 +14,7 @@ See [Building images on Scaleway with Docker](http://www.slideshare.net/manfredt
 
 This repository contains :
 
-- [Common scripts](#how-to-download-the-common-scripts-on-a-target-image) used in the images (upstart, sysvinit, openrc, common helpers, etc)
+- Common scripts in [./skeleton-* directories](#how-to-download-the-common-scripts-on-a-target-image) used in the images (upstart, sysvinit, openrc, common helpers, etc)
 - The [Builder](https://github.com/scaleway/image-tools/tree/master/builder)
 
 
