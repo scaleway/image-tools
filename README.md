@@ -1,17 +1,21 @@
-Scaleway's images - Toolbox
-===========================
+# Scaleway's images - Toolbox
 
-This repository contains the scripts used to boot an image on [Online.net's cloud services](http://labs.online.net/).
-Scripts are built-in official images and some of them are also used in the official Initrd image.
+This repository contains the scripts used to create images on [Scaleway](https://www.scaleway.com/).
 
-It is planned to to create packages (.deb) for distributions.
+See [Building images on Scaleway with Docker](http://www.slideshare.net/manfredtouron/while42-paris13-scaleway) presentation on Slideshare.
 
-Why this repository exists ?
-----------------------------
+For an example of project using **image-tools**, please give a look at the [hello-world app](https://github.com/scaleway/image-helloworld).
 
-Because we create more and more images, and they have lots of common files, so we categorize the kind of files (flavors) and try to prevent duplicates files and issues accross similar images
 
----
+## Repository
+
+This repository contains :
+
+- common scripts used in the images (upstart, sysvinit, openrc, common helpers, etc)
+- Makefile scripts to build the images
+
+
+## Images built with **image-tools**
 
 The official images built with [image-tools](https://github.com/scaleway/image-tools) are using this repositoty.
 
@@ -27,58 +31,34 @@ Non-exhaustive list :
 - [Docker app](https://github.com/scaleway/image-app-docker) (with FLAVORS=common,upstart,docker-based, by inheriting the Ubuntu image)
 - ...
 
-Upgrade a running image
------------------------
+
+## How to download the common scripts on a target image
+
+Those scripts are mainly used in the base image (distrib) but can sometimes be useful in the app images (inherited from distrib).o
+
+An example of usage in the [Ubuntu image](https://github.com/scaleway/image-ubuntu/blob/9cd0f287a1977a55b74b1a37ecb1c03c8ce55c85/14.04/Dockerfile#L12-L17)
 
 ```bash
 wget -qO - http://j.mp/scw-skeleton | bash -e
-```
 
-Using flavors
--------------
-
-```bash
-# upstart
+# Using upstart flavor
 wget -qO - http://j.mp/scw-skeleton | FLAVORS=upstart bash -e
-```
+# Using sysvinit, docker-based and common flavors
+wget -qO - http://j.mp/scw-skeleton | FLAVORS=sysvinit,docker-based,common bash -e
 
-```bash
-# sysvinit
-wget -qO - http://j.mp/scw-skeleton | FLAVORS=sysvinit bash -e
-```
-
-Using branches
---------------
-
-```bash
-# flavor=upstart on branch=feature-xxx
+# Specific GIT branch
 wget -qO - http://j.mp/scw-skeleton | FLAVORS=upstart BRANCH=feature-xxx bash -e
-```
 
-Using curl
-----------
-
-```bash
+# Use curl
 curl -L -q http://j.mp/scw-skeleton | DL=curl bash -e
-```
 
-Alternative url
----------------
-
-```bash
+# Alternative URL
 wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/scripts/install.sh | ... bash -e
 ```
 
----
+A running instance can be updated by calling the same commands.
+It is planned to to create packages (.deb) for distributions.
 
-Misc commands
--------------
-
-Run unit test suite
-
-```bash
-curl -L -q http://j.mp/scw-skeleton | bash && oc-image-unit
-```
 
 ---
 
