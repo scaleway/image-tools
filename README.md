@@ -11,8 +11,8 @@ For an example of project using **image-tools**, please give a look at the [hell
 
 This repository contains :
 
-- common scripts used in the images (upstart, sysvinit, openrc, common helpers, etc)
-- Makefile scripts to build the images
+- [Common scripts](#how-to-download-the-common-scripts-on-a-target-image) used in the images (upstart, sysvinit, openrc, common helpers, etc)
+- [Makefile scripts](https://github.com/scaleway/image-tools/tree/master/scripts) to build the images
 
 
 ## Images built with **image-tools**
