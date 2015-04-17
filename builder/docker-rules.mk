@@ -78,7 +78,7 @@ image:
 	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' \
 		|| $(MAKE) publish_on_s3.tar
 	test -f /tmp/create-image-from-s3.sh \
-		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/moul/scaleway-cli/raw/master/examples/create-image-from-s3.sh
+		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-s3.sh
 	chmod +x /tmp/create-image-from-s3.sh
 	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(S3_PUBLIC_URL)
 
