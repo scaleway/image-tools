@@ -1,0 +1,10 @@
+[Unit]
+Description=SCW additional volumes mounter
+
+[Service]
+ExecStart=/usr/local/sbin/oc-add-extra-volumes
+ExecStop=/usr/local/sbin/oc-remove-extra-volumes
+Type=forking
+
+[Install]
+WantedBy=basic.target
