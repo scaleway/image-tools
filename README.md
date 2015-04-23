@@ -74,55 +74,59 @@ The advantages are :
 
 The minimal command to install an image on an attached volume :
 
-    # write the image to /dev/nbd1
-    $ make install
+```console
+# write the image to /dev/nbd1
+$ make install
+```
 
 ## Commands
 
-    # Clone the hello world docker-based app on an armhf server with Docker
-    $ git clone https://github.com/scaleway/image-helloworld.git
+```console
+# Clone the hello world docker-based app on an armhf server with Docker
+$ git clone https://github.com/scaleway/image-helloworld.git
 
-    # Run the image in Docker
-    $ make shell
+# Run the image in Docker
+$ make shell
 
-    # push the rootfs.tar on s3 (requires `s3cmd`)
-    $ make publish_on_s3 S3_URL=s3://my-bucket/my-subdir/
+# push the rootfs.tar on s3 (requires `s3cmd`)
+$ make publish_on_s3 S3_URL=s3://my-bucket/my-subdir/
 
-    # push the image on docker registry
-    $ make release DOCKER_NAMESPACE=myusername
+# push the image on docker registry
+$ make release DOCKER_NAMESPACE=myusername
 
-    # remove build directories
-    $ make clean
+# remove build directories
+$ make clean
 
-    # remove build directories and docker images
-    $ make fclean
-
+# remove build directories and docker images
+$ make fclean
+```
 
 Debug commands
 
-    # push the rootfs.tar.gz on s3 (requires `s3cmd`)
-    $ make publish_on_s3.tar.gz S3_URL=s3://my-bucket/my-subdir/
+```console
+# push the rootfs.tar.gz on s3 (requires `s3cmd`)
+$ make publish_on_s3.tar.gz S3_URL=s3://my-bucket/my-subdir/
 
-    # push the rootfs.sqsh on s3 (requires `s3cmd`)
-    $ make publish_on_s3.sqsh S3_URL=s3://my-bucket/my-subdir/
+# push the rootfs.sqsh on s3 (requires `s3cmd`)
+$ make publish_on_s3.sqsh S3_URL=s3://my-bucket/my-subdir/
 
-    # build the image in a rootfs directory
-    $ make build
+# build the image in a rootfs directory
+$ make build
 
-    # build a tarball of the image
-    $ make rootfs.tar
+# build a tarball of the image
+$ make rootfs.tar
 
-    # build a squashfs of the image
-    $ make rootfs.sqsh
-
+# build a squashfs of the image
+$ make rootfs.sqsh
+```
 
 ## Install builder's `.mk` files
 
-```bash
+```console
 # From a shell
-wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
+$ wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
 # or
-wget -qO - http://j.mp/scw-builder | bash
+$ wget -qO - http://j.mp/scw-builder | bash
 ```
 
 Or from a Makefile ([example](https://github.com/scaleway/image-helloworld/blob/master/Makefile))
@@ -140,7 +144,7 @@ docker-rules.mk:
 
 At runtime, you can proceed to unit tests by calling
 
-```bash
+```console
 # using curl
 SCRIPT=$(mktemp); curl -s -o ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash && bash ${SCRIPT}
 # using wget
@@ -174,7 +178,7 @@ Those scripts are mainly used in the base image (distrib) but can sometimes be u
 
 An example of usage in the [Ubuntu image](https://github.com/scaleway/image-ubuntu/blob/9cd0f287a1977a55b74b1a37ecb1c03c8ce55c85/14.04/Dockerfile#L12-L17)
 
-```bash
+```console
 wget -qO - http://j.mp/scw-skeleton | bash -e
 
 # Using upstart flavor
