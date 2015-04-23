@@ -74,59 +74,59 @@ The advantages are :
 
 The minimal command to install an image on an attached volume :
 
-```console
+```bash
 # write the image to /dev/nbd1
-$ make install
+make install
 ```
 
 ## Commands
 
-```console
+```bash
 # Clone the hello world docker-based app on an armhf server with Docker
-$ git clone https://github.com/scaleway/image-helloworld.git
+git clone https://github.com/scaleway/image-helloworld.git
 
 # Run the image in Docker
-$ make shell
+make shell
 
 # push the rootfs.tar on s3 (requires `s3cmd`)
-$ make publish_on_s3 S3_URL=s3://my-bucket/my-subdir/
+make publish_on_s3 S3_URL=s3://my-bucket/my-subdir/
 
 # push the image on docker registry
-$ make release DOCKER_NAMESPACE=myusername
+make release DOCKER_NAMESPACE=myusername
 
 # remove build directories
-$ make clean
+make clean
 
 # remove build directories and docker images
-$ make fclean
+make fclean
 ```
 
 Debug commands
 
-```console
+```bash
 # push the rootfs.tar.gz on s3 (requires `s3cmd`)
-$ make publish_on_s3.tar.gz S3_URL=s3://my-bucket/my-subdir/
+make publish_on_s3.tar.gz S3_URL=s3://my-bucket/my-subdir/
 
 # push the rootfs.sqsh on s3 (requires `s3cmd`)
-$ make publish_on_s3.sqsh S3_URL=s3://my-bucket/my-subdir/
+make publish_on_s3.sqsh S3_URL=s3://my-bucket/my-subdir/
 
 # build the image in a rootfs directory
-$ make build
+make build
 
 # build a tarball of the image
-$ make rootfs.tar
+make rootfs.tar
 
 # build a squashfs of the image
-$ make rootfs.sqsh
+make rootfs.sqsh
 ```
 
 ## Install builder's `.mk` files
 
-```console
+```bash
 # From a shell
-$ wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
+wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
 # or
-$ wget -qO - http://j.mp/scw-builder | bash
+wget -qO - http://j.mp/scw-builder | bash
 ```
 
 Or from a Makefile ([example](https://github.com/scaleway/image-helloworld/blob/master/Makefile))
@@ -144,7 +144,7 @@ docker-rules.mk:
 
 At runtime, you can proceed to unit tests by calling
 
-```console
+```bash
 # using curl
 SCRIPT=$(mktemp); curl -s -o ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash && bash ${SCRIPT}
 # using wget
@@ -155,19 +155,19 @@ SCRIPT=$(mktemp); wget -qO ${SCRIPT} https://raw.githubusercontent.com/scaleway/
 
 List of features, scripts and modifications to check for proper **scaleway** image creation.
 
-- Add sysctl entry `vm.min_free_kbytes=65536`
-- Configure NTP to use internal server.
-- Configure SSH to only accept login through public keys and deny environment customization to avoid errors due to users locale.
-- Configure default locale to `en_US.UTF-8`.
-- Configure network scripts to use DHCP and enable them.
-  Although not, strictly speaking, needed since kernel already has IP address and gateway this allows DHCP hooks to be called for setting hostname, etc.
-- Install custom DHCP hook for hostname to set entry in `/etc/hosts` for software using `getent_r` to get hostname.
-- Install scripts to fetch SSH keys
-- Install scripts to fetch kernel modules.
-- Install scripts to connect and/or mount NBD volumes.
-- Install scripts to manage NBD root volume.
-- Disable all physical TTY initialization.
-- Enable STTY @ 9600 bps.
+- [ ] Add sysctl entry `vm.min_free_kbytes=65536`
+- [ ] Configure NTP to use internal server
+- [ ] Configure SSH to only accept login through public keys and deny environment customization to avoid errors due to users locale
+- [ ] Configure default locale to `en_US.UTF-8`
+- [ ] Configure network scripts to use DHCP and enable them
+  Although not, strictly speaking, needed since kernel already has IP address and gateway this allows DHCP hooks to be called for setting hostname, etc
+- [ ] Install custom DHCP hook for hostname to set entry in `/etc/hosts` for software using `getent_r` to get hostname
+- [ ] Install scripts to fetch SSH keys
+- [ ] Install scripts to fetch kernel modules
+- [ ] Install scripts to connect and/or mount NBD volumes
+- [ ] Install scripts to manage NBD root volume
+- [ ] Disable all physical TTY initialization
+- [ ] Enable STTY @ 9600 bps
 
 Before making the image public, do not forget to check it boots, stops and restarts from the OS without any error (most notably kernel) since a failure could lead to deadlocked instances.
 
@@ -178,7 +178,7 @@ Those scripts are mainly used in the base image (distrib) but can sometimes be u
 
 An example of usage in the [Ubuntu image](https://github.com/scaleway/image-ubuntu/blob/9cd0f287a1977a55b74b1a37ecb1c03c8ce55c85/14.04/Dockerfile#L12-L17)
 
-```console
+```bash
 wget -qO - http://j.mp/scw-skeleton | bash -e
 
 # Using upstart flavor
