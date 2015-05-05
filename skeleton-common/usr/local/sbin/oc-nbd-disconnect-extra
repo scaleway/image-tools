@@ -1,8 +1,10 @@
 #!/bin/bash
-# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
-# Released under the MIT license.
+# description "disconnect extra NBD volumes"
+# author "Scaleway <opensource@scaleway.com>"
+
+XNBD_CLIENT=/run/initramfs/sbin/xnbd-client
 
 for device in /dev/nbd[^0]*
 do
-    (nbd-client -c $device && nbd-client -d $device &> /dev/null) || true
+    ($XNBD_CLIENT -c $device && $XNBD_CLIENT -d $device &> /dev/null) || true
 done

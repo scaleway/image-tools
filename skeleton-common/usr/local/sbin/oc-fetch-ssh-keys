@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # description "fetch SSH keys"
 # author "Scaleway <opensource@scaleway.com>"
 

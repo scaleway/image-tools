@@ -1,36 +1,32 @@
-#!/bin/sh
-# Thanks to the LTSP project
-# If the root /dev/nbd0 device is unmounted on reboot then nbd read
-# errors occur, and if it isn't, then # the nbd-server process on the server
-# doesn't terminate.
+#!/bin/bash
+# description "disconnect root NBD volume"
+# author "Scaleway <opensource@scaleway.com>"
+#
+# Thanks to the LTSP project. If the root /dev/nbd0 device is
+# unmounted on reboot then nbd read errors occur, and if it isn't,
+# then the nbd-server process on the server doesn't terminate.
+#
 # Called by init scripts on reboot.
+
+XNBD_CLIENT=/run/initramfs/sbin/xnbd-client
 
 case "$RUNLEVEL" in
     6)
         key="b"
         ;;
     *)
-        echo "oc-nbd-disconnect-root should only be called by initscripts on reboot." >&2
+        echo "$0 should only be called by initscripts on reboot." >&2
         exit 1
         ;;
 esac
 
-if [ -x /run/initramfs/usr/sbin/xnbd-client ]; then
-    NBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
-elif [ -e /usr/local/sbin/xnbd-client ]; then
-    NBD_CLIENT=/usr/local/sbin/xnbd-client
-elif [ -e /usr/sbin/xnbd-client ]; then
-    NBD_CLIENT=/usr/sbin/xnbd-client
-else
-    NBD_CLIENT=/sbin/nbd-client
-fi
-
 disconnect() {
-    $NBD_CLIENT -d "$root"
+    $XNBD_CLIENT -d "$root"
     echo "$key" > /proc/sysrq-trigger
 }
 
-# Disconnect swap nbd devices first
+# Disconnect swap nbd devices first, this is an extra step since the
+# Linux distribution should already have done it.
 while read device etc; do
     case "$device" in
         /dev/nbd[0-9])
@@ -39,7 +35,7 @@ while read device etc; do
                 pgrep -f '@xnbd-client.*/dev/nbd0' >/dev/null || continue
             fi
             swapoff "$device"
-            $NBD_CLIENT -d "$device"
+            $XNBD_CLIENT -d "$device"
             ;;
         /dev/mapper/swap[0-9])
             nbd_device=$(cryptsetup status "$device" | awk '/device:/{print $2}')
@@ -47,7 +43,7 @@ while read device etc; do
             cryptsetup remove "$device"
             case "$nbd_device" in
                 /dev/nbd[1-9])
-                    $NBD_CLIENT -d "$nbd_device"
+                    $XNBD_CLIENT -d "$nbd_device"
                     ;;
             esac
             ;;
