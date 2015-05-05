@@ -3,7 +3,7 @@ Description=SCW additional volumes mounter
 
 [Service]
 ExecStart=/usr/local/sbin/oc-sync-connect-extra-volumes
-ExecStop=/usr/local/sbin/oc-remove-extra-volumes || true
+ExecStop=/usr/local/sbin/oc-nbd-disconnect-extra || true
 Type=forking
 
 [Install]
