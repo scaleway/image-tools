@@ -3,7 +3,7 @@ Description=SCW fetch ssh keys from metadata
 After=NetworkManager-wait-online.service
 
 [Service]
-ExecStart=/bin/bash -c "mkdir -p /root/.ssh/ ; chmod 700 /root/.ssh ; /usr/local/bin/oc-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \\' > /root/.ssh/authorized_keys"
+ExecStart=/usr/local/sbin/oc-fetch-ssh-keys
 Type=oneshot
 
 [Install]
