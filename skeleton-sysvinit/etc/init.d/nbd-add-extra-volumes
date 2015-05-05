@@ -15,7 +15,7 @@ set -e
 
 nbdaddextravolumes_start() {
     log_action_begin_msg "Starting to mount Scaleway extra volumes"
-    /usr/local/sbin/oc-add-extra-volumes
+    /usr/local/sbin/oc-sync-connect-extra-volumes
     log_action_end_msg 0
 }
 
