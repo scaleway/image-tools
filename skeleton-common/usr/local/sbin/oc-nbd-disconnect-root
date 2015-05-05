@@ -8,7 +8,7 @@
 #
 # Called by init scripts on reboot.
 
-XNBD_CLIENT=/run/initramfs/sbin/xnbd-client
+XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
 
 case "$RUNLEVEL" in
     6)

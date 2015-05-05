@@ -2,7 +2,7 @@
 # description "disconnect extra NBD volumes"
 # author "Scaleway <opensource@scaleway.com>"
 
-XNBD_CLIENT=/run/initramfs/sbin/xnbd-client
+XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
 
 for device in /dev/nbd[^0]*
 do
