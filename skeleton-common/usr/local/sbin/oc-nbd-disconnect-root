@@ -1,62 +1,8 @@
 #!/bin/bash
 # description "disconnect root NBD volume"
 # author "Scaleway <opensource@scaleway.com>"
-#
-# Thanks to the LTSP project. If the root /dev/nbd0 device is
-# unmounted on reboot then nbd read errors occur, and if it isn't,
-# then the nbd-server process on the server doesn't terminate.
-#
-# Called by init scripts on reboot.
 
 XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
 
-case "$RUNLEVEL" in
-    6)
-        key="b"
-        ;;
-    *)
-        echo "$0 should only be called by initscripts on reboot." >&2
-        exit 1
-        ;;
-esac
-
-disconnect() {
-    $XNBD_CLIENT -d "$root"
-    echo "$key" > /proc/sysrq-trigger
-}
-
-# Disconnect swap nbd devices first, this is an extra step since the
-# Linux distribution should already have done it.
-while read device etc; do
-    case "$device" in
-        /dev/nbd[0-9])
-            if [ "device" = "/dev/nbd0" ]; then
-                # do not disconnect non-existing device (rescue)
-                pgrep -f '@xnbd-client.*/dev/nbd0' >/dev/null || continue
-            fi
-            swapoff "$device"
-            $XNBD_CLIENT -d "$device"
-            ;;
-        /dev/mapper/swap[0-9])
-            nbd_device=$(cryptsetup status "$device" | awk '/device:/{print $2}')
-            swapoff "$device"
-            cryptsetup remove "$device"
-            case "$nbd_device" in
-                /dev/nbd[1-9])
-                    $XNBD_CLIENT -d "$nbd_device"
-                    ;;
-            esac
-            ;;
-    esac
-done < /proc/swaps
-
-unset root
-for param in $(cat /proc/cmdline); do
-    case "$param" in
-        root=/dev/nbd[0-9])
-            root="${param#root=}"
-            ;;
-    esac
-done
-test -n "$root" || exit 0
-disconnect
+$XNBD_CLIENT -d "$root"
+echo "b" > /proc/sysrq-trigger
