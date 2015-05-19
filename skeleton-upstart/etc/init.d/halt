@@ -35,11 +35,11 @@ do_stop () {
 	if [ "$INIT_HALT" = "HALT" ]
 	then
 	    log_action_msg "Will now halt"
-	    DO_PIVOT=1 /var/run/initramfs/shutdown halt
+	    DO_PIVOT=1 /run/initramfs/shutdown halt
 	fi
 
 	log_action_msg "Will now poweroff"
-	DO_PIVOT=1 /var/run/initramfs/shutdown poweroff
+	DO_PIVOT=1 /run/initramfs/shutdown poweroff
 }
 
 case "$1" in

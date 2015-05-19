@@ -17,7 +17,7 @@ do_stop () {
 	# Message should end with a newline since kFreeBSD may
 	# print more stuff (see #323749)
 	log_action_msg "Will now restart"
-	DO_PIVOT=1 /var/run/initramfs/shutdown reboot
+	DO_PIVOT=1 /run/initramfs/shutdown reboot
 }
 
 case "$1" in
