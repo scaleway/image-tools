@@ -37,6 +37,7 @@ app       | Ghost          | released | n/a                        | ubuntu | [S
 app       | Owncloud       | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-owncloud)
 app       | Pydio          | released | 6                          | ubuntu | [Source](https://github.com/online-labs/image-app-pydio)
 app       | Wordpress      | released | 4                          | ubuntu | [Source](https://github.com/online-labs/image-app-wordpress)
+app       | Torrents       | released | 1                          | ubuntu | [Source](https://github.com/online-labs/image-app-torrents)
 app       | OpenVPN        | wip      | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-openvpn)
 app       | TimeMachine    | wip      | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-timemachine)
 app       | SeedBox        | planned  | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-seedbox)
