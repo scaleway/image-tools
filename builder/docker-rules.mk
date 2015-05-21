@@ -19,6 +19,7 @@ HOST_ARCH ?=		$(shell uname -m)
 IMAGE_VOLUME_SIZE ?=	50G
 S3_FULL_URL ?=		$(S3_URL)/$(NAME)-$(VERSION).tar
 S3_PUBLIC_URL ?=	$(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
+ASSETS ?=		
 
 
 # Phonies
@@ -149,7 +150,7 @@ Dockerfile:
 	@exit 1
 
 
-.docker-container.built: Dockerfile patches $(shell find patches -type f)
+.docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f)
 	test $(HOST_ARCH) = armv7l
 	-find patches -name '*~' -delete || true
 	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
