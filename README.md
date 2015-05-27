@@ -48,12 +48,17 @@ app       | Node.js        | released | n/a                        | ubuntu | [S
 app       | Python         | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-python)
 app       | Discourse      | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-app-discourse)
 app       | Gitlab         | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-app-gitlab)
+app       | Java           | released | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-app-java)
 service   | Try-it         | released | n/a                        | docker | [Source](https://github.com/scaleway/image-service-tryit)
 service   | Rescue         | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-service-rescue)
 community | moul' dev      | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-devbox)
 community | moul' bench    | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
 community | mxs' 3.2 perf  | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
 community | mxs' 3.17 perf | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
+community | Camlistore     | private  | n/a                        | ubuntu |
+[Source](https://github.com/aimxhaisse/image-app-camlistore)
+community | Serendipity    | released | n/a                        | ubuntu |
+[Source](https://github.com/onli/image-app-serendipity)
 
 
 # Builder
