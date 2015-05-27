@@ -55,10 +55,8 @@ community | moul' dev      | private  | n/a                        | ubuntu | [S
 community | moul' bench    | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
 community | mxs' 3.2 perf  | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
 community | mxs' 3.17 perf | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
-community | Camlistore     | private  | n/a                        | ubuntu |
-[Source](https://github.com/aimxhaisse/image-app-camlistore)
-community | Serendipity    | released | n/a                        | ubuntu |
-[Source](https://github.com/onli/image-app-serendipity)
+community | Camlistore     | private  | n/a                        | ubuntu | [Source](https://github.com/aimxhaisse/image-app-camlistore)
+community | Serendipity    | released | n/a                        | ubuntu | [Source](https://github.com/onli/image-app-serendipity)
 
 
 # Builder
