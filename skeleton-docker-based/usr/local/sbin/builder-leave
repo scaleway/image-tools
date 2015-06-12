@@ -44,5 +44,8 @@ rm -f /var/cache/apt/*.bin /var/cache/apt/archives/partial/*.deb \
 # clean debootstrap
 rm -f /var/log/bootstrap.log
 
+# clean systemd
+rm -f /etc/machine-id
+
 # Update locate cache
 updatedb 2>/dev/null || true
