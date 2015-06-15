@@ -1,6 +1,6 @@
 [Unit]
 Description=SCW fetch ssh keys from metadata
-Before=sshd
+Before=sshd.service
 
 [Service]
 ExecStart=/usr/local/sbin/oc-fetch-ssh-keys
