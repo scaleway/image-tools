@@ -1,6 +1,6 @@
 [Unit]
 Description=SCW fetch ssh keys from metadata
-After=NetworkManager-wait-online.service
+Before=sshd
 
 [Service]
 ExecStart=/usr/local/sbin/oc-fetch-ssh-keys

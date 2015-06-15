@@ -1,5 +1,6 @@
 [Unit]
 Description=SCW generate ssh keys on first boot
+Before=sshd
 
 [Service]
 ExecStart=/usr/local/sbin/oc-generate-ssh-keys
