@@ -46,6 +46,7 @@ rm -f /var/log/bootstrap.log
 
 # clean systemd
 rm -f /etc/machine-id
+rm -f /var/log/journal/*
 
 # Update locate cache
 updatedb 2>/dev/null || true
