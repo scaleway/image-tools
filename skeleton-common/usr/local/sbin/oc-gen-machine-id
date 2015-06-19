@@ -2,8 +2,8 @@
 # description "generate a unique machine id"
 # author "Scaleway <opensource@scaleway.com>"
 
-if ! [ -f /etc/regen-machine-id ]
+if [ -f /etc/.regen-machine-id ]
 then
 	uuidgen > /etc/machine-id
-	rm -f /etc/regen-machine-id
+	rm -f /etc/.regen-machine-id
 fi
