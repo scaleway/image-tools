@@ -99,6 +99,10 @@ publish_on_s3.tar: $(BUILDDIR)rootfs.tar
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar
 
 
+check_s3.tar:
+	wget --read-timeout=3 --tries=0 -O - $(S3_PUBLIC_URL) >/dev/null
+
+
 publish_on_s3.tar.gz: $(BUILDDIR)rootfs.tar.gz
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar.gz
 
@@ -136,6 +140,7 @@ travis:
 
 # Aliases
 publish_on_s3: publish_on_s3.tar
+check_s3: check_s3.tar
 install: install_on_disk
 run: shell
 re: clean build
