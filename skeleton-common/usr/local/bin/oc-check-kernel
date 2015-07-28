@@ -7,14 +7,14 @@ CONFIG_FILE=/etc/oc-kernel-check.conf
 function warn_version {
     if [ ! -z "$EXPECT_MINOR_MIN" ]
     then
-	echo >&2 "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.$EXPECT_MINOR_MIN (you are using $KERNEL_VERSION) ; consider using another scaleway bootscript."
+	echo "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.$EXPECT_MINOR_MIN (you are using $KERNEL_VERSION) ; consider using another scaleway bootscript." | tee /dev/stderr /dev/console
     else
-	echo >&2 "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.0 (you are using $KERNEL_VERSION), consider using another scaleway bootscript."
+	echo "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.0 (you are using $KERNEL_VERSION), consider using another scaleway bootscript." | tee /dev/stderr /dev/console
     fi
 }
 
 function warn_config {
-    echo >&2 "Warning: this image expects a Linux kernel with $1, consider using another scaleway bootscript."
+    echo "Warning: this image expects a Linux kernel with $1, consider using another scaleway bootscript." | tee /dev/stderr /dev/console
 }
 
 if [ -f $CONFIG_FILE ]
