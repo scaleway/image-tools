@@ -45,8 +45,7 @@ help:
 	@echo ' test                    run unit test using `docker run` (limited testing)'
 
 build:	.docker-container.built
-rebuild:
-	rm -f .docker-container.built
+rebuild: clean
 	$(MAKE) build BUILD_OPTS=--no-cache
 
 info:
@@ -143,7 +142,7 @@ publish_on_s3: publish_on_s3.tar
 check_s3: check_s3.tar
 install: install_on_disk
 run: shell
-re: clean build
+re: rebuild
 
 
 # File-based rules
