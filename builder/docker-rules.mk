@@ -125,12 +125,12 @@ clean:
 
 
 shell:  .docker-container.built
-	test $(HOST_ARCH) = armv7l || $(MAKE) register_binfmt
+	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
 	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
 
 
 test:  .docker-container.built
-	test $(HOST_ARCH) = armv7l || $(MAKE) register_binfmt
+	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
 	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
@@ -155,8 +155,8 @@ Dockerfile:
 	@exit 1
 
 
-.docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f)
-	test $(HOST_ARCH) = armv7l || $(MAKE) register_binfmt
+.docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f) patches/usr/local/bin 
+	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
 	-find patches -name '*~' -delete || true
 	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
 	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
@@ -219,7 +219,17 @@ $(BUILDDIR)export.tar: .docker-container.built
 	mount $(DISK) $@
 
 
-register_binfmt:
+patches/usr/local/bin:
+	mkdir -p $@
+
+
+patches/usr/local/bin/qemu-arm-static: patches/usr/local/bin
+	wget --no-check-certificate https://github.com/armbuild/qemu-user-static/raw/master/x86_64/qemu-arm-static -O $@
+	chmod +x $@
+
+
+setup_binfmt: patches/usr/local/bin/qemu-arm-static
+	@echo "Configurig binfmt-misc on the Docker(/Boot2Docker) kernel"
 	docker run --rm --privileged busybox sh -c " \
 	  mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc && \
 	  test -f /proc/sys/fs/binfmt_misc/arm || \
