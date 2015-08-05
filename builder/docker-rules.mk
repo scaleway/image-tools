@@ -95,8 +95,12 @@ install_on_disk: /mnt/$(DISK)
 	tar -C /mnt/$(DISK) -xf $(BUILDDIR)rootfs.tar
 
 
-publish_on_s3.tar: $(BUILDDIR)rootfs.tar
+fast-publish_on_s3.tar: $(BUILDDIR)rootfs.tar
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar
+
+
+publish_on_s3.tar: fast-publish_on_s3.tar
+	$(MAKE) check_s3 || $(MAKE) publish_on_s3.tar
 
 
 check_s3.tar:
