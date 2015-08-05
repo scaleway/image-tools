@@ -1,5 +1,5 @@
 ## -*- docker-image-name: "armbuild/scw-image-builder:latest" -*-
-FROM armbuild/scw-image-builder:latest
+FROM armbuild/scw-app-docker:latest
 MAINTAINER Scaleway <opensource@scaleway.com> (@scaleway)
 
 
