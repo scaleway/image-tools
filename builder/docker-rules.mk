@@ -18,7 +18,6 @@ BUILD_OPTS ?=
 HOST_ARCH ?=		$(shell uname -m)
 IMAGE_VOLUME_SIZE ?=	50G
 S3_FULL_URL ?=		$(S3_URL)/$(NAME)-$(VERSION).tar
-S3_PUBLIC_URL ?=	$(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
 ASSETS ?=
 
 
@@ -70,17 +69,19 @@ info:
 	@echo "---------------------"
 	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
 	@echo "- S3 URL            $(S3_FULL_URL)"
-	@echo "- S3 pubilc URL     $(S3_PUBLIC_URL)"
+	@echo "- S3 pubilc URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
 	@test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
-image:
+image_dep:
 	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' \
 		|| $(MAKE) publish_on_s3.tar
 	test -f /tmp/create-image-from-s3.sh \
 		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-s3.sh
+
+image:	image_dep
 	chmod +x /tmp/create-image-from-s3.sh
-	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(S3_PUBLIC_URL)
+	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
 
 
 release: build
@@ -99,7 +100,7 @@ publish_on_s3.tar: $(BUILDDIR)rootfs.tar
 
 
 check_s3.tar:
-	wget --read-timeout=3 --tries=0 -O - $(S3_PUBLIC_URL) >/dev/null
+	wget --read-timeout=3 --tries=0 -O - $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}') >/dev/null
 
 
 publish_on_s3.tar.gz: $(BUILDDIR)rootfs.tar.gz
