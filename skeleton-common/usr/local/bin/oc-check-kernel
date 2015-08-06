@@ -27,12 +27,15 @@ then
     MINOR=$(echo $KERNEL_VERSION | cut -d'.' -f2)
     if [ ! -z "$EXPECT_MAJOR_MIN" ] && [ $MAJOR -lt $EXPECT_MAJOR_MIN ]
     then
-	warn_version
-	exit 1
-    elif [ ! -z "$EXPECT_MAJOR_MIN" ] && [ ! -z "$EXPECT_MINOR_MIN" ] && [ $MINOR -lt $EXPECT_MINOR_MIN ]
+        warn_version
+        exit 1
+    elif [ ! -z "$EXPECT_MAJOR_MIN" ] && [ $MAJOR -eq $EXPECT_MAJOR_MIN ]
     then
-	warn_version
-	exit 1
+        if [ ! -z "$EXPECT_MAJOR_MIN" ] && [ ! -z "$EXPECT_MINOR_MIN" ] && [ $MINOR -lt $EXPECT_MINOR_MIN ]
+        then
+            warn_version
+            exit 1
+        fi
     fi
 
     # check any additional required configs
