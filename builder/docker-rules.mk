@@ -69,7 +69,7 @@ info:
 	@echo "---------------------"
 	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
 	@echo "- S3 URL            $(S3_FULL_URL)"
-	@echo "- S3 pubilc URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
+	@echo "- S3 public URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
 	@test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
