@@ -22,7 +22,7 @@ RUN curl -L https://github.com/scaleway/scaleway-cli/releases/download/v1.3.0/sc
 RUN ssh-keygen  -f ~/.ssh/id_rsa -t rsa  -N  ''
 
 # Patch rootfs
-#ADD ./patches/etc/ /etc/
+ADD ./patches/etc/ /etc/
 ADD ./patches/usr/ /usr/
 
 # Clean rootfs from image-builder
