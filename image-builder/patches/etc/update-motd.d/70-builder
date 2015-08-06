@@ -1,0 +1,17 @@
+#! /bin/bash
+
+
+test -f ~/.s3cfg && test -f ~/.scwrc || cat << EOF
+
+*****************************************************************************
+
+   Welcome on image-builder.
+   Here, you'll be able to do your own images.
+
+   To configure your environment please run:
+
+   $> image-builder-configure
+
+*****************************************************************************
+
+EOF
