@@ -1,1 +1,1 @@
-{"api_endpoint": "https://api.scaleway.com/", "organization": "ACCESS_HERE", "token": "TOKEN_HERE"}
+{"api_endpoint": "https://api.scaleway.com/", "account_endpoint":"https://account.scaleway.com/", "organization": "ACCESS_HERE", "token": "TOKEN_HERE"}
