@@ -1,0 +1,22 @@
+#!/sbin/runscript
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Enables a swapfile"
+
+depend() {
+    need root
+    before kmod-static-nodes
+}
+
+start() {
+    ebegin "Starting swapfile"
+    /usr/local/sbin/oc-swapfile start
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping swapfile"
+    /usr/local/sbin/oc-swapfile stop
+    eend $?
+}
