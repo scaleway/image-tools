@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# description "enables a swapfile"
+# author "Scaleway <opensource@scaleway.com>"
+
+if ! [ -f /etc/scaleway.conf ]
+then
+    echo >&2 "oc-swapfile-off: missing /etc/scaleway.conf file"
+    exit -1
+fi
+source /etc/scaleway.conf
+
+function disable_swapfile {
+    if [ -f $CONFIG_SWAPFILE_PATH ]
+    then
+	swapoff $CONFIG_SWAPFILE_PATH
+
+	# this seems weird and may take time.
+	#
+	# /swapfile is present on disk but we don't need to actually
+	# keep its content on the S3 ; it may take a while to upload
+	# the root volume with a used swapfile. The idea here is to
+	# zero it so that it is efficiently compressed at the NBD
+	# layer: the effective volume size is reduced.
+	filesize=$(du -b $CONFIG_SWAPFILE_PATH | awk '// { print $1; }')
+	blocksize=4096
+	nb_blocks=$(($filesize / $blocksize))
+	echo "$filesize / $blocksize = $nb_blocks"
+	dd if=/dev/zero of=/swapfile bs=$blocksize count=$nb_blocks
+    fi
+}
+
+disable_swapfile

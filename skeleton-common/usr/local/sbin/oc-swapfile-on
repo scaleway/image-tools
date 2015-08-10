@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# description "enables a swapfile"
+# author "Scaleway <opensource@scaleway.com>"
+
+if ! [ -f /etc/scaleway.conf ]
+then
+    echo >&2 "oc-swapfile-on: missing /etc/scaleway.conf file"
+    exit -1
+fi
+source /etc/scaleway.conf
+
+function create_swapfile {
+    # we recreate this file even if it already exists: it is wiped to
+    # zeroes at shutdown by oc-swapfile-off, and this way we handle
+    # updates of settings in /etc/scaleway.conf
+    fallocate -l $CONFIG_SWAPFILE_SIZE $CONFIG_SWAPFILE_PATH
+    chmod 600 $CONFIG_SWAPFILE_PATH
+    mkswap $CONFIG_SWAPFILE_PATH
+}
+
+function enable_swapfile {
+    swapon $CONFIG_SWAPFILE_PATH
+}
+
+create_swapfile && enable_swapfile
