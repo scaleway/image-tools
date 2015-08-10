@@ -29,14 +29,14 @@ else
         done
     else
         # Using wget
-        while [ true ]; do
+        for i in 1 2 3 4 5; do
             BODY=$(wget --quiet -O- $METADATA_URL)
 	    echo "$BODY" | grep PRIVATE_IP >/dev/null
             if [ $? -eq 0 ]; then
 		echo "$BODY" > /run/oc-metadata.cache
                 break
             fi
-            sleep 5
+            sleep 2
         done
     fi
 fi
