@@ -4,12 +4,8 @@
 
 XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
 
-get_metadata() {
-    /usr/local/bin/oc-metadata --cached
-}
-
 get_value() {
-    get_metadata | grep "^$1=" | cut -d= -f2 | sed "s/^['\"]//;s/['\"]$//"
+    /usr/local/bin/oc-metadata --cached "$1"
 }
 
 sync_connect_extra_volumes() {
