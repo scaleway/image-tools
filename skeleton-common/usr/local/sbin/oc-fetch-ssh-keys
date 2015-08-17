@@ -10,5 +10,23 @@ then
     chmod 700 /root/.ssh
 fi
 
-/usr/local/bin/oc-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' > /root/.ssh/authorized_keys
+if [ $1 == "--upgrade" ]; then
+	/usr/local/bin/oc-metadata > /dev/null
+fi
+
+cat << EOF > /root/.ssh/authorized_keys
+#
+# WARNING: Automatically generated file; DO NOT EDIT.
+# This file was generated with 'oc-fetch-ssh-keys'
+# You can find this script in '/usr/local/sbin/'
+#
+# If you want to add a new key, you can make two ways:
+#   -- Add your keys on your Scaleway account https://cloud.scaleway.com/#/credentials
+#   -- Add tags on your image AUTHORIZED_KEY=YOURPUBLICKEY https://cloud.scaleway.com/#/servers
+#
+# And run:
+#   -- oc-fetch-ssh-keys --upgrade
+#
+EOF
+/usr/local/bin/oc-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' >> /root/.ssh/authorized_keys
 /usr/local/bin/oc-metadata --cached | grep TAGS_.*=AUTHORIZED_KEY | cut -d'=' -f 3- | sed 's/_/\ /' >> /root/.ssh/authorized_keys
