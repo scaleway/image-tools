@@ -74,6 +74,7 @@ info:
 
 
 image_dep:
+	s3cmd ls $(S3_URL) || s3cmd mb $(S3_URL)
 	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' \
 		|| $(MAKE) publish_on_s3.tar
 	test -f /tmp/create-image-from-s3.sh \

@@ -1,6 +1,6 @@
 DOCKER_NAMESPACE =	armbuild/
 NAME =			scw-image-builder
-VERSION =		1.0
+VERSION =		1.2.0
 VERSION_ALIASES = latest
 TITLE =			image-builder
 DESCRIPTION =		An image to build other images

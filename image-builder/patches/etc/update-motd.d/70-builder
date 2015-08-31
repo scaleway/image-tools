@@ -5,8 +5,8 @@ test -f ~/.s3cfg && test -f ~/.scwrc || cat << EOF
 
 *****************************************************************************
 
-   Welcome on image-builder.
-   Here, you'll be able to do your own images.
+   Welcome on the image-builder.
+   Here, you'll be able to craft your own images.
 
    To configure your environment please run:
 

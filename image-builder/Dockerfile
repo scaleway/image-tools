@@ -15,8 +15,10 @@ RUN apt-get -qq update     \
       curl                 \
  && apt-get clean
 
-# Download the awesome scaleway-cli ;)
-RUN curl -L https://github.com/scaleway/scaleway-cli/releases/download/v1.3.0/scw-Linux-armv7 > /usr/local/bin/scw && chmod +x /usr/local/bin/scw
+# Download scw
+RUN curl -L https://github.com/scaleway/scaleway-cli/releases/download/v1.4.0/scw_1.4.0_armhf.deb  > scw.deb \
+ && dpkg -i scw.deb \
+ && rm scw.deb
 
 # Generate ssh key
 RUN ssh-keygen  -f ~/.ssh/id_rsa -t rsa  -N  ''
