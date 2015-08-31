@@ -3,22 +3,22 @@
 test -f ~/.s3cfg || wget -qO ~/.s3cfg https://raw.githubusercontent.com/scaleway/image-tools/master/image-builder/s3cfg_template
 test -f ~/.scwrc || wget -qO ~/.scwrc https://raw.githubusercontent.com/scaleway/image-tools/master/image-builder/scwrc_template
 
-echo "You can get your credentials on https://cloud.scaleway.com/#/credentials"
-read -p "Organization (access key): " ACCESS
-stty -echo
-read -p "Token (hidden): " TOKEN
-stty echo
-echo
-read -p "S3_URL (s3://new_image): " S3_URL
+chmod 600 ~/.scwrc
+chmod 600 ~/.s3cfg
+
+scw login -s
+
+ACCESS=$(cat ~/.scwrc | python -c 'import sys, json; print json.load(sys.stdin)["organization"]')
+TOKEN=$(cat ~/.scwrc | python -c 'import sys, json; print json.load(sys.stdin)["token"]')
 
 sed -i "s/TOKEN_HERE/$TOKEN/" ~/.s3cfg
 sed -i "s/ACCESS_HERE/$ACCESS/" ~/.s3cfg
-sed -i "s/TOKEN_HERE/$TOKEN/" ~/.scwrc
-sed -i "s/ACCESS_HERE/$ACCESS/" ~/.scwrc
-chmod 600 ~/.s3cfg
-chmod 600 ~/.scwrc
-grep -v '^export S3_URL' /etc/bash.bashrc > /tmp/tmp_file
-mv /tmp/tmp_file /etc/bash.bashrc
-echo "export S3_URL=$S3_URL" >> /etc/bash.bashrc
 
-echo -e "\n*** Please run ***: source /etc/bash.bashrc\n"
+cat << EOF > ~/Makefile
+NAME ?= \$(shell basename \$(shell pwd))
+
+all:	docker-rules.mk
+docker-rules.mk:
+	wget -qO - http://j.mp/scw-builder | bash
+-include docker-rules.mk
+EOF
