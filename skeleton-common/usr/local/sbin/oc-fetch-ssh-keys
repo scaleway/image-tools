@@ -10,8 +10,8 @@ then
     chmod 700 /root/.ssh
 fi
 
-if [ $1 == "--upgrade" ]; then
-	/usr/local/bin/oc-metadata > /dev/null
+if [ "$1" = "--upgrade" ]; then
+        /usr/local/bin/oc-metadata > /dev/null
 fi
 
 cat << EOF > /root/.ssh/authorized_keys
