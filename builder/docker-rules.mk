@@ -8,6 +8,8 @@ HELP_URL ?=             https://community.scaleway.com
 IS_LATEST ?=            0
 NAME ?=                 $(shell basename $(PWD))
 S3_URL ?=               s3://test-images
+STORE_HOST ?=		store.scw.42.am
+STORE_PATH ?=		scw
 SHELL_BIN ?=            /bin/bash
 SHELL_DOCKER_OPTS ?=
 SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 's_git@github.com:_https://github.com/_'" || echo https://github.com/scaleway/image-tools)
@@ -35,9 +37,11 @@ help:
 	@echo 'General purpose commands'
 	@echo ' build                   build the Docker image'
 	@echo ' image                   create a Scaleway image (requires a working `scaleway-cli`)'
+	@echo ' rootfs.tar		build and print the location of a rootfs.tar'
 	@echo ' info                    print build information'
 	@echo ' install_on_disk         write the image to /dev/nbd1'
 	@echo ' publish_on_s3           push a tarball of the image on S3 (for rescue testing)'
+	@echo ' publish_on_store        push a tarball of the image on store using ssh'
 	@echo ' rebuild                 rebuild the Docker image without cache'
 	@echo ' release                 push the image on Docker registry'
 	@echo ' shell                   open a shell in the image using `docker run`'
@@ -102,6 +106,12 @@ fast-publish_on_s3.tar: $(BUILDDIR)rootfs.tar
 
 publish_on_s3.tar: fast-publish_on_s3.tar
 	$(MAKE) check_s3 || $(MAKE) publish_on_s3.tar
+
+
+.PHONY: publish_on_store
+publish_on_store: $(BUILDDIR)rootfs.tar
+	rsync -Pave ssh $(BUILDDIR)rootfs.tar $(STORE_HOST):store/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+	@echo http://$(STORE_HOST)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
 
 
 check_s3.tar:
@@ -194,10 +204,15 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/scw-release
 	mv $@.tmp $@
 
-
 $(BUILDDIR)rootfs.tar.gz: $(BUILDDIR)rootfs
 	tar --format=gnu -C $< -czf $@.tmp .
 	mv $@.tmp $@
+
+
+.PHONY: rootfs.tar
+rootfs.tar: $(BUILDDIR)rootfs.tar
+	ls -la $<
+	@echo $<
 
 
 $(BUILDDIR)rootfs.tar: $(BUILDDIR)rootfs
