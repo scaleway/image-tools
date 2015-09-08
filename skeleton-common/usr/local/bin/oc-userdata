@@ -9,7 +9,7 @@ USERDATA_URL=${USERDATA_URL:-"http://${USERDATA_IP}/user_data"}
 
 get() {
     URL=$1
-    if type curl 2>/dev/null; then
+    if type curl >/dev/null 2>/dev/null; then
         # Using curl
         RESPONSE=$(curl --silent --write-out "\n%{http_CODE}\n" $URL)
         CODE=$(echo "$RESPONSE" | sed -n '$p')
@@ -24,7 +24,7 @@ get() {
 patch() {
     URL="$1"
     DATA="$2"
-    if type curl 2>/dev/null; then
+    if type curl >/dev/null 2>/dev/null; then
         # Using curl
         RESPONSE=$(curl -X PATCH -d "$DATA" -H "Content-Type: text/plain" --silent --write-out "\n%{http_CODE}\n" $URL)
     else
