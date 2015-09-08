@@ -14,11 +14,10 @@ get() {
         RESPONSE=$(curl --local-port 1-1024 --silent --write-out "\n%{http_CODE}\n" $URL)
         CODE=$(echo "$RESPONSE" | sed -n '$p')
         BODY=$(echo "$RESPONSE" | sed '$d')
+	echo "$BODY"
     else
-        # Using wget
-        BODY=$(wget --quiet -O- $USERDATA_URL)
+	echo "'curl' dependency is missing." >&2
     fi
-    echo "$BODY"
 }
 
 patch() {
@@ -28,8 +27,7 @@ patch() {
         # Using curl
         RESPONSE=$(curl --local-port 1-1024 -X PATCH -d "$DATA" -H "Content-Type: text/plain" --silent --write-out "\n%{http_CODE}\n" $URL)
     else
-        # Using wget
-        echo "'curl' is missing"
+	echo "'curl' dependency is missing." >&2
     fi
 }
 
