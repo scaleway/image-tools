@@ -11,7 +11,7 @@ then
 fi
 
 if [ "$1" = "--upgrade" ]; then
-        /usr/local/bin/oc-metadata > /dev/null
+	/usr/local/bin/oc-metadata > /dev/null
 fi
 
 cat << EOF > /root/.ssh/authorized_keys
@@ -22,7 +22,11 @@ cat << EOF > /root/.ssh/authorized_keys
 #
 # If you want to add a new key, you can make two ways:
 #   -- Add your keys on your Scaleway account https://cloud.scaleway.com/#/credentials
-#   -- Add tags on your image AUTHORIZED_KEY=YOURPUBLICKEY https://cloud.scaleway.com/#/servers
+#   -- Add tags on your server https://cloud.scaleway.com/#/servers/$(oc-metadata --cached ID)
+#        - With this method you must change the spaces ' ' by underscores '_'
+#        - $> cat ~./ssh/id_rsa.pub | sed 's/ /_/g'
+#        - And your tag must be formatted like this:
+#        - AUTHORIZED_KEY=YOURPUBLICKEY
 #
 # And run:
 #   -- oc-fetch-ssh-keys --upgrade
