@@ -19,6 +19,8 @@ VERSION_ALIASES ?=
 BUILD_OPTS ?=
 HOST_ARCH ?=		$(shell uname -m)
 IMAGE_VOLUME_SIZE ?=	50G
+IMAGE_NAME ?=		$(NAME)
+IMAGE_BOOTSCRIPT ?=	stable
 S3_FULL_URL ?=		$(S3_URL)/$(NAME)-$(VERSION).tar
 ASSETS ?=
 
@@ -86,7 +88,7 @@ image_dep:
 
 image:	image_dep
 	chmod +x /tmp/create-image-from-s3.sh
-	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) /tmp/create-image-from-s3.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
+	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) IMAGE_NAME=$(IMAGE_NAME) IMAGE_BOOTSCRIPT=$(IMAGE_BOOTSCRIPT) /tmp/create-image-from-s3.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
 
 
 release: build
