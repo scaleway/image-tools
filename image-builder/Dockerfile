@@ -13,6 +13,7 @@ RUN apt-get -qq update     \
       s3cmd                \
       git                  \
       curl                 \
+      nginx-full           \
  && apt-get clean
 
 # Download scw
