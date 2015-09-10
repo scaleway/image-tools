@@ -83,12 +83,12 @@ image_dep:
 	s3cmd ls $(S3_URL) || s3cmd mb $(S3_URL)
 	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' \
 		|| $(MAKE) publish_on_s3.tar
-	test -f /tmp/create-image-from-s3.sh \
-		|| wget -qO /tmp/create-image-from-s3.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-s3.sh
+	test -f /tmp/create-image-from-http.sh \
+		|| wget -qO /tmp/create-image-from-http.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-http.sh
 
 image:	image_dep
-	chmod +x /tmp/create-image-from-s3.sh
-	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) IMAGE_NAME=$(IMAGE_NAME) IMAGE_BOOTSCRIPT=$(IMAGE_BOOTSCRIPT) /tmp/create-image-from-s3.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
+	chmod +x /tmp/create-image-from-http.sh
+	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) IMAGE_NAME=$(IMAGE_NAME) IMAGE_BOOTSCRIPT=$(IMAGE_BOOTSCRIPT) /tmp/create-image-from-http.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
 
 
 release: build
