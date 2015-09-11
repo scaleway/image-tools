@@ -1,27 +1,28 @@
 # Default variables
-BUILDDIR ?=             /tmp/build/$(NAME)-$(VERSION)/
+NAME ?=                 $(shell basename $(PWD))
+VERSION ?=              latest
+FULL_NAME ?=            $(NAME)-$(VERSION)
+BUILDDIR ?=             /tmp/build/$(FULL_NAME)/
 DESCRIPTION ?=          $(TITLE)
 DISK ?=                 /dev/nbd1
 DOCKER_NAMESPACE ?=     armbuild/
 DOC_URL ?=              https://scaleway.com/docs
 HELP_URL ?=             https://community.scaleway.com
 IS_LATEST ?=            0
-NAME ?=                 $(shell basename $(PWD))
 S3_URL ?=               s3://test-images
-STORE_HOST ?=		store.scw.42.am
-STORE_PATH ?=		scw
+STORE_HOST ?=           store.scw.42.am
+STORE_PATH ?=           scw
 SHELL_BIN ?=            /bin/bash
 SHELL_DOCKER_OPTS ?=
 SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 's_git@github.com:_https://github.com/_'" || echo https://github.com/scaleway/image-tools)
 TITLE ?=                $(NAME)
-VERSION ?=              latest
 VERSION_ALIASES ?=
 BUILD_OPTS ?=
-HOST_ARCH ?=		$(shell uname -m)
-IMAGE_VOLUME_SIZE ?=	50G
-IMAGE_NAME ?=		$(NAME)
-IMAGE_BOOTSCRIPT ?=	stable
-S3_FULL_URL ?=		$(S3_URL)/$(NAME)-$(VERSION).tar
+HOST_ARCH ?=            $(shell uname -m)
+IMAGE_VOLUME_SIZE ?=    50G
+IMAGE_NAME ?=           $(NAME)
+IMAGE_BOOTSCRIPT ?=     stable
+S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ASSETS ?=
 
 
@@ -38,8 +39,11 @@ all: help
 help:
 	@echo 'General purpose commands'
 	@echo ' build                   build the Docker image'
-	@echo ' image                   create a Scaleway image (requires a working `scaleway-cli`)'
-	@echo ' rootfs.tar		build and print the location of a rootfs.tar'
+	@echo ' image                   create a Scaleway image (requires a working `scaleway-cli`) from s3 by default'
+	@echo ' image_on_s3             create a Scaleway image (requires a working `scaleway-cli`) from s3'
+	@echo ' image_on_store          create a Scaleway image (requires a working `scaleway-cli`) from the store'
+	@echo ' image_on_local          create a Scaleway image (requires a working `scaleway-cli`) from your local webserver'
+	@echo ' rootfs.tar              build and print the location of a rootfs.tar'
 	@echo ' info                    print build information'
 	@echo ' install_on_disk         write the image to /dev/nbd1'
 	@echo ' publish_on_s3           push a tarball of the image on S3 (for rescue testing)'
@@ -80,15 +84,29 @@ info:
 
 
 image_dep:
-	s3cmd ls $(S3_URL) || s3cmd mb $(S3_URL)
-	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' \
-		|| $(MAKE) publish_on_s3.tar
 	test -f /tmp/create-image-from-http.sh \
 		|| wget -qO /tmp/create-image-from-http.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-http.sh
-
-image:	image_dep
 	chmod +x /tmp/create-image-from-http.sh
+
+
+.PHONY: image_on_s3
+image_on_s3: image_dep
+	s3cmd ls $(S3_URL) || s3cmd mb $(S3_URL)
+	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' || $(MAKE) publish_on_s3.tar
 	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) IMAGE_NAME=$(IMAGE_NAME) IMAGE_BOOTSCRIPT=$(IMAGE_BOOTSCRIPT) /tmp/create-image-from-http.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
+
+
+.PHONY: image_on_store
+image_on_store: image_dep publish_on_store
+	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) IMAGE_NAME=$(IMAGE_NAME) IMAGE_BOOTSCRIPT=$(IMAGE_BOOTSCRIPT) /tmp/create-image-from-http.sh http://$(STORE_HOST)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+
+
+.PHONY: image_on_local
+image_on_local: image_dep $(BUILDDIR)rootfs.tar
+	VOLUME_SIZE=$(IMAGE_VOLUME_SIZE) IMAGE_NAME=$(IMAGE_NAME) IMAGE_BOOTSCRIPT=$(IMAGE_BOOTSCRIPT) /tmp/create-image-from-http.sh http://$(shell oc-metadata --cached PUBLIC_IP_ADDRESS)/$(FULL_NAME)/rootfs.tar
+
+
+image:	image_on_s3
 
 
 release: build
@@ -172,7 +190,7 @@ Dockerfile:
 	@exit 1
 
 
-.docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f) patches/usr/local/bin 
+.docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f) patches/usr/local/bin
 	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
 	-find patches -name '*~' -delete || true
 	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
