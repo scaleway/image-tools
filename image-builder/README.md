@@ -89,38 +89,13 @@ You can see other Dockerfiles [here](https://github.com/scaleway/image-tools#off
 
 ##### 3. Building the custom image
 ```console
-root@buildcowsay> S3_URL="s3://yourbucketname" make image
-s3cmd ls s3://yourbucketname || s3cmd mb s3://yourbucketname
-s3cmd ls s3://yourbucketname/vivid-cowsay-latest.tar | grep -q '.tar' \
-	|| make publish_on_s3.tar
+root@buildcowsay> make image_on_local
 make[1]: Entering directory '/root/vivid-cowsay'
-s3cmd put --acl-public /tmp/build/vivid-cowsay-latest/rootfs.tar s3://yourbucketname/vivid-cowsay-latest.tar
-/tmp/build/vivid-cowsay-latest/rootfs.tar -> s3://yourbucketname/vivid-cowsay-latest.tar  [part 1 of 2, 250MB]
- 262144000 of 262144000   100% in   17s    14.43 MB/s  done
-/tmp/build/vivid-cowsay-latest/rootfs.tar -> s3://yourbucketname/vivid-cowsay-latest.tar  [part 2 of 2, 98MB]
- 103464960 of 103464960   100% in    6s    14.49 MB/s  done
-Public URL of the object is: http://yourbucketname.fr-1.storage.online.net/vivid-cowsay-latest.tar
-make check_s3 || make publish_on_s3.tar
-make[2]: Entering directory '/root/vivid-cowsay'
-wget --read-timeout=3 --tries=0 -O - http://yourbucketname.fr-1.storage.online.net/vivid-cowsay-latest.tar >/dev/null
---2015-08-28 20:22:22--  http://yourbucketname.fr-1.storage.online.net/vivid-cowsay-latest.tar
-Resolving yourbucketname.fr-1.storage.online.net (yourbucketname.fr-1.storage.online.net)... 212.47.225.66
-Connecting to yourbucketname.fr-1.storage.online.net (yourbucketname.fr-1.storage.online.net)|212.47.225.66|:80... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 365608960 (349M) [application/x-tar]
-Saving to: ‘STDOUT’
-
--                               100%[======================================================>] 348.67M  15.6MB/s   in 20s
-
-2015-08-28 20:22:42 (17.4 MB/s) - written to stdout [365608960/365608960]
-
-make[2]: Leaving directory '/root/vivid-cowsay'
-make[1]: Leaving directory '/root/vivid-cowsay'
-test -f /tmp/create-image-from-s3.sh \
-	|| wget -qO /tmp/create-image-from-s3.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-s3.sh
-chmod +x /tmp/create-image-from-s3.sh
-VOLUME_SIZE=50G /tmp/create-image-from-s3.sh http://yourbucketname.fr-1.storage.online.net/vivid-cowsay-latest.tar
-[+] URL of the tarball: http://yourbucketname.fr-1.storage.online.net/vivid-cowsay-latest.tar
+test -f /tmp/create-image-from-http.sh \
+	|| wget -qO /tmp/create-image-from-http.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-http.sh
+chmod +x /tmp/create-image-from-http.sh
+VOLUME_SIZE=50G /tmp/create-image-from-http.sh http://YOURIP/vivid-cowsay-latest/rootfs.tar
+[+] URL of the tarball: http://YOURIP/vivid-cowsay-latest/rootfs.tar
 [+] Target name: vivid-cowsay-latest-2015-08-28_20:22
 [+] Creating new server in rescue mode with a secondary volume...
 [+] Server created: 53f65ff4-8a37-495c-9539-460f7c6facf3
@@ -151,7 +126,7 @@ Creating journal (32768 blocks): done
 Writing superblocks and filesystem accounting information: done
 
 [+] /dev/nbd1 formatted in ext4 and mounted on /mnt
-[+] Download tarball from S3 and write it to /dev/nbd1
+[+] Download tarball and write it to /dev/nbd1
 [+] Tarball extracted on /dev/nbd1
 [+] Stopping the server
 [+] Server stopped
@@ -181,6 +156,12 @@ root@your_custom_image> cowsay "Hello from my custom vivid"
 ---
 
 ## Changelog
+
+### 1.3.0 (2015-09-11)
+
+* Bumped scw to 1.5.0
+* Added a local webserver
+* Put the generation of the key in rc.local
 
 ### 1.2.0 (2015-08-28)
 

@@ -22,9 +22,6 @@ RUN curl -L https://github.com/scaleway/scaleway-cli/releases/download/v${SCW_VE
  && dpkg -i scw.deb \
  && rm scw.deb
 
-# Generate ssh key
-RUN ssh-keygen  -f ~/.ssh/id_rsa -t rsa  -N  ''
-
 # Patch rootfs
 ADD ./patches/etc/ /etc/
 ADD ./patches/usr/ /usr/
