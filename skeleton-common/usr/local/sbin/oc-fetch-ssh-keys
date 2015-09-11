@@ -17,7 +17,7 @@ fi
 cat << EOF > /root/.ssh/authorized_keys
 #
 # WARNING: Automatically generated file
-# This file will be erased at every boots
+# This file will be erased at every boot
 # This file was generated with '/usr/local/sbin/oc-fetch-ssh-keys'
 #
 # To add a new key, you can:
