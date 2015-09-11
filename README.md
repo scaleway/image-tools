@@ -3,6 +3,12 @@
 This repository contains the tools, documentations, examples and contents for building, debug and running images on [Scaleway](https://www.scaleway.com/).
 
 
+## Distribs & Community
+
+* The distribution images are located on the [scaleway](https://github.com/scaleway) organization
+* The apps and stacks are located on the [scaleway-community](https://github.com/scaleway-community) organization
+
+
 ## Getting start
 
 You can look the docker-based [hello-world](https://github.com/scaleway/image-helloworld) image.
@@ -32,26 +38,26 @@ distrib   | Arch Linux     | released | n/a                        | n/a    | [S
 distrib   | Opensuse       | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-opensuse)
 distrib   | Slackware      | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-slackware)
 distrib   | Busybox        | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-busybox)
-app       | Docker         | released | 1.5                        | ubuntu | [Source](https://github.com/scaleway/image-app-docker)
-app       | Ghost          | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-ghost)
-app       | Owncloud       | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-owncloud)
-app       | Pydio          | released | 6                          | ubuntu | [Source](https://github.com/online-labs/image-app-pydio)
-app       | Wordpress      | released | 4                          | ubuntu | [Source](https://github.com/online-labs/image-app-wordpress)
-app       | Torrents       | released | 1                          | ubuntu | [Source](https://github.com/online-labs/image-app-torrents)
-app       | OpenVPN        | wip      | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-openvpn)
-app       | TimeMachine    | wip      | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-timemachine)
-app       | SeedBox        | planned  | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-seedbox)
-app       | Mesos          | planned  | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-mesos)
+app       | Docker         | released | 1.5                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-docker)
+app       | Ghost          | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-ghost)
+app       | Owncloud       | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-owncloud)
+app       | Pydio          | released | 6                          | ubuntu | [Source](https://github.com/scaleway-community/image-app-pydio)
+app       | Wordpress      | released | 4                          | ubuntu | [Source](https://github.com/scaleway-community/image-app-wordpress)
+app       | Torrents       | released | 1                          | ubuntu | [Source](https://github.com/scaleway-community/image-app-torrents)
+app       | OpenVPN        | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-openvpn)
+app       | TimeMachine    | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-timemachine)
+app       | SeedBox        | planned  | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-seedbox)
+app       | Mesos          | planned  | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-mesos)
 app       | Proxy          | planned  | n/a                        | n/a    | n/a
-app       | LEMP           | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-lemp)
-app       | Node.js        | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-node)
-app       | Python         | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-app-python)
-app       | Discourse      | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-app-discourse)
-app       | Gitlab         | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-app-gitlab)
-app       | Java           | released | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-app-java)
-app       | ELK            | released | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-app-elk)
+app       | LEMP           | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-lemp)
+app       | Node.js        | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-node)
+app       | Python         | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-python)
+app       | Discourse      | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-discourse)
+app       | Gitlab         | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-gitlab)
+app       | Java           | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-java)
+app       | ELK            | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-elk)
 service   | Try-it         | released | n/a                        | docker | [Source](https://github.com/scaleway/image-service-tryit)
-service   | Rescue         | released | n/a                        | ubuntu | [Source](https://github.com/online-labs/image-service-rescue)
+service   | Rescue         | released | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-service-rescue)
 community | moul' dev      | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-devbox)
 community | moul' bench    | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
 community | mxs' 3.2 perf  | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
@@ -70,7 +76,7 @@ We added some small hacks to let the image be fully runnable on a C1 server with
 The advantages are :
 
 - Lots of available base images and examples on the [Docker's official registry](https://registry.hub.docker.com)
-- Easy inheritance between images ([app-timemachine](https://github.com/online-labs/image-app-timemachine) image inherits from [app-openvpn](https://github.com/online-labs/image-app-openvpn) image which inherits from [ubuntu](https://github.com/online-labs/image-ubuntu) image)
+- Easy inheritance between images ([app-timemachine](https://github.com/scaleway-community/image-app-timemachine) image inherits from [app-openvpn](https://github.com/scaleway-community/image-app-openvpn) image which inherits from [ubuntu](https://github.com/scaleway-community/image-ubuntu) image)
 - Easy debug with `docker run ...`
 - A well-known build format file (Dockerfile)
 - Docker's amazing builder advantages (speed, cache, tagging system)
