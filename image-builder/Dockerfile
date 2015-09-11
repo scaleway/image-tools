@@ -17,7 +17,8 @@ RUN apt-get -qq update     \
  && apt-get clean
 
 # Download scw
-RUN curl -L https://github.com/scaleway/scaleway-cli/releases/download/v1.4.0/scw_1.4.0_armhf.deb  > scw.deb \
+ENV SCW_VERSION 1.5.0
+RUN curl -L https://github.com/scaleway/scaleway-cli/releases/download/v${SCW_VERSION}/scw_${SCW_VERSION}_armhf.deb  > scw.deb \
  && dpkg -i scw.deb \
  && rm scw.deb
 
