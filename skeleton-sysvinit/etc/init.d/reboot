@@ -14,13 +14,7 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin
 . /lib/lsb/init-functions
 
 do_stop () {
-	# Message should end with a newline since kFreeBSD may
-	# print more stuff (see #323749)
-
-        # Disabled by Scaleway, needed for root NBD device disconnection
-        # log_action_msg "Will now restart"
-	# reboot -d -f -i
-	return
+    DO_PIVOT=1 /run/initramfs/shutdown reboot
 }
 
 case "$1" in
