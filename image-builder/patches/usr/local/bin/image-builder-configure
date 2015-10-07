@@ -1,12 +1,11 @@
 #! /bin/bash
 
+set -e
+
 test -f ~/.s3cfg || wget -qO ~/.s3cfg https://raw.githubusercontent.com/scaleway/image-tools/master/image-builder/s3cfg_template
-test -f ~/.scwrc || wget -qO ~/.scwrc https://raw.githubusercontent.com/scaleway/image-tools/master/image-builder/scwrc_template
+test -f ~/.scwrc || (wget -qO ~/.scwrc https://raw.githubusercontent.com/scaleway/image-tools/master/image-builder/scwrc_template && chmod 600 ~/.scwrc && scw login -s)
 
-chmod 600 ~/.scwrc
 chmod 600 ~/.s3cfg
-
-scw login -s
 
 ACCESS=$(cat ~/.scwrc | python -c 'import sys, json; print json.load(sys.stdin)["organization"]')
 TOKEN=$(cat ~/.scwrc | python -c 'import sys, json; print json.load(sys.stdin)["token"]')
@@ -15,7 +14,16 @@ sed -i "s/TOKEN_HERE/$TOKEN/" ~/.s3cfg
 sed -i "s/ACCESS_HERE/$ACCESS/" ~/.s3cfg
 
 cat << EOF > ~/Makefile
-NAME ?= \$(shell basename \$(shell pwd))
+NAME =                 YOUR_NAME
+VERSION =              latest
+VERSION_ALIASES =
+TITLE =                YOUR_TITLE
+SOURCE_URL =           https://github/com/...
+VENDOR_URL =
+
+IMAGE_VOLUME_SIZE =    50G
+IMAGE_BOOTSCRIPT =     stable
+IMAGE_NAME =           YOUR_IMAGE_NAME
 
 all:	docker-rules.mk
 docker-rules.mk:
