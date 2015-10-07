@@ -74,8 +74,28 @@ total 4
 -rw-r--r-- 1 root root   0 Aug 28 15:35 Dockerfile
 -rw-r--r-- 1 root root 146 Aug 28 15:19 Makefile
 ```
+##### 2. Configuring your Makefile
+```console
+root@buildcowsay> cat Makefile
+NAME =                 YOUR_NAME
+VERSION =              latest
+VERSION_ALIASES =
+TITLE =                YOUR_TITLE
+SOURCE_URL =           https://github/com/...
+VENDOR_URL =
 
-##### 2. Generating a Dockerfile
+IMAGE_VOLUME_SIZE =    50G
+IMAGE_BOOTSCRIPT =     stable
+IMAGE_NAME =           YOUR_IMAGE_NAME
+
+all:    docker-rules.mk
+docker-rules.mk:
+        wget -qO - http://j.mp/scw-builder | bash
+-include docker-rules.mk
+```
+
+
+##### 3. Generating a Dockerfile
 
 **Copy-Paste** this in your `Dockerfile` [see more](https://docs.docker.com/reference/builder/)
 ```dockerfile
@@ -87,7 +107,7 @@ RUN apt-get install -y cowsay
 ```
 You can see other Dockerfiles [here](https://github.com/scaleway/image-tools#official-images-built-with-image-tools)
 
-##### 3. Building the custom image
+##### 4. Building the custom image
 ```console
 root@buildcowsay> make image_on_local
 make[1]: Entering directory '/root/vivid-cowsay'
@@ -156,6 +176,9 @@ root@your_custom_image> cowsay "Hello from my custom vivid"
 ---
 
 ## Changelog
+
+### Unreleased
+* Improved image-builder-configure (now he don't ask for login/password is ~/.scwrc already exist)
 
 ### 1.3.0 (2015-09-11)
 
