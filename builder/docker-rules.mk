@@ -111,10 +111,7 @@ image:	image_on_s3
 
 
 release: build
-	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
-	  echo docker push $(DOCKER_NAMESPACE)$(NAME):$$tag; \
-	  docker push $(DOCKER_NAMESPACE)$(NAME):$$tag; \
-	done
+	docker push $(DOCKER_NAMESPACE)$(NAME)
 
 
 install_on_disk: /mnt/$(DISK)
