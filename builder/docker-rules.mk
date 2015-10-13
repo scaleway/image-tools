@@ -111,7 +111,14 @@ image:	image_on_s3
 
 
 release: build
-	docker push $(DOCKER_NAMESPACE)$(NAME)
+	@if [ -n "$(TRAVIS)" ]; then
+	  echo "we are on travis, sometimes 'docker push' timeouts, so retrying 3 times if needed."; \
+	  echo "$(DOCKER_NAMESPACE)$(NAME) || docker push $(DOCKER_NAMESPACE)$(NAME) || docker push $(DOCKER_NAMESPACE)$(NAME)"; \
+	  docker push $(DOCKER_NAMESPACE)$(NAME) || docker push $(DOCKER_NAMESPACE)$(NAME) || docker push $(DOCKER_NAMESPACE)$(NAME); \
+	else
+	  echo "docker push $(DOCKER_NAMESPACE)$(NAME)"; \
+	  docker push $(DOCKER_NAMESPACE)$(NAME); \
+	fi
 
 
 install_on_disk: /mnt/$(DISK)
