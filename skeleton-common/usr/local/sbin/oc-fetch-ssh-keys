@@ -27,7 +27,7 @@ cat << EOF > /root/.ssh/authorized_keys
 #        - i.e: "AUTHORIZED_KEY=ssh-rsa_XXXXXXXXXXX AUTHORIZED_KEY=ssh-rsa_YYYYYYYYYYYYYYY"
 #        - Be sure to replace all spaces with underscores
 #        - $> sed 's/ /_/g' ~./ssh/id_rsa.pub
-#   -- Edit the alternative file: `~/.ssh/authorized_keys2` which won't be erased at boot
+#   -- Edit the alternative file: \`~/.ssh/authorized_keys2\` which won't be erased at boot
 #
 EOF
 
