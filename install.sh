@@ -37,7 +37,6 @@ clean() {
     rm -rf ${TMPFILE}
 }
 
-
 main() {
     # Download tarball
     dl https://github.com/scaleway/image-tools/archive/${BRANCH}.tar.gz > ${TMPFILE}
@@ -47,6 +46,14 @@ main() {
         apply_flavor ${flavor}
     done
 
+	# Save flavors
+	FLAVORS_BACKUP=$(cat /etc/scw-release 2>/dev/null | grep "^IMAGE_FLAVORS=" | tr ',' ' ' | cut -d'=' -f2)
+	NEW_FLAVORS=$(echo "$(echo "${FLAVORS_BACKUP} ${FLAVORS}" | tr ' ' '\n')" | sed '/^\s*$/d' | sort -u | tr '\n' ' ')
+
+	sed -i '/^IMAGE_FLAVORS=/d' /etc/scw-release 2>/dev/null
+	cat << EOF >> /etc/scw-release
+IMAGE_FLAVORS=${NEW_FLAVORS}
+EOF
     clean
 }
 
