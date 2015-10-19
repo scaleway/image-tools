@@ -29,6 +29,7 @@ cat << EOF > /root/.ssh/authorized_keys
 #        - $> sed 's/ /_/g' ~./ssh/id_rsa.pub
 #   -- Edit the alternative file: \`~/.ssh/authorized_keys2\` which won't be erased at boot
 #
+#   -- Add the keys to \'~/.ssh/instance_keys\' which will be imported
 EOF
 
 # add Scaleway account keys
@@ -36,3 +37,6 @@ EOF
 
 # add Server tags keys
 /usr/local/bin/oc-metadata --cached | grep TAGS_.*=AUTHORIZED_KEY | cut -d'=' -f 3- | sed 's/_/\ /g' >> /root/.ssh/authorized_keys
+
+# Import custom keys
+cat ~/.ssh/instance_keys >> /root/.ssh/authorized_keys
