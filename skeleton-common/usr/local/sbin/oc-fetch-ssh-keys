@@ -22,14 +22,15 @@ cat << EOF > /root/.ssh/authorized_keys
 #
 # To add a new key, you can:
 #   -- Add keys on your Scaleway account https://cloud.scaleway.com/#/credentials
-#          and run 'oc-fetch-ssh-keys --upgrade'
 #   -- Add keys using server tags - https://cloud.scaleway.com/#/servers/$(oc-metadata --cached ID)
 #        - i.e: "AUTHORIZED_KEY=ssh-rsa_XXXXXXXXXXX AUTHORIZED_KEY=ssh-rsa_YYYYYYYYYYYYYYY"
 #        - Be sure to replace all spaces with underscores
 #        - $> sed 's/ /_/g' ~./ssh/id_rsa.pub
-#   -- Edit the alternative file: \`~/.ssh/authorized_keys2\` which won't be erased at boot
+#   -- Add the keys to '/root/.ssh/instance_keys' which will be imported
 #
-#   -- Add the keys to \'~/.ssh/instance_keys\' which will be imported
+# And recreate your 'authorized_keys' file with the new keys:
+#   -- Run 'oc-fetch-ssh-keys --upgrade'
+#
 EOF
 
 # add Scaleway account keys
@@ -39,4 +40,9 @@ EOF
 /usr/local/bin/oc-metadata --cached | grep TAGS_.*=AUTHORIZED_KEY | cut -d'=' -f 3- | sed 's/_/\ /g' >> /root/.ssh/authorized_keys
 
 # Import custom keys
-cat ~/.ssh/instance_keys >> /root/.ssh/authorized_keys
+if [ -f /root/.ssh/instance_keys ]; then
+	cat << EOF >> /root/.ssh/authorized_keys
+# Below your custom ssh keys from '/root/.ssh/instance_keys'
+EOF
+	cat /root/.ssh/instance_keys | grep -v "^#" >> /root/.ssh/authorized_keys
+fi
