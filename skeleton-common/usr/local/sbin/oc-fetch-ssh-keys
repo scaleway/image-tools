@@ -44,5 +44,5 @@ if [ -f /root/.ssh/instance_keys ]; then
 	cat << EOF >> /root/.ssh/authorized_keys
 # Below your custom ssh keys from '/root/.ssh/instance_keys'
 EOF
-	cat /root/.ssh/instance_keys | grep -v "^#" || true >> /root/.ssh/authorized_keys
+	(cat /root/.ssh/instance_keys | grep -v "^#" || true) >> /root/.ssh/authorized_keys
 fi
