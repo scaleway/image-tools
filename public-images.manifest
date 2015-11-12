@@ -16,46 +16,55 @@ busybox           latest                github.com/scaleway/image-busybox       
 slackware         latest                github.com/scaleway/image-slackware           .
 
 # official apps
-docker            latest                github.com/scaleway/image-app-docker          .
-wordpress         latest                github.com/scaleway/image-app-wordpress       .
-lemp              latest                github.com/scaleway/image-app-lemp            .
-openvpn           latest                github.com/scaleway/image-app-openvpn         .
-kanboard          latest                github.com/scaleway/image-app-kanboard        .
-elk               latest                github.com/scaleway/image-app-elk             .
-torrents          latest                github.com/scaleway/image-app-torrents        .
-gitlab            latest                github.com/scaleway/image-app-gitlab          .
-cozy              latest                github.com/scaleway/image-app-cozy            .
-rails             latest                github.com/scaleway/image-app-rails           .
-redmine           latest                github.com/scaleway/image-app-redmine         .
-drupal            latest                github.com/scaleway/image-app-drupal          .
-jenkins           latest                github.com/scaleway/image-app-jenkins         .
-java              latest                github.com/scaleway/image-app-java            .
-discourse         latest                github.com/scaleway/image-app-discourse       .
-wordpress         latest                github.com/scaleway/image-app-wordpress       .
-nodejs            latest                github.com/scaleway/image-app-nodejs          .
-ghost             latest                github.com/scaleway/image-app-ghost           .
-syncthing         latest                github.com/scaleway/image-app-syncthing       .
-pydio             latest                github.com/scaleway/image-app-pydio           .
-owncloud          latest                github.com/scaleway/image-app-owncloud        .
-centos            latest                github.com/scaleway/image-app-centos          .
-timemachine       latest                github.com/scaleway/image-app-timemachine     .
-ruby              latest                github.com/scaleway/image-app-ruby            .
-mysql             latest                github.com/scaleway/image-app-mysql           .
-ubuntu-desktop    latest                github.com/scaleway/image-app-ubuntu-desktop  .
-nginx             latest                github.com/scaleway/image-app-nginx           .
-python            latest                github.com/scaleway/image-app-python          .
-proxy             latest                github.com/scaleway/image-app-proxy           .
+docker            latest                github.com/scaleway-community/scaleway-docker          .
+wordpress         latest                github.com/scaleway-community/scaleway-wordpress       .
+lemp              latest                github.com/scaleway-community/scaleway-lemp            .
+openvpn           latest                github.com/scaleway-community/scaleway-openvpn         .
+kanboard          latest                github.com/scaleway-community/scaleway-kanboard        .
+elk               latest                github.com/scaleway-community/scaleway-elk             .
+torrents          latest                github.com/scaleway-community/scaleway-torrents        .
+gitlab            latest                github.com/scaleway-community/scaleway-gitlab          .
+cozy              latest                github.com/scaleway-community/scaleway-cozy            .
+rails             latest                github.com/scaleway-community/scaleway-rails           .
+redmine           latest                github.com/scaleway-community/scaleway-redmine         .
+drupal            latest                github.com/scaleway-community/scaleway-drupal          .
+jenkins           latest                github.com/scaleway-community/scaleway-jenkins         .
+java              latest                github.com/scaleway-community/scaleway-java            .
+discourse         latest                github.com/scaleway-community/scaleway-discourse       .
+wordpress         latest                github.com/scaleway-community/scaleway-wordpress       .
+nodejs            latest                github.com/scaleway-community/scaleway-nodejs          .
+ghost             latest                github.com/scaleway-community/scaleway-ghost           .
+syncthing         latest                github.com/scaleway-community/scaleway-syncthing       .
+pydio             latest                github.com/scaleway-community/scaleway-pydio           .
+owncloud          latest                github.com/scaleway-community/scaleway-owncloud        .
+centos            latest                github.com/scaleway-community/scaleway-centos          .
+timemachine       latest                github.com/scaleway-community/scaleway-timemachine     .
+ruby              latest                github.com/scaleway-community/scaleway-ruby            .
+mysql             latest                github.com/scaleway-community/scaleway-mysql           .
+ubuntu-desktop    latest                github.com/scaleway-community/scaleway-ubuntu-desktop  .
+nginx             latest                github.com/scaleway-community/scaleway-nginx           .
+python            latest                github.com/scaleway-community/scaleway-python          .
+proxy             latest                github.com/scaleway-community/scaleway-proxy           .
+camlistore        latest                github.com/scaleway-community/scaleway-camlistore      .
+serendipity       latest                github.com/scaleway-community/scaleway-serendipity     .
+redis             latest                github.com/scaleway-community/scaleway-redis           .
+zerobin           latest                github.com/scaleway-community/scaleway-zerobin         .
+gogs              latest                github.com/scaleway-community/scaleway-gogs            .
+etherpad          latest                github.com/scaleway-community/scaleway-etherpad        .
+webmin            latest                github.com/scaleway-community/scaleway-webmin          .
+prestashop        latest                github.com/scaleway-community/scaleway-prestashop      .
 
 # official services
 helloworld        latest                github.com/scaleway/image-helloworld          .
 service-rescue    latest                github.com/scaleway/image-service-rescue      .
 service-travis    latest                github.com/scaleway/image-service-travis      .
 service-tryit     latest                github.com/scaleway/image-service-tryit       .
+image-builder     latest                github.com/scaleway/image-tools               image-builder
 
 # community apps
-plex              latest                github.com/coolya/image-app-plex              .
-phabricator       latest                github.com/coolya/image-app-phabricator       .
-tor               latest                github.com/coolya/image-app-tor               .
-serendipity       latest                github.com/onli/image-app-serendipity         .
-ampache           latest                github.com/aimxhaisse/image-app-ampache       .
-camlistore        latest                github.com/aimxhaisse/image-app-camlistore    .
+# plex              latest                github.com/coolya/image-app-plex              .
+# phabricator       latest                github.com/coolya/image-app-phabricator       .
+# tor               latest                github.com/coolya/image-app-tor               .
+# serendipity       latest                github.com/onli/image-app-serendipity         .
+# ampache           latest                github.com/aimxhaisse/image-app-ampache       .
+# camlistore        latest                github.com/aimxhaisse/image-app-camlistore    .
