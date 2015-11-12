@@ -14,6 +14,7 @@ alpine            latest                github.com/scaleway/image-alpine        
 voidlinux         latest                github.com/scaleway/image-voidlinux           .
 busybox           latest                github.com/scaleway/image-busybox             .
 slackware         latest                github.com/scaleway/image-slackware           .
+centos            latest                github.com/scaleway/image-centos              .
 
 # official apps
 docker            latest                github.com/scaleway-community/scaleway-docker          .
@@ -37,7 +38,6 @@ ghost             latest                github.com/scaleway-community/scaleway-g
 syncthing         latest                github.com/scaleway-community/scaleway-syncthing       .
 pydio             latest                github.com/scaleway-community/scaleway-pydio           .
 owncloud          latest                github.com/scaleway-community/scaleway-owncloud        .
-centos            latest                github.com/scaleway-community/scaleway-centos          .
 timemachine       latest                github.com/scaleway-community/scaleway-timemachine     .
 ruby              latest                github.com/scaleway-community/scaleway-ruby            .
 mysql             latest                github.com/scaleway-community/scaleway-mysql           .
