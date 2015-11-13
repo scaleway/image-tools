@@ -6,6 +6,7 @@ ubuntu            14.04,trusty,lts      github.com/scaleway/image-ubuntu        
 ubuntu            15.04,vivid,latest    github.com/scaleway/image-ubuntu              15.04
 debian            8,jessie,latest       github.com/scaleway/image-debian              jessie
 debian            7,wheezy              github.com/scaleway/image-debian              wheezy
+debian            sid                   github.com/scaleway/image-debian              sid
 fedora            22,latest             github.com/scaleway/image-fedora              .
 opensuse          latest                github.com/scaleway/image-opensuse            .
 archlinux         latest                github.com/scaleway/image-archlinux           .
