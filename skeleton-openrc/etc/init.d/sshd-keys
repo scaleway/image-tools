@@ -1,0 +1,16 @@
+#!/sbin/runscript
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="SSHD keys"
+
+depend() {
+    need root
+    after sshd
+}
+
+start() {
+    ebegin "Generating SSH host keys"
+    /usr/local/sbin/oc-generate-ssh-keys
+    eend $?
+}
