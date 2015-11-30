@@ -10,7 +10,7 @@ DOC_URL ?=              https://scaleway.com/docs
 HELP_URL ?=             https://community.scaleway.com
 IS_LATEST ?=            0
 S3_URL ?=               s3://test-images
-STORE_HOST ?=           store.scw.42.am
+STORE_HOSTNAME ?=       store.scw.42.am
 STORE_PATH ?=           scw
 SHELL_BIN ?=            /bin/bash
 SHELL_DOCKER_OPTS ?=
@@ -98,7 +98,7 @@ image_on_s3: image_dep
 
 .PHONY: image_on_store
 image_on_store: image_dep publish_on_store
-	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(STORE_HOST)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
 
 
 .PHONY: image_on_local
@@ -131,8 +131,18 @@ publish_on_s3.tar: fast-publish_on_s3.tar
 
 .PHONY: publish_on_store
 publish_on_store: $(BUILDDIR)rootfs.tar
-	rsync -Pave ssh $(BUILDDIR)rootfs.tar $(STORE_HOST):store/$(STORE_PATH)/$(NAME)-$(VERSION).tar
-	@echo http://$(STORE_HOST)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+	rsync -Pave ssh $(BUILDDIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+	@echo http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+
+
+.PHONY: publish_on_store_ftp
+publish_on_store_ftp: $(BUILDDIR)rootfs.tar
+	cd $(BUILDDIR) && curl -T rootfs.tar --netrc ftp://$(STORE_HOSTNAME)/images/$(NAME)-$(VERSION).tar
+
+
+.PHONY: publish_on_store_sftp
+publish_on_store_sftp: $(BUILDDIR)rootfs.tar
+	cd $(BUILDDIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "mkdir store/images; cd store/images; put rootfs.tar; bye"
 
 
 check_s3.tar:
