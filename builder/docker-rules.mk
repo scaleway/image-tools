@@ -143,7 +143,7 @@ publish_on_store_ftp: $(BUILDDIR)rootfs.tar
 
 .PHONY: publish_on_store_sftp
 publish_on_store_sftp: $(BUILDDIR)rootfs.tar
-	cd $(BUILDDIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "mkdir store/images; cd store/images; put rootfs.tar; bye"
+	cd $(BUILDDIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar; bye"
 
 
 check_s3.tar:
