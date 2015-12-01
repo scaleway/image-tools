@@ -11,6 +11,7 @@ HELP_URL ?=             https://community.scaleway.com
 IS_LATEST ?=            0
 S3_URL ?=               s3://test-images
 STORE_HOSTNAME ?=       store.scw.42.am
+STORE_USERNAME ?=       $(shell whoami)
 STORE_PATH ?=           scw
 SHELL_BIN ?=            /bin/bash
 SHELL_DOCKER_OPTS ?=
