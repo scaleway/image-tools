@@ -25,6 +25,8 @@ IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ASSETS ?=
+TARGET_ARCH ?=		arm
+TARGET_ARCH_LONG ?=	armv7l
 
 
 # Phonies
@@ -169,12 +171,12 @@ clean:
 
 
 shell:  .docker-container.built
-	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
+	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
 	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
 
 
 test:  .docker-container.built
-	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
+	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
 	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
@@ -200,7 +202,7 @@ Dockerfile:
 
 
 .docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f) patches/usr/local/bin
-	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
+	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
 	-find patches -name '*~' -delete || true
 	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
 	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
@@ -268,19 +270,13 @@ $(BUILDDIR)export.tar: .docker-container.built
 	mount $(DISK) $@
 
 
-patches/usr/local/bin:
-	mkdir -p $@
+patches/usr/bin/qemu-$(TARGET_QEMU_ARCH)-static:
+	mkdir -p patches/usr/bin
+	wget https://github.com/multiarch/qemu-user-static/releases/download/v2.0.0/amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	tar -xf amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	rm -f amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
 
 
-patches/usr/local/bin/qemu-arm-static: patches/usr/local/bin
-	wget --no-check-certificate https://github.com/armbuild/qemu-user-static/raw/master/x86_64/qemu-arm-static -O $@
-	chmod +x $@
-
-
-setup_binfmt: patches/usr/local/bin/qemu-arm-static
+setup_binfmt:
 	@echo "Configurig binfmt-misc on the Docker(/Boot2Docker) kernel"
-	docker run --rm --privileged busybox sh -c " \
-	  mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc && \
-	  test -f /proc/sys/fs/binfmt_misc/arm || \
-	  echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/local/bin/qemu-arm-static:' > /proc/sys/fs/binfmt_misc/register \
-	"
+	docker run --rm --privileged multiarch/qemu-arm-static:register
