@@ -29,16 +29,12 @@ TARGET_ARCH ?=		arm
 TARGET_ARCH_LONG ?=	armv7l
 
 
-# Phonies
-.PHONY: build release install install_on_disk publish_on_s3 clean shell re all run
-.PHONY: publish_on_s3.tar publish_on_s3.sqsh publish_on_s3.tar.gz travis help
-
-
 # Default action
 all: help
 
 
 # Actions
+.PHONY: help
 help:
 	@echo 'General purpose commands'
 	@echo ' build                   build the Docker image'
@@ -56,10 +52,17 @@ help:
 	@echo ' shell                   open a shell in the image using `docker run`'
 	@echo ' test                    run unit test using `docker run` (limited testing)'
 
+
+.PHONY: build
 build:	.docker-container.built
+
+
+.PHONY: rebuild
 rebuild: clean
 	$(MAKE) build BUILD_OPTS=--no-cache
 
+
+.PHONY: info
 info:
 	@echo "Makefile variables:"
 	@echo "-------------------"
@@ -86,6 +89,7 @@ info:
 	@test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
+.PHONY: image_dep
 image_dep:
 	test -f /tmp/create-image-from-http.sh \
 		|| wget -qO /tmp/create-image-from-http.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-http.sh
@@ -110,21 +114,26 @@ image_on_local: image_dep $(BUILDDIR)rootfs.tar
 	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell oc-metadata --cached PUBLIC_IP_ADDRESS)/$(NAME)-$(VERSION)/$(NAME)-$(VERSION).tar
 
 
+.PHONY: image
 image:	image_on_s3
 
 
+.PHONY: release
 release: build
 	docker push $(DOCKER_NAMESPACE)$(NAME)
 
 
+.PHONY: install_on_disk
 install_on_disk: /mnt/$(DISK)
 	tar -C /mnt/$(DISK) -xf $(BUILDDIR)rootfs.tar
 
 
+.PHONY: fast-publish_on_s3.tar
 fast-publish_on_s3.tar: $(BUILDDIR)rootfs.tar
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar
 
 
+.PHONY: publish_on_s3.tar
 publish_on_s3.tar: fast-publish_on_s3.tar
 	$(MAKE) check_s3 || $(MAKE) publish_on_s3.tar
 
@@ -145,18 +154,22 @@ publish_on_store_sftp: $(BUILDDIR)rootfs.tar
 	cd $(BUILDDIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar -o $(NAME)-$(VERSION).tar; bye"
 
 
+.PHONY: check_s3.tar
 check_s3.tar:
 	wget --read-timeout=3 --tries=0 -O - $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}') >/dev/null
 
 
+.PHONY: publish_on_s3.tar.gz
 publish_on_s3.tar.gz: $(BUILDDIR)rootfs.tar.gz
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar.gz
 
 
+.PHONY: publish_on_s3.sqsh
 publish_on_s3.sqsh: $(BUILDDIR)rootfs.sqsh
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).sqsh
 
 
+.PHONY: fclean
 fclean: clean
 	$(eval IMAGE_ID := $(shell docker inspect -f '{{.Id}}' $(NAME):$(VERSION)))
 	$(eval PARENT_ID := $(shell docker inspect -f '{{.Parent}}' $(NAME):$(VERSION)))
@@ -165,30 +178,49 @@ fclean: clean
 	-docker rmi -f $(PARENT_ID)
 
 
+.PHONY: clean
 clean:
 	-rm -f $(BUILDDIR)rootfs.tar $(BUILDDIR)export.tar .??*.built
 	-rm -rf $(BUILDDIR)rootfs
 
 
+.PHONY: shell
 shell:  .docker-container.built
 	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
 	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
 
 
+.PHONY: test
 test:  .docker-container.built
 	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
 	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
+.PHONY: travis
 travis:
 	find . -name Dockerfile | xargs cat | grep -vi ^maintainer | bash -n
 
 
+.PHONY:
+setup_binfmt:
+	@echo "Configurig binfmt-misc on the Docker(/Boot2Docker) kernel"
+	docker run --rm --privileged multiarch/qemu-user-static:register --reset
+
+
 # Aliases
+.PHONY: publish_on_s3
 publish_on_s3: publish_on_s3.tar
+
+.PHONY: check_s3
 check_s3: check_s3.tar
+
+.PHONY: install
 install: install_on_disk
+
+.PHONY: run
 run: shell
+
+.PHONY: re
 re: rebuild
 
 
@@ -275,8 +307,3 @@ patches/usr/bin/qemu-$(TARGET_QEMU_ARCH)-static:
 	wget https://github.com/multiarch/qemu-user-static/releases/download/v2.0.0/amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
 	tar -xf amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
 	rm -f amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
-
-
-setup_binfmt:
-	@echo "Configurig binfmt-misc on the Docker(/Boot2Docker) kernel"
-	docker run --rm --privileged multiarch/qemu-arm-static:register
