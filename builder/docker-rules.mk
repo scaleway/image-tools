@@ -25,8 +25,11 @@ IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ASSETS ?=
-TARGET_ARCH ?=		arm
-TARGET_ARCH_LONG ?=	armv7l
+ARCH ?=			$(HOST_ARCH)
+ifeq ($(ARCH),arm)
+	TARGET_QEMU_ARCH=arm
+	TARGET_UNAME_ARCH=armv7l
+endif
 
 
 # Default action
@@ -81,12 +84,19 @@ info:
 	@echo "- VERSION           $(VERSION)"
 	@echo "- VERSION_ALIASES   $(VERSION_ALIASES)"
 	@echo
+	@echo "Arch:"
+	@echo "-----"
+	@echo "- HOST_ARCH         $(HOST_ARCH)"
+	@echo "- ARCH              $(ARCH)"
+	@echo "- TARGET_QEMU_ARCH  $(TARGET_QEMU_ARCH)"
+	@echo "- TARGET_UNAME_ARCH $(TARGET_UNAME_ARCH)"
+	@echo
 	@echo "Computed information:"
 	@echo "---------------------"
 	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
 	@echo "- S3 URL            $(S3_FULL_URL)"
-	@echo "- S3 public URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
-	@test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
+	@#echo "- S3 public URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
+	@#test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
 .PHONY: image_dep
@@ -186,13 +196,13 @@ clean:
 
 .PHONY: shell
 shell:  .docker-container.built
-	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
+	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
 	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
 
 
 .PHONY: test
 test:  .docker-container.built
-	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
+	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
 	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
@@ -226,16 +236,19 @@ re: rebuild
 
 # File-based rules
 Dockerfile:
-	@echo
-	@echo "You need a Dockerfile to build the image using this script."
-	@echo "Please give a look at https://github.com/scaleway/image-helloworld"
-	@echo
-	@exit 1
+	@if [ ! -f Dockerfile.$(TARGET_QEMU_ARCH) ]; then						\
+	  echo;										\
+	  echo "You need a Dockerfile to build the image using this script.";		\
+	  echo "Please give a look at https://github.com/scaleway/image-helloworld";	\
+	  echo;										\
+	  exit 1;									\
+	fi	
+	cp Dockerfile.$(TARGET_QEMU_ARCH) Dockerfile 
 
-
-.docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f) patches/usr/local/bin
-	test $(HOST_ARCH) = $(TARGET_ARCH_LONG) || $(MAKE) setup_binfmt
-	-find patches -name '*~' -delete || true
+.docker-container.built: patches overlay Dockerfile patches $(ASSETS) $(shell find patches overlay -type f) patches/usr/local/bin
+	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
+	@find patches -name '*~' -delete || true
+	@find overlay -name '*~' -delete || true
 	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
 	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
 	  echo docker tag -f $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
@@ -244,8 +257,8 @@ Dockerfile:
 	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > $@
 
 
-patches:
-	mkdir patches
+patches overlay:
+	@mkdir $@
 
 
 $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
