@@ -12,6 +12,7 @@ RUN apt-get -qq update     \
  && apt-get install -y -qq \
       s3cmd                \
       git                  \
+      lftp                 \
       curl                 \
       nginx-full           \
  && apt-get clean
