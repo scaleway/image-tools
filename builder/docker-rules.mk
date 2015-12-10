@@ -25,7 +25,7 @@ IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ADDITIONAL_ASSETS ?=
-DEFAULT_IMAGE_ARCH ?=	x86_64
+DEFAULT_IMAGE_ARCH ?=	armv7l
 ARCH ?=			$(HOST_ARCH)
 ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
 ifeq ($(ARCH),arm)
