@@ -19,17 +19,41 @@ SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 
 TITLE ?=                $(NAME)
 VERSION_ALIASES ?=
 BUILD_OPTS ?=
-HOST_ARCH ?=            $(shell uname -m)
+HOST_ARCH :=            $(shell uname -m)
 IMAGE_VOLUME_SIZE ?=    50G
 IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ASSETS ?=
 ARCH ?=			$(HOST_ARCH)
+ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
 ifeq ($(ARCH),arm)
 	TARGET_QEMU_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
+	TARGET_DOCKER_TAG_ARCH=armhf
 endif
+ifeq ($(ARCH),armhf)
+	TARGET_QEMU_ARCH=arm
+	TARGET_UNAME_ARCH=armv7l
+	TARGET_DOCKER_TAG_ARCH=armhf
+endif
+ifeq ($(ARCH),armv7l)
+	TARGET_QEMU_ARCH=arm
+	TARGET_UNAME_ARCH=armv7l
+	TARGET_DOCKER_TAG_ARCH=armhf
+endif
+ifeq ($(ARCH),x86_64)
+	TARGET_QEMU_ARCH=x86_64
+	TARGET_UNAME_ARCH=x86_64
+	TARGET_DOCKER_TAG_ARCH=amd64
+endif
+ifeq ($(ARCH),amd64)
+	TARGET_QEMU_ARCH=x86_64
+	TARGET_UNAME_ARCH=x86_64
+	TARGET_DOCKER_TAG_ARCH=amd64
+endif
+OVERLAY_DIRS := overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH)
+OVERLAY_FILES := $(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
 
 
 # Default action
@@ -57,7 +81,7 @@ help:
 
 
 .PHONY: build
-build:	.docker-container.built
+build:	.docker-container-$(TARGET_UNAME_ARCH).built
 
 
 .PHONY: rebuild
@@ -195,13 +219,13 @@ clean:
 
 
 .PHONY: shell
-shell:  .docker-container.built
+shell:  .docker-container-$(TARGET_UNAME_ARCH).built
 	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
 	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
 
 
 .PHONY: test
-test:  .docker-container.built
+test:  .docker-container-$(TARGET_UNAME_ARCH).built
 	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
 	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
@@ -235,30 +259,39 @@ re: rebuild
 
 
 # File-based rules
-Dockerfile:
-	@if [ ! -f Dockerfile.$(TARGET_QEMU_ARCH) ]; then						\
-	  echo;										\
-	  echo "You need a Dockerfile to build the image using this script.";		\
-	  echo "Please give a look at https://github.com/scaleway/image-helloworld";	\
-	  echo;										\
-	  exit 1;									\
-	fi	
-	cp Dockerfile.$(TARGET_QEMU_ARCH) Dockerfile 
-
-.docker-container.built: patches overlay Dockerfile patches $(ASSETS) $(shell find patches overlay -type f) patches/usr/local/bin
-	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
-	@find patches -name '*~' -delete || true
-	@find overlay -name '*~' -delete || true
-	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
-	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
-	  echo docker tag -f $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
-	  docker tag -f $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+tmp-$(TARGET_UNAME_ARCH)/Dockerfile: Dockerfile
+	mkdir -p tmp-$(TARGET_UNAME_ARCH)
+	cp $< $@
+	for arch in $(ARCHS); do                              \
+	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then     \
+	    sed -i "/#[[:space:]]*arch=$$arch[[:space:]]*$$/d" $@;          \
+	  fi                                                  \
 	done
-	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > $@
+	sed -i '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@
+	sed -i 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@
+	cat $@
 
 
-patches overlay:
-	@mkdir $@
+tmp-$(TARGET_UNAME_ARCH)/.overlays: $(OVERLAY_FILES)
+	mkdir -p tmp-$(TARGET_UNAME_ARCH)
+	for dir in overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH); do  \
+	  if [ -d "$$dir" ]; then											        \
+	    rm -rf "tmp-$(TARGET_UNAME_ARCH)/$$dir";                                                                            \
+	    cp -rf "$$dir" "tmp-$(TARGET_UNAME_ARCH)/$$dir";                                                                    \
+	  fi                                                                                                                    \
+	done
+	touch $@
+
+
+.docker-container-$(TARGET_UNAME_ARCH).built: tmp-$(TARGET_UNAME_ARCH)/Dockerfile tmp-$(TARGET_UNAME_ARCH)/.overlays $(ASSETS)
+	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
+	@find tmp-$(TARGET_UNAME_ARCH) -name "*~" -delete || true
+	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) tmp-$(TARGET_UNAME_ARCH)
+	for tag in $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do							                                   \
+	  echo docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;   \
+	  docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;	   \
+	done
+	docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) > $@
 
 
 $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
@@ -300,7 +333,7 @@ $(BUILDDIR)rootfs.sqsh: $(BUILDDIR)rootfs
 	mksquashfs $< $@ -noI -noD -noF -noX
 
 
-$(BUILDDIR)export.tar: .docker-container.built
+$(BUILDDIR)export.tar: .docker-container-$(TARGET_UNAME_ARCH).built
 	-mkdir -p $(BUILDDIR)
 	docker run --name $(NAME)-$(VERSION)-export --entrypoint /dontexists $(NAME):$(VERSION) 2>/dev/null || true
 	docker export $(NAME)-$(VERSION)-export > $@.tmp
