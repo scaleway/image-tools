@@ -2,7 +2,7 @@
 NAME ?=                 $(shell basename $(PWD))
 VERSION ?=              latest
 FULL_NAME ?=            $(NAME)-$(VERSION)
-BUILDDIR ?=             /tmp/build/$(FULL_NAME)/
+EXPORT_DIR ?=             /tmp/build/$(FULL_NAME)/
 DESCRIPTION ?=          $(TITLE)
 DISK ?=                 /dev/nbd1
 DOCKER_NAMESPACE ?=     scaleway/
@@ -24,7 +24,7 @@ IMAGE_VOLUME_SIZE ?=    50G
 IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
-ASSETS ?=
+ADDITIONAL_ASSETS ?=
 ARCH ?=			$(HOST_ARCH)
 ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
 ifeq ($(ARCH),arm)
@@ -52,8 +52,10 @@ ifeq ($(ARCH),amd64)
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
 endif
-OVERLAY_DIRS := overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH)
-OVERLAY_FILES := $(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
+OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH)
+OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
+TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
+BUILD_DIR :=		$(shell test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
 
 
 # Default action
@@ -93,7 +95,8 @@ rebuild: clean
 info:
 	@echo "Makefile variables:"
 	@echo "-------------------"
-	@echo "- BUILDDIR          $(BUILDDIR)"
+	@echo "- EXPORT_DIR          $(EXPORT_DIR)"
+	@echo "- BUILD_DIR          $(BUILD_DIR)"
 	@echo "- DESCRIPTION       $(DESCRIPTION)"
 	@echo "- DISK              $(DISK)"
 	@echo "- DOCKER_NAMESPACE  $(DOCKER_NAMESPACE)"
@@ -120,7 +123,7 @@ info:
 	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
 	@echo "- S3 URL            $(S3_FULL_URL)"
 	@#echo "- S3 public URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
-	@#test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
+	@#test -f $(EXPORT_DIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(EXPORT_DIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
 .PHONY: image_dep
@@ -143,8 +146,8 @@ image_on_store: image_dep publish_on_store
 
 
 .PHONY: image_on_local
-image_on_local: image_dep $(BUILDDIR)rootfs.tar
-	ln -sf $(BUILDDIR)rootfs.tar $(BUILDDIR)$(NAME)-$(VERSION).tar
+image_on_local: image_dep $(EXPORT_DIR)rootfs.tar
+	ln -sf $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)$(NAME)-$(VERSION).tar
 	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell oc-metadata --cached PUBLIC_IP_ADDRESS)/$(NAME)-$(VERSION)/$(NAME)-$(VERSION).tar
 
 
@@ -159,11 +162,11 @@ release: build
 
 .PHONY: install_on_disk
 install_on_disk: /mnt/$(DISK)
-	tar -C /mnt/$(DISK) -xf $(BUILDDIR)rootfs.tar
+	tar -C /mnt/$(DISK) -xf $(EXPORT_DIR)rootfs.tar
 
 
 .PHONY: fast-publish_on_s3.tar
-fast-publish_on_s3.tar: $(BUILDDIR)rootfs.tar
+fast-publish_on_s3.tar: $(EXPORT_DIR)rootfs.tar
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar
 
 
@@ -173,19 +176,19 @@ publish_on_s3.tar: fast-publish_on_s3.tar
 
 
 .PHONY: publish_on_store
-publish_on_store: $(BUILDDIR)rootfs.tar
-	rsync -Pave ssh $(BUILDDIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+publish_on_store: $(EXPORT_DIR)rootfs.tar
+	rsync -Pave ssh $(EXPORT_DIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(NAME)-$(VERSION).tar
 	@echo http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
 
 
 .PHONY: publish_on_store_ftp
-publish_on_store_ftp: $(BUILDDIR)rootfs.tar
-	cd $(BUILDDIR) && curl -T rootfs.tar --netrc ftp://$(STORE_HOSTNAME)/images/$(NAME)-$(VERSION).tar
+publish_on_store_ftp: $(EXPORT_DIR)rootfs.tar
+	cd $(EXPORT_DIR) && curl -T rootfs.tar --netrc ftp://$(STORE_HOSTNAME)/images/$(NAME)-$(VERSION).tar
 
 
 .PHONY: publish_on_store_sftp
-publish_on_store_sftp: $(BUILDDIR)rootfs.tar
-	cd $(BUILDDIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar -o $(NAME)-$(VERSION).tar; bye"
+publish_on_store_sftp: $(EXPORT_DIR)rootfs.tar
+	cd $(EXPORT_DIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar -o $(NAME)-$(VERSION).tar; bye"
 
 
 .PHONY: check_s3.tar
@@ -194,12 +197,12 @@ check_s3.tar:
 
 
 .PHONY: publish_on_s3.tar.gz
-publish_on_s3.tar.gz: $(BUILDDIR)rootfs.tar.gz
+publish_on_s3.tar.gz: $(EXPORT_DIR)rootfs.tar.gz
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar.gz
 
 
 .PHONY: publish_on_s3.sqsh
-publish_on_s3.sqsh: $(BUILDDIR)rootfs.sqsh
+publish_on_s3.sqsh: $(EXPORT_DIR)rootfs.sqsh
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).sqsh
 
 
@@ -214,8 +217,8 @@ fclean: clean
 
 .PHONY: clean
 clean:
-	-rm -f $(BUILDDIR)rootfs.tar $(BUILDDIR)export.tar .??*.built
-	-rm -rf $(BUILDDIR)rootfs
+	-rm -f $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)export.tar .??*.built
+	-rm -rf $(EXPORT_DIR)rootfs
 
 
 .PHONY: shell
@@ -259,8 +262,8 @@ re: rebuild
 
 
 # File-based rules
-tmp-$(TARGET_UNAME_ARCH)/Dockerfile: Dockerfile
-	mkdir -p tmp-$(TARGET_UNAME_ARCH)
+$(TMP_BUILD_DIR)/Dockerfile: Dockerfile
+	mkdir -p "$(TMP_BUILD_DIR)"
 	cp $< $@
 	for arch in $(ARCHS); do                              \
 	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then     \
@@ -272,21 +275,25 @@ tmp-$(TARGET_UNAME_ARCH)/Dockerfile: Dockerfile
 	cat $@
 
 
-tmp-$(TARGET_UNAME_ARCH)/.overlays: $(OVERLAY_FILES)
-	mkdir -p tmp-$(TARGET_UNAME_ARCH)
-	for dir in overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH); do  \
-	  if [ -d "$$dir" ]; then											        \
-	    rm -rf "tmp-$(TARGET_UNAME_ARCH)/$$dir";                                                                            \
-	    cp -rf "$$dir" "tmp-$(TARGET_UNAME_ARCH)/$$dir";                                                                    \
-	  fi                                                                                                                    \
+$(TMP_BUILD_DIR)/.overlays: $(OVERLAY_FILES)
+	mkdir -p $(TMP_BUILD_DIR)
+	for dir in $(OVERLAY_DIRS); do                           \
+	  if [ -d "$$dir" ]; then				 \
+	    rm -rf "$(TMP_BUILD_DIR)/$$dir";             \
+	    cp -rf "$$dir" "$(TMP_BUILD_DIR)/$$dir";     \
+	  fi                                                     \
 	done
 	touch $@
 
 
-.docker-container-$(TARGET_UNAME_ARCH).built: tmp-$(TARGET_UNAME_ARCH)/Dockerfile tmp-$(TARGET_UNAME_ARCH)/.overlays $(ASSETS)
+.overlays:
+	touch $@
+
+
+.docker-container-$(TARGET_UNAME_ARCH).built: $(BUILD_DIR)/Dockerfile $(BUILD_DIR)/.overlays $(ADDITIONAL_ASSETS)
 	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
-	@find tmp-$(TARGET_UNAME_ARCH) -name "*~" -delete || true
-	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) tmp-$(TARGET_UNAME_ARCH)
+	@find $(BUILD_DIR) -name "*~" -delete || true
+	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(BUILD_DIR)
 	for tag in $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do							                                   \
 	  echo docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;   \
 	  docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;	   \
@@ -294,7 +301,7 @@ tmp-$(TARGET_UNAME_ARCH)/.overlays: $(OVERLAY_FILES)
 	docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) > $@
 
 
-$(BUILDDIR)rootfs: $(BUILDDIR)export.tar
+$(EXPORT_DIR)rootfs: $(EXPORT_DIR)export.tar
 	-rm -rf $@ $@.tmp
 	-mkdir -p $@.tmp
 	tar -C $@.tmp -xf $<
@@ -313,35 +320,36 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/scw-release
 	mv $@.tmp $@
 
-$(BUILDDIR)rootfs.tar.gz: $(BUILDDIR)rootfs
+
+$(EXPORT_DIR)rootfs.tar.gz: $(EXPORT_DIR)rootfs
 	tar --format=gnu -C $< -czf $@.tmp .
 	mv $@.tmp $@
 
 
 .PHONY: rootfs.tar
-rootfs.tar: $(BUILDDIR)rootfs.tar
+rootfs.tar: $(EXPORT_DIR)rootfs.tar
 	ls -la $<
 	@echo $<
 
 
-$(BUILDDIR)rootfs.tar: $(BUILDDIR)rootfs
+$(EXPORT_DIR)rootfs.tar: $(EXPORT_DIR)rootfs
 	tar --format=gnu -C $< -cf $@.tmp .
 	mv $@.tmp $@
 
 
-$(BUILDDIR)rootfs.sqsh: $(BUILDDIR)rootfs
+$(EXPORT_DIR)rootfs.sqsh: $(EXPORT_DIR)rootfs
 	mksquashfs $< $@ -noI -noD -noF -noX
 
 
-$(BUILDDIR)export.tar: .docker-container-$(TARGET_UNAME_ARCH).built
-	-mkdir -p $(BUILDDIR)
+$(EXPORT_DIR)export.tar: .docker-container-$(TARGET_UNAME_ARCH).built
+	-mkdir -p $(EXPORT_DIR)
 	docker run --name $(NAME)-$(VERSION)-export --entrypoint /dontexists $(NAME):$(VERSION) 2>/dev/null || true
 	docker export $(NAME)-$(VERSION)-export > $@.tmp
 	docker rm $(NAME)-$(VERSION)-export
 	mv $@.tmp $@
 
 
-/mnt/$(DISK): $(BUILDDIR)rootfs.tar
+/mnt/$(DISK): $(EXPORT_DIR)rootfs.tar
 	umount $(DISK) || true
 	mkfs.ext4 $(DISK)
 	mkdir -p $@
