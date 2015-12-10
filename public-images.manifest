@@ -55,6 +55,7 @@ gogs              latest                github.com/scaleway-community/scaleway-g
 etherpad          latest                github.com/scaleway-community/scaleway-etherpad        .
 webmin            latest                github.com/scaleway-community/scaleway-webmin          .
 prestashop        latest                github.com/scaleway-community/scaleway-prestashop      .
+prometheus        latest                github.com/scaleway-community/scaleway-prometheus      .
 
 # official services
 helloworld        latest                github.com/scaleway/image-helloworld          .
