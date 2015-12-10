@@ -272,7 +272,7 @@ $(TMP_BUILD_DIR)/Dockerfile: Dockerfile
 	done
 	sed -i '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@
 	sed -i 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@
-	cat $@
+	#cat $@
 
 
 $(TMP_BUILD_DIR)/.overlays: $(OVERLAY_FILES)
