@@ -25,6 +25,7 @@ IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ADDITIONAL_ASSETS ?=
+DEFAULT_IMAGE_ARCH ?=	x86_64
 ARCH ?=			$(HOST_ARCH)
 ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
 ifeq ($(ARCH),arm)
@@ -55,7 +56,7 @@ endif
 OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH)
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
 TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
-BUILD_DIR :=		$(shell test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
+BUILD_DIR :=		$(shell test $(HOST_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
 
 
 # Default action
