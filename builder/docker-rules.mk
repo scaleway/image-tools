@@ -226,13 +226,13 @@ clean:
 .PHONY: shell
 shell:  .docker-container-$(TARGET_UNAME_ARCH).built
 	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
-	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
+	docker run --rm -it $(SHELL_DOCKER_OPTS) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(SHELL_BIN)
 
 
 .PHONY: test
 test:  .docker-container-$(TARGET_UNAME_ARCH).built
 	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
-	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
+	docker run --rm -it -e SKIP_NON_DOCKER=1 $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
 .PHONY: travis
@@ -348,7 +348,7 @@ $(EXPORT_DIR)rootfs.sqsh: $(EXPORT_DIR)rootfs
 
 $(EXPORT_DIR)export.tar: .docker-container-$(TARGET_UNAME_ARCH).built
 	-mkdir -p $(EXPORT_DIR)
-	docker run --name $(NAME)-$(VERSION)-export --entrypoint /dontexists $(NAME):$(VERSION) 2>/dev/null || true
+	docker run --name $(NAME)-$(VERSION)-export --entrypoint /dontexists $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) 2>/dev/null || true
 	docker export $(NAME)-$(VERSION)-export > $@.tmp
 	docker rm $(NAME)-$(VERSION)-export
 	mv $@.tmp $@
