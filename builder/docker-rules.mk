@@ -2,7 +2,6 @@
 NAME ?=                 $(shell basename $(PWD))
 VERSION ?=              latest
 FULL_NAME ?=            $(NAME)-$(VERSION)
-EXPORT_DIR ?=             /tmp/build/$(FULL_NAME)/
 DESCRIPTION ?=          $(TITLE)
 DISK ?=                 /dev/nbd1
 DOCKER_NAMESPACE ?=     scaleway/
@@ -57,6 +56,7 @@ OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches pat
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
 TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
 BUILD_DIR :=		$(shell test $(TARGET_UNAME_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
+EXPORT_DIR ?=           /tmp/build/$(TARGET_UNAME_ARCH)-$(FULL_NAME)/
 
 
 # Default action
