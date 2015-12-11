@@ -179,18 +179,18 @@ publish_on_s3.tar: fast-publish_on_s3.tar
 
 .PHONY: publish_on_store
 publish_on_store: $(EXPORT_DIR)rootfs.tar
-	rsync -Pave ssh $(EXPORT_DIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+	rsync -Pave ssh $(EXPORT_DIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 	@echo http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
 
 
 .PHONY: publish_on_store_ftp
 publish_on_store_ftp: $(EXPORT_DIR)rootfs.tar
-	cd $(EXPORT_DIR) && curl -T rootfs.tar --netrc ftp://$(STORE_HOSTNAME)/images/$(NAME)-$(VERSION).tar
+	cd $(EXPORT_DIR) && curl -T rootfs.tar --netrc ftp://$(STORE_HOSTNAME)/images/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: publish_on_store_sftp
 publish_on_store_sftp: $(EXPORT_DIR)rootfs.tar
-	cd $(EXPORT_DIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar -o $(NAME)-$(VERSION).tar; bye"
+	cd $(EXPORT_DIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar -o $(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar; bye"
 
 
 .PHONY: check_s3.tar
@@ -200,12 +200,12 @@ check_s3.tar:
 
 .PHONY: publish_on_s3.tar.gz
 publish_on_s3.tar.gz: $(EXPORT_DIR)rootfs.tar.gz
-	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar.gz
+	s3cmd put --acl-public $< $(S3_URL)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar.gz
 
 
 .PHONY: publish_on_s3.sqsh
 publish_on_s3.sqsh: $(EXPORT_DIR)rootfs.sqsh
-	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).sqsh
+	s3cmd put --acl-public $< $(S3_URL)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).sqsh
 
 
 .PHONY: fclean
