@@ -56,7 +56,7 @@ endif
 OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH)
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
 TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
-BUILD_DIR :=		$(shell test $(HOST_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
+BUILD_DIR :=		$(shell test $(TARGET_UNAME_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
 
 
 # Default action
@@ -96,34 +96,35 @@ rebuild: clean
 info:
 	@echo "Makefile variables:"
 	@echo "-------------------"
-	@echo "- EXPORT_DIR          $(EXPORT_DIR)"
-	@echo "- BUILD_DIR          $(BUILD_DIR)"
-	@echo "- DESCRIPTION       $(DESCRIPTION)"
-	@echo "- DISK              $(DISK)"
-	@echo "- DOCKER_NAMESPACE  $(DOCKER_NAMESPACE)"
-	@echo "- DOC_URL           $(DOC_URL)"
-	@echo "- HELP_URL          $(HELP_URL)"
-	@echo "- IS_LATEST         $(IS_LATEST)"
-	@echo "- NAME              $(NAME)"
-	@echo "- S3_URL            $(S3_URL)"
-	@echo "- SHELL_BIN         $(SHELL_BIN)"
-	@echo "- SOURCE_URL        $(SOURCE_URL)"
-	@echo "- TITLE             $(TITLE)"
-	@echo "- VERSION           $(VERSION)"
-	@echo "- VERSION_ALIASES   $(VERSION_ALIASES)"
+	@echo "- EXPORT_DIR           $(EXPORT_DIR)"
+	@echo "- BUILD_DIR            $(BUILD_DIR)"
+	@echo "- DESCRIPTION          $(DESCRIPTION)"
+	@echo "- DISK                 $(DISK)"
+	@echo "- DOCKER_NAMESPACE     $(DOCKER_NAMESPACE)"
+	@echo "- DOC_URL              $(DOC_URL)"
+	@echo "- HELP_URL             $(HELP_URL)"
+	@echo "- IS_LATEST            $(IS_LATEST)"
+	@echo "- NAME                 $(NAME)"
+	@echo "- S3_URL               $(S3_URL)"
+	@echo "- SHELL_BIN            $(SHELL_BIN)"
+	@echo "- SOURCE_URL           $(SOURCE_URL)"
+	@echo "- TITLE                $(TITLE)"
+	@echo "- VERSION              $(VERSION)"
+	@echo "- VERSION_ALIASES      $(VERSION_ALIASES)"
 	@echo
 	@echo "Arch:"
 	@echo "-----"
-	@echo "- HOST_ARCH         $(HOST_ARCH)"
-	@echo "- ARCH              $(ARCH)"
-	@echo "- TARGET_QEMU_ARCH  $(TARGET_QEMU_ARCH)"
-	@echo "- TARGET_UNAME_ARCH $(TARGET_UNAME_ARCH)"
+	@echo "- HOST_ARCH            $(HOST_ARCH)"
+	@echo "- DEFAULT_IMAGE_ARCH   $(DEFAULT_IMAGE_ARCH)"
+	@echo "- ARCH                 $(ARCH)"
+	@echo "- TARGET_QEMU_ARCH     $(TARGET_QEMU_ARCH)"
+	@echo "- TARGET_UNAME_ARCH    $(TARGET_UNAME_ARCH)"
 	@echo
 	@echo "Computed information:"
 	@echo "---------------------"
-	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
-	@echo "- S3 URL            $(S3_FULL_URL)"
-	@#echo "- S3 public URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
+	@echo "- Docker image         $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
+	@echo "- S3 URL               $(S3_FULL_URL)"
+	@#echo "- S3 public URL        $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
 	@#test -f $(EXPORT_DIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(EXPORT_DIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
@@ -266,23 +267,26 @@ re: rebuild
 $(TMP_BUILD_DIR)/Dockerfile: Dockerfile
 	mkdir -p "$(TMP_BUILD_DIR)"
 	cp $< $@
-	for arch in $(ARCHS); do                              \
-	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then     \
-	    sed -i "/#[[:space:]]*arch=$$arch[[:space:]]*$$/d" $@;          \
-	  fi                                                  \
+	for arch in $(ARCHS); do							\
+	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then				\
+	    sed -i "/#[[:space:]]*arch=$$arch[[:space:]]*$$/d" $@;			\
+	  fi										\
 	done
 	sed -i '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@
 	sed -i 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@
+	if [ "`grep ^FROM $(TMP_BUILD_DIR)/Dockerfile | wc -l`" = "2" ]; then		\
+	  sed -i 0,/^FROM/d $(TMP_BUILD_DIR)/Dockerfile;					\
+	fi
 	#cat $@
 
 
 $(TMP_BUILD_DIR)/.overlays: $(OVERLAY_FILES)
 	mkdir -p $(TMP_BUILD_DIR)
-	for dir in $(OVERLAY_DIRS); do                           \
-	  if [ -d "$$dir" ]; then				 \
-	    rm -rf "$(TMP_BUILD_DIR)/$$dir";             \
-	    cp -rf "$$dir" "$(TMP_BUILD_DIR)/$$dir";     \
-	  fi                                                     \
+	for dir in $(OVERLAY_DIRS); do                           			\
+	  if [ -d "$$dir" ]; then				 			\
+	    rm -rf "$(TMP_BUILD_DIR)/$$dir";             				\
+	    cp -rf "$$dir" "$(TMP_BUILD_DIR)/$$dir";     				\
+	  fi                                                     			\
 	done
 	touch $@
 
