@@ -2,7 +2,6 @@
 NAME ?=                 $(shell basename $(PWD))
 VERSION ?=              latest
 FULL_NAME ?=            $(NAME)-$(VERSION)
-BUILDDIR ?=             /tmp/build/$(FULL_NAME)/
 DESCRIPTION ?=          $(TITLE)
 DISK ?=                 /dev/nbd1
 DOCKER_NAMESPACE ?=     scaleway/
@@ -19,17 +18,45 @@ SOURCE_URL ?=           $(shell sh -c "git config --get remote.origin.url | sed 
 TITLE ?=                $(NAME)
 VERSION_ALIASES ?=
 BUILD_OPTS ?=
-HOST_ARCH ?=            $(shell uname -m)
+HOST_ARCH :=            $(shell uname -m)
 IMAGE_VOLUME_SIZE ?=    50G
 IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
-ASSETS ?=
-
-
-# Phonies
-.PHONY: build release install install_on_disk publish_on_s3 clean shell re all run
-.PHONY: publish_on_s3.tar publish_on_s3.sqsh publish_on_s3.tar.gz travis help
+ADDITIONAL_ASSETS ?=
+DEFAULT_IMAGE_ARCH ?=	armv7l
+ARCH ?=			$(HOST_ARCH)
+ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
+ifeq ($(ARCH),arm)
+	TARGET_QEMU_ARCH=arm
+	TARGET_UNAME_ARCH=armv7l
+	TARGET_DOCKER_TAG_ARCH=armhf
+endif
+ifeq ($(ARCH),armhf)
+	TARGET_QEMU_ARCH=arm
+	TARGET_UNAME_ARCH=armv7l
+	TARGET_DOCKER_TAG_ARCH=armhf
+endif
+ifeq ($(ARCH),armv7l)
+	TARGET_QEMU_ARCH=arm
+	TARGET_UNAME_ARCH=armv7l
+	TARGET_DOCKER_TAG_ARCH=armhf
+endif
+ifeq ($(ARCH),x86_64)
+	TARGET_QEMU_ARCH=x86_64
+	TARGET_UNAME_ARCH=x86_64
+	TARGET_DOCKER_TAG_ARCH=amd64
+endif
+ifeq ($(ARCH),amd64)
+	TARGET_QEMU_ARCH=x86_64
+	TARGET_UNAME_ARCH=x86_64
+	TARGET_DOCKER_TAG_ARCH=amd64
+endif
+OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH)
+OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
+TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
+BUILD_DIR :=		$(shell test $(TARGET_UNAME_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
+EXPORT_DIR ?=           /tmp/build/$(TARGET_UNAME_ARCH)-$(FULL_NAME)/
 
 
 # Default action
@@ -37,6 +64,7 @@ all: help
 
 
 # Actions
+.PHONY: help
 help:
 	@echo 'General purpose commands'
 	@echo ' build                   build the Docker image'
@@ -54,36 +82,53 @@ help:
 	@echo ' shell                   open a shell in the image using `docker run`'
 	@echo ' test                    run unit test using `docker run` (limited testing)'
 
-build:	.docker-container.built
+
+.PHONY: build
+build:	.docker-container-$(TARGET_UNAME_ARCH).built
+
+
+.PHONY: rebuild
 rebuild: clean
 	$(MAKE) build BUILD_OPTS=--no-cache
 
+
+.PHONY: info
 info:
 	@echo "Makefile variables:"
 	@echo "-------------------"
-	@echo "- BUILDDIR          $(BUILDDIR)"
-	@echo "- DESCRIPTION       $(DESCRIPTION)"
-	@echo "- DISK              $(DISK)"
-	@echo "- DOCKER_NAMESPACE  $(DOCKER_NAMESPACE)"
-	@echo "- DOC_URL           $(DOC_URL)"
-	@echo "- HELP_URL          $(HELP_URL)"
-	@echo "- IS_LATEST         $(IS_LATEST)"
-	@echo "- NAME              $(NAME)"
-	@echo "- S3_URL            $(S3_URL)"
-	@echo "- SHELL_BIN         $(SHELL_BIN)"
-	@echo "- SOURCE_URL        $(SOURCE_URL)"
-	@echo "- TITLE             $(TITLE)"
-	@echo "- VERSION           $(VERSION)"
-	@echo "- VERSION_ALIASES   $(VERSION_ALIASES)"
+	@echo "- EXPORT_DIR           $(EXPORT_DIR)"
+	@echo "- BUILD_DIR            $(BUILD_DIR)"
+	@echo "- DESCRIPTION          $(DESCRIPTION)"
+	@echo "- DISK                 $(DISK)"
+	@echo "- DOCKER_NAMESPACE     $(DOCKER_NAMESPACE)"
+	@echo "- DOC_URL              $(DOC_URL)"
+	@echo "- HELP_URL             $(HELP_URL)"
+	@echo "- IS_LATEST            $(IS_LATEST)"
+	@echo "- NAME                 $(NAME)"
+	@echo "- S3_URL               $(S3_URL)"
+	@echo "- SHELL_BIN            $(SHELL_BIN)"
+	@echo "- SOURCE_URL           $(SOURCE_URL)"
+	@echo "- TITLE                $(TITLE)"
+	@echo "- VERSION              $(VERSION)"
+	@echo "- VERSION_ALIASES      $(VERSION_ALIASES)"
+	@echo
+	@echo "Arch:"
+	@echo "-----"
+	@echo "- HOST_ARCH            $(HOST_ARCH)"
+	@echo "- DEFAULT_IMAGE_ARCH   $(DEFAULT_IMAGE_ARCH)"
+	@echo "- ARCH                 $(ARCH)"
+	@echo "- TARGET_QEMU_ARCH     $(TARGET_QEMU_ARCH)"
+	@echo "- TARGET_UNAME_ARCH    $(TARGET_UNAME_ARCH)"
 	@echo
 	@echo "Computed information:"
 	@echo "---------------------"
-	@echo "- Docker image      $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
-	@echo "- S3 URL            $(S3_FULL_URL)"
-	@echo "- S3 public URL     $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
-	@test -f $(BUILDDIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(BUILDDIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
+	@echo "- Docker image         $(DOCKER_NAMESPACE)$(NAME):$(VERSION)"
+	@echo "- S3 URL               $(S3_FULL_URL)"
+	@#echo "- S3 public URL        $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')"
+	@#test -f $(EXPORT_DIR)rootfs.tar && echo "- Image size        $(shell stat -c %s $(EXPORT_DIR)rootfs.tar | numfmt --to=iec-i --suffix=B --format=\"%3f\")" || true
 
 
+.PHONY: image_dep
 image_dep:
 	test -f /tmp/create-image-from-http.sh \
 		|| wget -qO /tmp/create-image-from-http.sh https://github.com/scaleway/scaleway-cli/raw/master/examples/create-image-from-http.sh
@@ -103,58 +148,67 @@ image_on_store: image_dep publish_on_store
 
 
 .PHONY: image_on_local
-image_on_local: image_dep $(BUILDDIR)rootfs.tar
-	ln -sf $(BUILDDIR)rootfs.tar $(BUILDDIR)$(NAME)-$(VERSION).tar
+image_on_local: image_dep $(EXPORT_DIR)rootfs.tar
+	ln -sf $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)$(NAME)-$(VERSION).tar
 	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell oc-metadata --cached PUBLIC_IP_ADDRESS)/$(NAME)-$(VERSION)/$(NAME)-$(VERSION).tar
 
 
+.PHONY: image
 image:	image_on_s3
 
 
+.PHONY: release
 release: build
 	docker push $(DOCKER_NAMESPACE)$(NAME)
 
 
+.PHONY: install_on_disk
 install_on_disk: /mnt/$(DISK)
-	tar -C /mnt/$(DISK) -xf $(BUILDDIR)rootfs.tar
+	tar -C /mnt/$(DISK) -xf $(EXPORT_DIR)rootfs.tar
 
 
-fast-publish_on_s3.tar: $(BUILDDIR)rootfs.tar
+.PHONY: fast-publish_on_s3.tar
+fast-publish_on_s3.tar: $(EXPORT_DIR)rootfs.tar
 	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar
 
 
+.PHONY: publish_on_s3.tar
 publish_on_s3.tar: fast-publish_on_s3.tar
 	$(MAKE) check_s3 || $(MAKE) publish_on_s3.tar
 
 
 .PHONY: publish_on_store
-publish_on_store: $(BUILDDIR)rootfs.tar
-	rsync -Pave ssh $(BUILDDIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+publish_on_store: $(EXPORT_DIR)rootfs.tar
+	rsync -Pave ssh $(EXPORT_DIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 	@echo http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
 
 
 .PHONY: publish_on_store_ftp
-publish_on_store_ftp: $(BUILDDIR)rootfs.tar
-	cd $(BUILDDIR) && curl -T rootfs.tar --netrc ftp://$(STORE_HOSTNAME)/images/$(NAME)-$(VERSION).tar
+publish_on_store_ftp: $(EXPORT_DIR)rootfs.tar
+	cd $(EXPORT_DIR) && curl -T rootfs.tar --netrc ftp://$(STORE_HOSTNAME)/images/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: publish_on_store_sftp
-publish_on_store_sftp: $(BUILDDIR)rootfs.tar
-	cd $(BUILDDIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar -o $(NAME)-$(VERSION).tar; bye"
+publish_on_store_sftp: $(EXPORT_DIR)rootfs.tar
+	cd $(EXPORT_DIR) && lftp -u $(STORE_USERNAME) -p 2222 sftp://$(STORE_HOSTNAME) -e "set sftp:auto-confirm yes; mkdir store/images; cd store/images; put rootfs.tar -o $(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar; bye"
 
 
+.PHONY: check_s3.tar
 check_s3.tar:
 	wget --read-timeout=3 --tries=0 -O - $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}') >/dev/null
 
 
-publish_on_s3.tar.gz: $(BUILDDIR)rootfs.tar.gz
-	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).tar.gz
+.PHONY: publish_on_s3.tar.gz
+publish_on_s3.tar.gz: $(EXPORT_DIR)rootfs.tar.gz
+	s3cmd put --acl-public $< $(S3_URL)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar.gz
 
 
-publish_on_s3.sqsh: $(BUILDDIR)rootfs.sqsh
-	s3cmd put --acl-public $< $(S3_URL)/$(NAME)-$(VERSION).sqsh
+.PHONY: publish_on_s3.sqsh
+publish_on_s3.sqsh: $(EXPORT_DIR)rootfs.sqsh
+	s3cmd put --acl-public $< $(S3_URL)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).sqsh
 
 
+.PHONY: fclean
 fclean: clean
 	$(eval IMAGE_ID := $(shell docker inspect -f '{{.Id}}' $(NAME):$(VERSION)))
 	$(eval PARENT_ID := $(shell docker inspect -f '{{.Parent}}' $(NAME):$(VERSION)))
@@ -163,58 +217,96 @@ fclean: clean
 	-docker rmi -f $(PARENT_ID)
 
 
+.PHONY: clean
 clean:
-	-rm -f $(BUILDDIR)rootfs.tar $(BUILDDIR)export.tar .??*.built
-	-rm -rf $(BUILDDIR)rootfs
+	-rm -f $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)export.tar .??*.built
+	-rm -rf $(EXPORT_DIR)rootfs
 
 
-shell:  .docker-container.built
-	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
-	docker run --rm -it $(SHELL_DOCKER_OPTS) $(NAME):$(VERSION) $(SHELL_BIN)
+.PHONY: shell
+shell:  .docker-container-$(TARGET_UNAME_ARCH).built
+	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
+	docker run --rm -it $(SHELL_DOCKER_OPTS) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(SHELL_BIN)
 
 
-test:  .docker-container.built
-	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
-	docker run --rm -it -e SKIP_NON_DOCKER=1 $(NAME):$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
+.PHONY: test
+test:  .docker-container-$(TARGET_UNAME_ARCH).built
+	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
+	docker run --rm -it -e SKIP_NON_DOCKER=1 $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(SHELL_BIN) -c 'SCRIPT=$$(mktemp); curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > $$SCRIPT; bash $$SCRIPT'
 
 
+.PHONY: travis
 travis:
 	find . -name Dockerfile | xargs cat | grep -vi ^maintainer | bash -n
 
 
+.PHONY:
+setup_binfmt:
+	@echo "Configurig binfmt-misc on the Docker(/Boot2Docker) kernel"
+	docker run --rm --privileged multiarch/qemu-user-static:register --reset
+
+
 # Aliases
+.PHONY: publish_on_s3
 publish_on_s3: publish_on_s3.tar
+
+.PHONY: check_s3
 check_s3: check_s3.tar
+
+.PHONY: install
 install: install_on_disk
+
+.PHONY: run
 run: shell
+
+.PHONY: re
 re: rebuild
 
 
 # File-based rules
-Dockerfile:
-	@echo
-	@echo "You need a Dockerfile to build the image using this script."
-	@echo "Please give a look at https://github.com/scaleway/image-helloworld"
-	@echo
-	@exit 1
-
-
-.docker-container.built: Dockerfile patches $(ASSETS) $(shell find patches -type f) patches/usr/local/bin
-	test $(HOST_ARCH) = armv7l || $(MAKE) setup_binfmt
-	-find patches -name '*~' -delete || true
-	docker build $(BUILD_OPTS) -t $(NAME):$(VERSION) .
-	for tag in $(VERSION) $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do \
-	  echo docker tag -f $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
-	  docker tag -f $(NAME):$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$$tag; \
+$(TMP_BUILD_DIR)/Dockerfile: Dockerfile
+	mkdir -p "$(TMP_BUILD_DIR)"
+	cp $< $@
+	for arch in $(ARCHS); do							\
+	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then				\
+	    sed -i "/#[[:space:]]*arch=$$arch[[:space:]]*$$/d" $@;			\
+	  fi										\
 	done
-	docker inspect -f '{{.Id}}' $(NAME):$(VERSION) > $@
+	sed -i '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@
+	sed -i 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@
+	if [ "`grep ^FROM $(TMP_BUILD_DIR)/Dockerfile | wc -l`" = "2" ]; then		\
+	  sed -i 0,/^FROM/d $(TMP_BUILD_DIR)/Dockerfile;					\
+	fi
+	#cat $@
 
 
-patches:
-	mkdir patches
+$(TMP_BUILD_DIR)/.overlays: $(OVERLAY_FILES)
+	mkdir -p $(TMP_BUILD_DIR)
+	for dir in $(OVERLAY_DIRS); do                           			\
+	  if [ -d "$$dir" ]; then				 			\
+	    rm -rf "$(TMP_BUILD_DIR)/$$dir";             				\
+	    cp -rf "$$dir" "$(TMP_BUILD_DIR)/$$dir";     				\
+	  fi                                                     			\
+	done
+	touch $@
 
 
-$(BUILDDIR)rootfs: $(BUILDDIR)export.tar
+.overlays:
+	touch $@
+
+
+.docker-container-$(TARGET_UNAME_ARCH).built: $(BUILD_DIR)/Dockerfile $(BUILD_DIR)/.overlays $(ADDITIONAL_ASSETS)
+	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
+	@find $(BUILD_DIR) -name "*~" -delete || true
+	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(BUILD_DIR)
+	for tag in $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do							                                   \
+	  echo docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;   \
+	  docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;	   \
+	done
+	docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) > $@
+
+
+$(EXPORT_DIR)rootfs: $(EXPORT_DIR)export.tar
 	-rm -rf $@ $@.tmp
 	-mkdir -p $@.tmp
 	tar -C $@.tmp -xf $<
@@ -233,54 +325,44 @@ $(BUILDDIR)rootfs: $(BUILDDIR)export.tar
 	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/scw-release
 	mv $@.tmp $@
 
-$(BUILDDIR)rootfs.tar.gz: $(BUILDDIR)rootfs
+
+$(EXPORT_DIR)rootfs.tar.gz: $(EXPORT_DIR)rootfs
 	tar --format=gnu -C $< -czf $@.tmp .
 	mv $@.tmp $@
 
 
 .PHONY: rootfs.tar
-rootfs.tar: $(BUILDDIR)rootfs.tar
+rootfs.tar: $(EXPORT_DIR)rootfs.tar
 	ls -la $<
 	@echo $<
 
 
-$(BUILDDIR)rootfs.tar: $(BUILDDIR)rootfs
+$(EXPORT_DIR)rootfs.tar: $(EXPORT_DIR)rootfs
 	tar --format=gnu -C $< -cf $@.tmp .
 	mv $@.tmp $@
 
 
-$(BUILDDIR)rootfs.sqsh: $(BUILDDIR)rootfs
+$(EXPORT_DIR)rootfs.sqsh: $(EXPORT_DIR)rootfs
 	mksquashfs $< $@ -noI -noD -noF -noX
 
 
-$(BUILDDIR)export.tar: .docker-container.built
-	-mkdir -p $(BUILDDIR)
-	docker run --name $(NAME)-$(VERSION)-export --entrypoint /dontexists $(NAME):$(VERSION) 2>/dev/null || true
+$(EXPORT_DIR)export.tar: .docker-container-$(TARGET_UNAME_ARCH).built
+	-mkdir -p $(EXPORT_DIR)
+	docker run --name $(NAME)-$(VERSION)-export --entrypoint /dontexists $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) 2>/dev/null || true
 	docker export $(NAME)-$(VERSION)-export > $@.tmp
 	docker rm $(NAME)-$(VERSION)-export
 	mv $@.tmp $@
 
 
-/mnt/$(DISK): $(BUILDDIR)rootfs.tar
+/mnt/$(DISK): $(EXPORT_DIR)rootfs.tar
 	umount $(DISK) || true
 	mkfs.ext4 $(DISK)
 	mkdir -p $@
 	mount $(DISK) $@
 
 
-patches/usr/local/bin:
-	mkdir -p $@
-
-
-patches/usr/local/bin/qemu-arm-static: patches/usr/local/bin
-	wget --no-check-certificate https://github.com/armbuild/qemu-user-static/raw/master/x86_64/qemu-arm-static -O $@
-	chmod +x $@
-
-
-setup_binfmt: patches/usr/local/bin/qemu-arm-static
-	@echo "Configurig binfmt-misc on the Docker(/Boot2Docker) kernel"
-	docker run --rm --privileged busybox sh -c " \
-	  mount binfmt_misc -t binfmt_misc /proc/sys/fs/binfmt_misc && \
-	  test -f /proc/sys/fs/binfmt_misc/arm || \
-	  echo ':arm:M::\x7fELF\x01\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02\x00\x28\x00:\xff\xff\xff\xff\xff\xff\xff\x00\xff\xff\xff\xff\xff\xff\xff\xff\xfe\xff\xff\xff:/usr/local/bin/qemu-arm-static:' > /proc/sys/fs/binfmt_misc/register \
-	"
+patches/usr/bin/qemu-$(TARGET_QEMU_ARCH)-static:
+	mkdir -p patches/usr/bin
+	wget https://github.com/multiarch/qemu-user-static/releases/download/v2.0.0/amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	tar -xf amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	rm -f amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
