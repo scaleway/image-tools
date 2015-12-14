@@ -180,7 +180,7 @@ publish_on_s3.tar: fast-publish_on_s3.tar
 .PHONY: publish_on_store
 publish_on_store: $(EXPORT_DIR)rootfs.tar
 	rsync -Pave ssh $(EXPORT_DIR)rootfs.tar $(STORE_HOSTNAME):store/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
-	@echo http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(NAME)-$(VERSION).tar
+	@echo http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: publish_on_store_ftp
@@ -275,7 +275,7 @@ $(TMP_BUILD_DIR)/Dockerfile: Dockerfile
 	sed -i '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@
 	sed -i 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@
 	if [ "`grep ^FROM $(TMP_BUILD_DIR)/Dockerfile | wc -l`" = "2" ]; then		\
-	  sed -i 0,/^FROM/d $(TMP_BUILD_DIR)/Dockerfile;					\
+	  sed -i 0,/^FROM/d $(TMP_BUILD_DIR)/Dockerfile;				\
 	fi
 	#cat $@
 
