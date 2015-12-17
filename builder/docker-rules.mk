@@ -149,7 +149,7 @@ image_on_store: image_dep publish_on_store
 
 .PHONY: image_on_local
 image_on_local: image_dep $(EXPORT_DIR)rootfs.tar
-	ln -sf $(EXPORT_DIR)rootfs.tar $(TARGET_UNAME_ARCH)-$(EXPORT_DIR)$(NAME)-$(VERSION).tar
+	ln -sf $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell oc-metadata --cached PUBLIC_IP_ADDRESS)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
