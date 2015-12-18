@@ -274,14 +274,20 @@ $(TMP_BUILD_DIR)/Dockerfile: Dockerfile
 	cp $< $@
 	for arch in $(ARCHS); do							\
 	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then				\
-	    sed -i "/#[[:space:]]*arch=$$arch[[:space:]]*$$/d" $@;			\
+	    mv $@ $@.tmp;								\
+	    sed "/#[[:space:]]*arch=$$arch[[:space:]]*$$/d" $@.tmp > $@;		\
+	    rm -f $@.tmp;								\
 	  fi										\
 	done
-	sed -i '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@
-	sed -i 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@
+	mv $@ $@.tmp
+	sed '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@.tmp > $@
+	mv $@ $@.tmp
+	sed 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@.tmp > $@
 	if [ "`grep ^FROM $(TMP_BUILD_DIR)/Dockerfile | wc -l`" = "2" ]; then		\
-	  sed -i 0,/^FROM/d $(TMP_BUILD_DIR)/Dockerfile;				\
+	  mv $@ $@.tmp;									\
+	  sed 0,/^FROM/d $@.tmp > $@;							\
 	fi
+	rm -f $@.tmp
 	#cat $@
 
 
