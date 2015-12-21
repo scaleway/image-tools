@@ -56,6 +56,7 @@ etherpad          latest                github.com/scaleway-community/scaleway-e
 webmin            latest                github.com/scaleway-community/scaleway-webmin          .
 prestashop        latest                github.com/scaleway-community/scaleway-prestashop      .
 prometheus        latest                github.com/scaleway-community/scaleway-prometheus      .
+ubuntu-coreos     latest                github.com/scaleway-community/scaleway-ubuntu-coreos   .
 
 # official services
 helloworld        latest                github.com/scaleway/image-helloworld          .
@@ -68,6 +69,4 @@ image-builder     latest                github.com/scaleway/image-tools         
 # plex              latest                github.com/coolya/image-app-plex              .
 # phabricator       latest                github.com/coolya/image-app-phabricator       .
 # tor               latest                github.com/coolya/image-app-tor               .
-# serendipity       latest                github.com/onli/image-app-serendipity         .
 # ampache           latest                github.com/aimxhaisse/image-app-ampache       .
-# camlistore        latest                github.com/aimxhaisse/image-app-camlistore    .
