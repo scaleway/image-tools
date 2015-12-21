@@ -148,7 +148,7 @@ image_on_s3: image_dep
 
 
 .PHONY: image_on_store
-image_on_store: image_dep publish_on_store
+image_on_store: image_dep
 	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
