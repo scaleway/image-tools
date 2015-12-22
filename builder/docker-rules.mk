@@ -144,18 +144,18 @@ image_dep:
 image_on_s3: image_dep
 	s3cmd ls $(S3_URL) || s3cmd mb $(S3_URL)
 	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' || $(MAKE) publish_on_s3.tar
-	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
+	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
 
 
 .PHONY: image_on_store
 image_on_store: image_dep
-	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
+	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: image_on_local
 image_on_local: image_dep $(EXPORT_DIR)rootfs.tar
 	ln -sf $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
-	VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell oc-metadata --cached PUBLIC_IP_ADDRESS)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
+	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell oc-metadata --cached PUBLIC_IP_ADDRESS)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: image
@@ -215,7 +215,7 @@ publish_on_s3.sqsh: $(EXPORT_DIR)rootfs.sqsh
 
 .PHONY: fclean
 fclean: clean
-	$(eval IMAGE_ID := $(shell docker inspect -f '{{.Id}}' $(NAME):$(VERSION)))
+	$(eval IMAGE_ID := $(shellc docker inspect -f '{{.Id}}' $(NAME):$(VERSION)))
 	$(eval PARENT_ID := $(shell docker inspect -f '{{.Parent}}' $(NAME):$(VERSION)))
 	-docker rmi -f $(IMAGE_ID)
 	-docker rmi -f $(IMAGE_ID)
