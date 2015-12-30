@@ -57,7 +57,7 @@ ifeq ($(ARCH),amd64)
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
 endif
-OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH)
+OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH) overlay-image-tools
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
 TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
 BUILD_DIR :=		$(shell test $(TARGET_UNAME_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
@@ -377,3 +377,9 @@ patches/usr/bin/qemu-$(TARGET_QEMU_ARCH)-static:
 	wget https://github.com/multiarch/qemu-user-static/releases/download/v2.0.0/amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
 	tar -xf amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
 	rm -f amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+
+
+sync-image-tools:
+	rm -rf overlay-image-tools
+	mkdir -p overlay-image-tools
+	curl -sLq http://j.mp/scw-skeleton | FLAVORS=$(IMAGE_TOOLS_FLAVORS) ROOTDIR=overlay-image-tools BRANCH=$(IMAGE_TOOLS_CHECKOUT) bash -e
