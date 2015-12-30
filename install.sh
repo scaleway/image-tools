@@ -47,12 +47,12 @@ main() {
     done
 
 	# Save flavors
-	FLAVORS_BACKUP=$(cat /etc/scw-release 2>/dev/null | grep "^IMAGE_FLAVORS=" | tr -d '"' | tr ',' ' ' | cut -d'=' -f2)
+	FLAVORS_BACKUP=$(cat ${ROOTDIR}/etc/scw-release 2>/dev/null | grep "^IMAGE_FLAVORS=" | tr -d '"' | tr ',' ' ' | cut -d'=' -f2)
 	NEW_FLAVORS=$(echo "$(echo "${FLAVORS_BACKUP} ${FLAVORS}" | tr ' ' '\n')" | sed '/^\s*$/d' | sort -u | tr '\n' ' ')
 
-	touch /etc/scw-release
-	sed -i '/^IMAGE_FLAVORS=/d' /etc/scw-release 2>/dev/null
-	cat << EOF >> /etc/scw-release
+	touch ${ROOTDIR}/etc/scw-release
+	sed -i '/^IMAGE_FLAVORS=/d' ${ROOTDIR}/etc/scw-release 2>/dev/null
+	cat << EOF >> ${ROOTDIR}/etc/scw-release
 IMAGE_FLAVORS="${NEW_FLAVORS%?}"
 EOF
     clean
