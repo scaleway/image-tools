@@ -40,19 +40,19 @@ clean() {
 main() {
     # Download tarball
     dl https://github.com/scaleway/image-tools/archive/${BRANCH}.tar.gz > ${TMPFILE}
-
+    
     # Apply flavors
     for flavor in ${FLAVORS}; do
         apply_flavor ${flavor}
     done
 
-	# Save flavors
-	FLAVORS_BACKUP=$(cat ${ROOTDIR}/etc/scw-release 2>/dev/null | grep "^IMAGE_FLAVORS=" | tr -d '"' | tr ',' ' ' | cut -d'=' -f2)
-	NEW_FLAVORS=$(echo "$(echo "${FLAVORS_BACKUP} ${FLAVORS}" | tr ' ' '\n')" | sed '/^\s*$/d' | sort -u | tr '\n' ' ')
+    # Save flavors
+    FLAVORS_BACKUP=$(cat ${ROOTDIR}/etc/scw-release 2>/dev/null | grep "^IMAGE_FLAVORS=" | tr -d '"' | tr ',' ' ' | cut -d'=' -f2)
+    NEW_FLAVORS=$(echo "$(echo "${FLAVORS_BACKUP} ${FLAVORS}" | tr ' ' '\n')" | sed '/^\s*$/d' | sort -u | tr '\n' ' ')
 
-	touch ${ROOTDIR}/etc/scw-release
-	sed -i '/^IMAGE_FLAVORS=/d' ${ROOTDIR}/etc/scw-release 2>/dev/null
-	cat << EOF >> ${ROOTDIR}/etc/scw-release
+    touch ${ROOTDIR}/etc/scw-release
+    sed -i '/^IMAGE_FLAVORS=/d' ${ROOTDIR}/etc/scw-release 2>/dev/null
+    cat << EOF >> ${ROOTDIR}/etc/scw-release
 IMAGE_FLAVORS="${NEW_FLAVORS%?}"
 EOF
     clean
