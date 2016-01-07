@@ -57,6 +57,16 @@ ifeq ($(ARCH),amd64)
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
 endif
+ifeq ($(ARCH),mips)
+	TARGET_QEMU_ARCH=mips
+	TARGET_UNAME_ARCH=mips
+	TARGET_DOCKER_TAG_ARCH=mips
+endif
+ifeq ($(ARCH),powerpc)
+	TARGET_QEMU_ARCH=powerpc
+	TARGET_UNAME_ARCH=powerpc
+	TARGET_DOCKER_TAG_ARCH=powerpc
+endif
 OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH) overlay-image-tools
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
 TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
