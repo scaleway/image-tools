@@ -31,41 +31,49 @@ ifeq ($(ARCH),arm)
 	TARGET_QEMU_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
 	TARGET_DOCKER_TAG_ARCH=armhf
+	TARGET_GOLANG_ARCH=arm
 endif
 ifeq ($(ARCH),armhf)
 	TARGET_QEMU_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
 	TARGET_DOCKER_TAG_ARCH=armhf
+	TARGET_GOLANG_ARCH=arm
 endif
 ifeq ($(ARCH),armv7l)
 	TARGET_QEMU_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
 	TARGET_DOCKER_TAG_ARCH=armhf
+	TARGET_GOLANG_ARCH=arm
 endif
 ifeq ($(ARCH),arm64)
 	TARGET_QEMU_ARCH=aarch64
 	TARGET_UNAME_ARCH=arm64
 	TARGET_DOCKER_TAG_ARCH=arm64
+	TARGET_GOLANG_ARCH=arm64
 endif
 ifeq ($(ARCH),x86_64)
 	TARGET_QEMU_ARCH=x86_64
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
+	TARGET_GOLANG_ARCH=amd64
 endif
 ifeq ($(ARCH),amd64)
 	TARGET_QEMU_ARCH=x86_64
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
+	TARGET_GOLANG_ARCH=amd64
 endif
 ifeq ($(ARCH),mips)
 	TARGET_QEMU_ARCH=mips
 	TARGET_UNAME_ARCH=mips
 	TARGET_DOCKER_TAG_ARCH=mips
+	TARGET_GOLANG_ARCH=unsupported
 endif
 ifeq ($(ARCH),powerpc)
 	TARGET_QEMU_ARCH=powerpc
 	TARGET_UNAME_ARCH=powerpc
 	TARGET_DOCKER_TAG_ARCH=powerpc
+	TARGET_GOLANG_ARCH=unsupported
 endif
 OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH) overlay-image-tools
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
