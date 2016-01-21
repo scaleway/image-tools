@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ "$FLAVORS" = "" ]; then
+	if [ -f /etc/scw-release ]; then
+		FLAVORS=$(cat /etc/scw-release | grep "^IMAGE_FLAVORS=" | tr -d '"' | tr ' ' ',' | cut -d'=' -f2)
+	fi
+fi
+FLAVORS=${FLAVORS:-common}
+
+echo -n "This script will update (overwrite) scaleway's scripts, continue (y/N)? "
+read ANSWER
+if [ "$ANSWER" = "y" -o "$ANSWER" = "Y" ]; then
+	curl -Lq http://j.mp/scw-skeleton | FLAVORS=$FLAVORS sh
+fi

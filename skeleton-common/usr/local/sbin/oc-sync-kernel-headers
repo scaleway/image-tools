@@ -1,13 +1,1 @@
-#!/bin/sh
-# description "synchronizes kernel headers"
-# author "Scaleway <opensource@scaleway.com>"
-
-set -e
-
-DIR=/usr
-mkdir -p $DIR
-KVERSION=`uname -r`
-
-export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
-
-wget -q -O - http://mirror.scaleway.com/kernel/${KVERSION}/include.tar | tar -C ${DIR} -xf -
+scw-sync-kernel-headers

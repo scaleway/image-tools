@@ -1,0 +1,11 @@
+#!/bin/sh
+# description "run image unit tests on current image"
+# author "Scaleway <opensource@scaleway.com>"
+
+set -e
+
+export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
+
+curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > /tmp/oc-image-unit-suite.bash
+bash /tmp/oc-image-unit-suite.bash
+rm -f /tmp/oc-image-unit-suite.bash

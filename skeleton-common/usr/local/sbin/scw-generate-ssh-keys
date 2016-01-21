@@ -1,0 +1,14 @@
+#!/bin/bash
+# description "generate SSH keys"
+# author "Scaleway <opensource@scaleway.com>"
+
+# Generate ssh host keys if not present
+if [ ! -f /etc/ssh/ssh_host_rsa_key ]
+then
+    ssh-keygen -t rsa -b 2048 -N '' -f /etc/ssh/ssh_host_rsa_key &
+    ssh-keygen -t dsa -N '' -f /etc/ssh/ssh_host_dsa_key &
+    ssh-keygen -t ecdsa -N '' -f /etc/ssh/ssh_host_ecdsa_key &
+    ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key || true &
+    wait `jobs -p` || true
+fi
+oc-userdata ssh-host-fingerprints "$(for key in /etc/ssh/ssh_host_*_key; do ssh-keygen -lf $key; done)"
