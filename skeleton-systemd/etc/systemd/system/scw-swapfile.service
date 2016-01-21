@@ -5,8 +5,8 @@ Before=sysinit.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/sbin/oc-swapfile start
-ExecStop=-/usr/local/sbin/oc-swapfile stop
+ExecStart=/usr/local/sbin/scw-swapfile start
+ExecStop=-/usr/local/sbin/scw-swapfile stop
 
 [Install]
 WantedBy=multi-user.target

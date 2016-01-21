@@ -2,7 +2,7 @@
 # description "checks the version/config of the kernel"
 # author "Scaleway <opensource@scaleway.com>"
 
-CONFIG_FILE=/etc/oc-kernel-check.conf
+CONFIG_FILE=/etc/scw-kernel-check.conf
 
 function warn_version {
     if [ ! -z "$EXPECT_MINOR_MIN" ]

@@ -18,16 +18,16 @@ users=`users | wc -w`
 time=`uptime | grep -ohe 'up .*' | sed 's/,/\ hours/g' | awk '{ printf $2" "$3 }'`
 processes=`ps aux | wc -l`
 ip=`ifconfig $(route | grep default | awk '{ print $8 }') | grep "inet addr" | awk -F: '{print $2}' | awk '{print $1}'`
-public_ip=$(oc-metadata --cached PUBLIC_IP_ADDRESS)
+public_ip=$(scw-metadata --cached PUBLIC_IP_ADDRESS)
 
 metadata() {
-  oc-metadata --cached "$1"
+  scw-metadata --cached "$1"
 }
 
 volume_metadata() {
   device=$1
   key=$2
-  oc-metadata --cached "VOLUMES_${device}_${key}"
+  scw-metadata --cached "VOLUMES_${device}_${key}"
 }
 
 

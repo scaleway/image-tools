@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ### BEGIN INIT INFO
-# Provides:		sshkeys
+# Provides:		scw-ssh-keys
 # Required-Start:	$remote_fs $sshd
 # Required-Stop:	$remote_fs $sshd
 # Default-Start:	2 3 4 5
@@ -15,11 +15,11 @@ set -e
 
 export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/sbin"
 
-sshkey_start() {
+sshkeys_start() {
     (
 	log_action_begin_msg "Fetching SSH keys from the web console"
     	# Fetching /root/.ssh/authorized_keys from metadata
-	/usr/local/sbin/oc-fetch-ssh-keys &
+	/usr/local/sbin/fetch-ssh-keys &
 
 	# Generate ssh host keys
 	if [ ! -f /etc/ssh/ssh_host_rsa_key ]
@@ -40,10 +40,10 @@ sshkey_start() {
 
 case "$1" in
   start|reload|force-reload|restart)
-	sshkey_start
+	sshkeys_start
 	;;
   *)
-	log_action_msg "Usage: /etc/init.d/ssh-keys {start|restart}" || true
+	log_action_msg "Usage: /etc/init.d/scw-ssh-keys {start|restart}" || true
 	exit 1
 esac
 

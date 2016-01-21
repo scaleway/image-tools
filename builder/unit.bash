@@ -17,17 +17,17 @@ testKernelModules() {
 
 
 testMetadata() {
-    which oc-metadata >/dev/null
+    which scw-metadata >/dev/null
     returnCode=$?
-    assertEquals "oc-metadata not found" 0 $returnCode
+    assertEquals "scw-metadata not found" 0 $returnCode
 
     [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
-    test -n "$(oc-metadata --cached)"
+    test -n "$(scw-metadata --cached)"
     returnCode=$?
     assertEquals "Cannot fetch metadata" 0 $returnCode
 
     local private_ip=$(ip addr list eth0 | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
-    local metadata_ip=$(oc-metadata --cached PRIVATE_IP)
+    local metadata_ip=$(scw-metadata --cached PRIVATE_IP)
     assertEquals "PRIVATE_IP from metadata does not match eth0" $private_ip $metadata_ip
     [ -n "${SKIP_NON_DOCKER}" ] && endSkipping
 }
@@ -35,7 +35,7 @@ testMetadata() {
 
 testHostname() {
     [ -n "${SKIP_NON_DOCKER}" ] && startSkipping
-    local metadata_hostname=$(oc-metadata --cached HOSTNAME)
+    local metadata_hostname=$(scw-metadata --cached HOSTNAME)
     local local_hostname=$(hostname -f)
     assertEquals "HOSTNAME from metadata not matching with local hostname" $metadata_hostname $local_hostname
     [ -n "${SKIP_NON_DOCKER}" ] && endSkipping

@@ -5,7 +5,7 @@
 XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
 
 get_value() {
-    /usr/local/bin/oc-metadata --cached "$1"
+    /usr/local/bin/scw-metadata --cached "$1"
 }
 
 sync_connect_extra_volumes() {

@@ -11,4 +11,4 @@ then
     ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key || true &
     wait `jobs -p` || true
 fi
-oc-userdata ssh-host-fingerprints "$(for key in /etc/ssh/ssh_host_*_key; do ssh-keygen -lf $key; done)"
+scw-userdata ssh-host-fingerprints "$(for key in /etc/ssh/ssh_host_*_key; do ssh-keygen -lf $key; done)"

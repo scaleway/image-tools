@@ -5,7 +5,7 @@ Before=sysinit.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/oc-check-kernel
+ExecStart=/usr/local/bin/scw-check-kernel
 
 [Install]
 WantedBy=multi-user.target

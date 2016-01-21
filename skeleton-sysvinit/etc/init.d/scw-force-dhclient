@@ -1,7 +1,7 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides:                 oc-force-dhclient
+# Provides:                 scw-force-dhclient
 # Required-Start:           $remote_fs $local_fs
 # Required-Stop:
 # Default-Start:            2 3 4 5
@@ -26,7 +26,7 @@ case "$1" in
         forcedhclient_start
         ;;
   *)
-        log_action_msg "Usage: /etc/init.d/oc-force-dhclient {start|restart|reload|force-reload}" || true
+        log_action_msg "Usage: /etc/init.d/scw-force-dhclient {start|restart|reload|force-reload}" || true
         exit 1
 esac
 

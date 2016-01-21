@@ -11,6 +11,6 @@ depend() {
 
 start() {
     ebegin "Syncing kernel modules/headers"
-    /usr/local/sbin/oc-sync-kernel-modules
+    /usr/local/sbin/scw-sync-kernel-modules
     eend $?
 }

@@ -1,11 +1,11 @@
 #!/bin/sh
 
 if [ "$1" = "" ]; then
-    oc-metadata --cached | grep "^TAGS_" | cut -d'=' -f2-3
+    scw-metadata --cached | grep "^TAGS_" | cut -d'=' -f2-3
     exit 0
 fi
 
-VALUE=$(oc-metadata --cached | grep "^TAGS_" | cut -d'=' -f2-3 | grep "^$1")
+VALUE=$(scw-metadata --cached | grep "^TAGS_" | cut -d'=' -f2-3 | grep "^$1")
 VALUE1=$(echo $VALUE | awk -F'=' '{print $1}')
 VALUE2=$(echo $VALUE | awk -F'=' '{print $2}')
 if [ "$VALUE1" = "" ]; then
