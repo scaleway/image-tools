@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# description "checks the version/config of the kernel"
+# author "Scaleway <opensource@scaleway.com>"
+
+CONFIG_FILE=/etc/scw-kernel-check.conf
+
+function warn_version {
+    if [ ! -z "$EXPECT_MINOR_MIN" ]
+    then
+	echo "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.$EXPECT_MINOR_MIN (you are using $KERNEL_VERSION) ; consider using another scaleway bootscript." | tee /dev/stderr /dev/console
+    else
+	echo "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.0 (you are using $KERNEL_VERSION), consider using another scaleway bootscript." | tee /dev/stderr /dev/console
+    fi
+}
+
+function warn_config {
+    echo "Warning: this image expects a Linux kernel with $1, consider using another scaleway bootscript." | tee /dev/stderr /dev/console
+}
+
+if [ -f $CONFIG_FILE ]
+then
+    source $CONFIG_FILE
+
+    # check if the current kernel version is >= to the expected one
+    KERNEL_VERSION=$(uname -r)
+    MAJOR=$(echo $KERNEL_VERSION | cut -d'.' -f1)
+    MINOR=$(echo $KERNEL_VERSION | cut -d'.' -f2)
+    if [ ! -z "$EXPECT_MAJOR_MIN" ] && [ $MAJOR -lt $EXPECT_MAJOR_MIN ]
+    then
+        warn_version
+        exit 1
+    elif [ ! -z "$EXPECT_MAJOR_MIN" ] && [ $MAJOR -eq $EXPECT_MAJOR_MIN ]
+    then
+        if [ ! -z "$EXPECT_MAJOR_MIN" ] && [ ! -z "$EXPECT_MINOR_MIN" ] && [ $MINOR -lt $EXPECT_MINOR_MIN ]
+        then
+            warn_version
+            exit 1
+        fi
+    fi
+
+    # check any additional required configs
+    FAILED=0
+    for EXPECT_CONFIG in $(env | grep "EXPECT_CONFIG")
+    do
+	EXPECT_LINE=$(echo "$EXPECT_CONFIG" | sed 's/EXPECT_\(.*\)/\1/')
+
+	EXPECT_CONF=$(echo $EXPECT_LINE | cut -d'=' -f1)
+	EXPECT_VALUE=$(echo $EXPECT_LINE | cut -d'=' -f2)
+
+	if [ "$EXPECT_VALUE" = "y" ]
+	then
+	    if ! zgrep "$EXPECT_CONF=y" /proc/config.gz &> /dev/null
+	    then
+		warn_config $EXPECT_LINE
+		FAILED=1
+	    fi
+	elif [ "$EXPECT_VALUE" = "n" ]
+	then
+	    if zgrep "$EXPECT_CONF=[ym]" /proc/config.gz &> /dev/null
+	    then
+		warn_config $EXPECT_LINE
+		FAILED=1
+	    fi
+	fi
+    done
+    if [ $FAILED -ne 0 ]
+    then
+	exit 1
+    fi
+fi

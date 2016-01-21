@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# description "enables a swapfile"
+# author "Scaleway <opensource@scaleway.com>"
+
+if ! type fallocate >/dev/null 2>/dev/null; then
+	echo "No such 'fallocate' binary, please install 'util-linux'."
+	exit 1
+fi
+
+SWAPFILE_SIZE=4G
+SWAPFILE_PATH=/swapfile
+
+function swapfile_off {
+    if [ -f $SWAPFILE_PATH ]
+    then
+	# this is unfortunate: we have now way of telling NBD that
+	# this file is actually uneeded and we need not to save it in
+	# the block device behind (trying to take advantage of
+	# compression by zero-ing it does not work).
+	#
+	# this means that if we swap, swapped data will be uploaded on
+	# the object storage anyway.
+	swapoff $SWAPFILE_PATH
+	rm -f $SWAPFILE_PATH
+    fi
+}
+
+function swapfile_on {
+    # we recreate this file even if it already exists: this way we
+    # handle updates of settings in /etc/scaleway.conf
+    fallocate -l $SWAPFILE_SIZE $SWAPFILE_PATH
+    chmod 600 $SWAPFILE_PATH
+    mkswap $SWAPFILE_PATH
+    swapon $SWAPFILE_PATH
+}
+
+case $1 in
+    "start")
+	swapfile_on > /dev/null
+	exit $?
+	;;
+
+    "stop")
+	swapfile_off > /dev/null
+	exit $?
+	;;
+esac
+
+echo >&2 "usage: $0 [start|stop]" ; exit 1

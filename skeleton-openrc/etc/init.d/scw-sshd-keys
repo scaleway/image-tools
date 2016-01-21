@@ -11,6 +11,6 @@ depend() {
 
 start() {
     ebegin "Generating SSH host keys"
-    /usr/local/sbin/oc-generate-ssh-keys
+    /usr/local/sbin/scw-generate-ssh-keys
     eend $?
 }

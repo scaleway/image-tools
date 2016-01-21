@@ -1,9 +1,9 @@
 [Unit]
 Description=SCW generate machine id
-After=oc-sync-kernel-modules.service
+After=scw-sync-kernel-modules.service
 
 [Service]
-ExecStart=/usr/local/sbin/oc-gen-machine-id
+ExecStart=/usr/local/sbin/scw-gen-machine-id
 Type=oneshot
 
 [Install]

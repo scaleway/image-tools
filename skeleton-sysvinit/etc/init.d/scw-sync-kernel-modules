@@ -1,8 +1,8 @@
 #! /bin/sh
 
 ### BEGIN INIT INFO
-# Provides:		sync-kernel-modules
-# Required-Start:	$remote_fs oc-force-dhclient
+# Provides:		scw-sync-kernel-modules
+# Required-Start:	$remote_fs scw-force-dhclient
 # Required-Stop:	$remote_fs
 # Default-Start:	2 3 4 5
 # Default-Stop:
@@ -15,7 +15,7 @@ set -e
 
 synckernelmodules_start() {
     log_action_begin_msg "Starting to mount Scaleway extra volumes"
-    /usr/local/sbin/oc-sync-kernel-modules
+    /usr/local/sbin/scw-sync-kernel-modules
     log_action_end_msg 0
 }
 
@@ -32,7 +32,7 @@ case "$1" in
 	synckernelmodules_start
 	;;
   *)
-	log_action_msg "Usage: /etc/init.d/sync-kernel-modules {start|restart}" || true
+	log_action_msg "Usage: /etc/init.d/scw-sync-kernel-modules {start|restart}" || true
 	exit 1
 esac
 

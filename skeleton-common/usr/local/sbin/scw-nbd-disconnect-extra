@@ -1,0 +1,10 @@
+#!/bin/bash
+# description "disconnect extra NBD volumes"
+# author "Scaleway <opensource@scaleway.com>"
+
+XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
+
+for device in /dev/nbd[^0]*
+do
+    ($XNBD_CLIENT -c $device && $XNBD_CLIENT -d $device &> /dev/null) || true
+done

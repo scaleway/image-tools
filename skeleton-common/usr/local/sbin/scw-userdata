@@ -1,0 +1,42 @@
+#!/bin/sh
+# description "executable which retrieves server userdata (TEXT)"
+# author "Scaleway <opensource@scaleway.com>"
+
+export PATH="${PATH:+$PATH:}/usr/bin:/bin"
+
+USERDATA_IP=${USERDATA_IP:-169.254.42.42}
+USERDATA_URL=${USERDATA_URL:-"http://${USERDATA_IP}/user_data"}
+
+get() {
+    URL=$1
+    if type curl >/dev/null 2>/dev/null; then
+        # Using curl
+        RESPONSE=$(curl --local-port 1-1024 --silent --write-out "\n%{http_CODE}\n" $URL)
+        CODE=$(echo "$RESPONSE" | sed -n '$p')
+        BODY=$(echo "$RESPONSE" | sed '$d')
+	echo "$BODY"
+    else
+	echo "'curl' dependency is missing." >&2
+    fi
+}
+
+patch() {
+    URL="$1"
+    DATA="$2"
+    if type curl >/dev/null 2>/dev/null; then
+        # Using curl
+        RESPONSE=$(curl --local-port 1-1024 -X PATCH -d "$DATA" -H "Content-Type: text/plain" --silent --write-out "\n%{http_CODE}\n" $URL)
+    else
+	echo "'curl' dependency is missing." >&2
+    fi
+}
+
+if [ "$1" = "" ]; then
+    get "$USERDATA_URL/"
+else
+    if [ "$2" = "" ]; then
+        get "$USERDATA_URL/$1"
+    else
+        patch "$USERDATA_URL/$1" "$2"
+    fi
+fi

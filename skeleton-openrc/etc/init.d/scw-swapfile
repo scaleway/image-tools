@@ -11,12 +11,12 @@ depend() {
 
 start() {
     ebegin "Starting swapfile"
-    /usr/local/sbin/oc-swapfile start
+    /usr/local/sbin/scw-swapfile start
     eend $?
 }
 
 stop() {
     ebegin "Stopping swapfile"
-    /usr/local/sbin/oc-swapfile stop
+    /usr/local/sbin/scw-swapfile stop
     eend $?
 }
