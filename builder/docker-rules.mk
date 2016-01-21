@@ -397,7 +397,14 @@ patches/usr/bin/qemu-$(TARGET_QEMU_ARCH)-static:
 	rm -f amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
 
 
+.PHONY: sync-image-tools
 sync-image-tools:
 	rm -rf overlay-image-tools
 	mkdir -p overlay-image-tools
 	curl -sLq http://j.mp/scw-skeleton | FLAVORS=$(IMAGE_TOOLS_FLAVORS) ROOTDIR=overlay-image-tools BRANCH=$(IMAGE_TOOLS_CHECKOUT) bash -e
+
+
+.PHONY: bump-image-tools
+bump-image-tools:
+	$(eval SHA := $(shell curl -s https://api.github.com/repos/scaleway/image-tools/branches/master | jq -r .commit.sha))
+	sed --in-place='' 's/^\(IMAGE_TOOLS_CHECKOUT\s*=\s*\).*$$/\1$(SHA)/' Makefile
