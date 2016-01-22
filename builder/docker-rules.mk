@@ -233,12 +233,12 @@ publish_on_s3.sqsh: $(EXPORT_DIR)rootfs.sqsh
 
 .PHONY: fclean
 fclean: clean
-	for tag in latest $(shell docker images | grep "^$(DOCKER_NAMESPACE)/$(NAME) "  | awk '{print $$2}'); do\
-	  echo "Creating a backup of '$(DOCKER_NAMESPACE)/$(NAME):$$tag' for caching"; \
-	  docker tag -f old$(DOCKER_NAMESPACE)/$(NAME):$$tag $(DOCKER_NAMESPACE)/$(NAME):$$tag; \
-	  docker rmi -f $(DOCKER_NAMESPACE)/$(NAME):$$tag; \
+	for tag in latest $(shell docker images | grep "^$(DOCKER_NAMESPACE)$(NAME) " | awk '{print $$2}'); do\
+	  echo "Creating a backup of '$(DOCKER_NAMESPACE)$(NAME):$$tag' for caching"; \
+	  docker tag -f $(DOCKER_NAMESPACE)$(NAME):$$tag old$(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	  docker rmi -f $(DOCKER_NAMESPACE)$(NAME):$$tag; \
 	done
-
+        
 .PHONY: clean
 clean:
 	-rm -f $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)export.tar .??*.built
