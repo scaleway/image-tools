@@ -233,12 +233,11 @@ publish_on_s3.sqsh: $(EXPORT_DIR)rootfs.sqsh
 
 .PHONY: fclean
 fclean: clean
-	$(eval IMAGE_ID := $(shellc docker inspect -f '{{.Id}}' $(NAME):$(VERSION)))
-	$(eval PARENT_ID := $(shell docker inspect -f '{{.Parent}}' $(NAME):$(VERSION)))
-	-docker rmi -f $(IMAGE_ID)
-	-docker rmi -f $(IMAGE_ID)
-	-docker rmi -f $(PARENT_ID)
-
+	for tag in latest $(shell docker images | grep "^$(DOCKER_NAMESPACE)/$(NAME) "  | awk '{print $$2}'); do\
+	  echo "Creating a backup of '$(DOCKER_NAMESPACE)/$(NAME):$$tag' for caching"; \
+	  docker tag -f old$(DOCKER_NAMESPACE)/$(NAME):$$tag $(DOCKER_NAMESPACE)/$(NAME):$$tag; \
+	  docker rmi -f $(DOCKER_NAMESPACE)/$(NAME):$$tag; \
+	done
 
 .PHONY: clean
 clean:
