@@ -238,7 +238,7 @@ fclean: clean
 	  docker tag -f $(DOCKER_NAMESPACE)$(NAME):$$tag old$(DOCKER_NAMESPACE)$(NAME):$$tag; \
 	  docker rmi -f $(DOCKER_NAMESPACE)$(NAME):$$tag; \
 	done
-        
+
 .PHONY: clean
 clean:
 	-rm -f $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)export.tar .??*.built
@@ -259,12 +259,11 @@ test:  .docker-container-$(TARGET_UNAME_ARCH).built
 
 .PHONY: travis
 travis:
-	find . -name Dockerfile | xargs cat | grep -vi ^maintainer | bash -n
-
+	@echo "TODO: find Dockerfile syntax checker"
 
 .PHONY:
 setup_binfmt:
-	@echo "Configurig binfmt-misc on the Docker(/Boot2Docker) kernel"
+	@echo "Configuring binfmt-misc on the Docker(/Boot2Docker) kernel"
 	docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
 
