@@ -33,3 +33,5 @@ then
     mv $TMP_DIR/${KVERSION} $DIR
   fi
 fi
+
+depmod -a
