@@ -8,6 +8,7 @@ DIR=/lib/modules
 mkdir -p $DIR
 TMP_DIR=`mktemp -d -p $DIR`
 KVERSION=`uname -r`
+KARCH=`uname -m`
 TIMEOUT=10
 
 export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
@@ -25,7 +26,7 @@ then
   wget --timeout=${TIMEOUT} --quiet --no-check-certificate -r --no-parent \
      --reject "index.html*" --reject "robots.txt" \
      --no-host-directories --cut-dirs 3 --directory-prefix \
-     $TMP_DIR http://mirror.scaleway.com/kernel/${KVERSION}/modules/${KVERSION}/
+     $TMP_DIR http://mirror.scaleway.com/kernel/${KARCH}-${KVERSION}/modules/${KVERSION}/
 
   if [ $? -eq 0 ]
   then
