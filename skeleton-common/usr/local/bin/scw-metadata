@@ -17,7 +17,7 @@ else
         # Using curl
         CODE=0
         while [ $CODE -ne 200 ]; do
-            RESPONSE=$(curl --silent --write-out "\n%{http_CODE}\n" $METADATA_URL)
+            RESPONSE=$(curl --noproxy '*' --silent --write-out "\n%{http_CODE}\n" $METADATA_URL)
             CODE=$(echo "$RESPONSE" | sed -n '$p')
             BODY=$(echo "$RESPONSE" | sed '$d')
 
@@ -31,7 +31,7 @@ else
     else
         # Using wget
         for i in 1 2 3 4 5; do
-            BODY=$(wget --quiet -O- $METADATA_URL)
+            BODY=$(wget --no-proxy --quiet -O- $METADATA_URL)
 	    echo "$BODY" | grep PRIVATE_IP >/dev/null
             if [ $? -eq 0 ]; then
 		echo "$BODY" > /run/scw-metadata.cache
