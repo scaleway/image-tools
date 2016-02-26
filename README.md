@@ -15,6 +15,16 @@ You can look the docker-based [hello-world](https://github.com/scaleway/image-he
 
 See [Building images on Scaleway with Docker](http://www.slideshare.net/manfredtouron/while42-paris13-scaleway) presentation on Slideshare.
 
+---
+
+The [multiarch](https://hub.docker.com/u/multiarch/) Docker organization contains some base images you can start with (ubuntu, debian, centos, alpine, busybox, ...), they all are ported for multiple architectures.
+All the [ImageHub](https://hub.scaleway.com) images are also available as standard Docker images in the  [scaleway](https://hub.docker.com/u/scaleway/) Docker organization. They are also a good choice for starting a new project.
+
+**Not maintained** (historical): our first ported images are hosted in the [armbuild](https://hub.docker.com/u/armbuild/) Docker organization.
+
+---
+
+[dockerpatch](https://github.com/moul/dockerpatch) may help you to convert existing Docker images from `x86_64` to `armhf`.
 
 ## Repository
 
