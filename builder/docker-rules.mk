@@ -24,6 +24,8 @@ IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
 S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ADDITIONAL_ASSETS ?=
+LOCAL_HTTPD_PORT ?=	80
+EMBEDDED_HTTPD = (printf "HTTP/1.1 200 OK\r\nContent-type: $(3)\r\nContent-Disposition: attachment; filename=\"$(2)\"\r\nContent-Length: $(shell stat -c %s $(1))\r\nConnection: close\r\n\r\n"; cat $(1)) | nc -l -p $(4) > /dev/null &
 DEFAULT_IMAGE_ARCH ?=	armv7l
 ARCH ?=			$(HOST_ARCH)
 ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
@@ -173,7 +175,12 @@ image_on_store: image_dep
 .PHONY: image_on_local
 image_on_local: image_dep $(EXPORT_DIR)rootfs.tar
 	ln -sf $(EXPORT_DIR)rootfs.tar $(EXPORT_DIR)$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
-	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell scw-metadata --cached PUBLIC_IP_ADDRESS)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
+	$(eval USE_INTERNAL_HTTPD ?= $(shell mkdir -p /tmp/build; marker=$$(date); echo $$marker > /tmp/build/httpd_check; test "$$(curl --silent --noproxy '*' http://127.0.0.1/httpd_check)" = "$$marker"; echo $$?; rm /tmp/build/httpd_check))
+	$(if [ $(USE_INTERNAL_HTTPD) -eq 1 ], \
+		$(eval LOCAL_HTTPD_PORT := $(shell for candidate in $$(seq 8000 8100); do lsof -i tcp:$$candidate >/dev/null 2>&1; if [ $$? = 1 ]; then echo $$candidate; break; fi; done)) \
+		$(shell sh -c '$(call EMBEDDED_HTTPD,$(EXPORT_DIR)rootfs.tar,$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar,application/x-tar,$(LOCAL_HTTPD_PORT))') \
+	)
+	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell scw-metadata --cached PUBLIC_IP_ADDRESS):$(LOCAL_HTTPD_PORT)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: image
