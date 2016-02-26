@@ -23,7 +23,7 @@ else
 
             if [ $CODE -eq 200 ]; then
                 echo "$BODY" > /run/scw-metadata.cache
-		ln -s scw-metadata.cache /run/oc-metadata.cache
+		ln -s scw-metadata.cache /run/oc-metadata.cache 2>/dev/null
                 break
             fi
             sleep 5
@@ -35,7 +35,7 @@ else
 	    echo "$BODY" | grep PRIVATE_IP >/dev/null
             if [ $? -eq 0 ]; then
 		echo "$BODY" > /run/scw-metadata.cache
-		ln -s scw-metadata.cache /run/oc-metadata.cache
+		ln -s scw-metadata.cache /run/oc-metadata.cache 2>/dev/null
                 break
             fi
             sleep 2
