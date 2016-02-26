@@ -266,7 +266,8 @@ test:  .docker-container-$(TARGET_UNAME_ARCH).built
 
 .PHONY: travis
 travis:
-	@echo "TODO: find Dockerfile syntax checker"
+	npm install dockerfile_lint
+	find . -name Dockerfile -print0 | xargs -L 1 -r -0 ./node_modules/.bin/dockerfile_lint -f
 
 .PHONY:
 setup_binfmt:
