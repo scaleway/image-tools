@@ -25,8 +25,8 @@ then
   # find . -name "*.ko" -size 0 -delete
   wget --timeout=${TIMEOUT} --quiet --no-check-certificate -r --no-parent \
      --reject "index.html*" --reject "robots.txt" \
-     --no-host-directories --cut-dirs 3 --directory-prefix \
-     $TMP_DIR http://mirror.scaleway.com/kernel/${KARCH}-${KVERSION}/modules/${KVERSION}/
+     --no-host-directories --cut-dirs 4 --directory-prefix \
+     $TMP_DIR http://mirror.scaleway.com/kernel/${KARCH}/${KVERSION}/modules/${KVERSION}/
 
   if [ $? -eq 0 ]
   then
