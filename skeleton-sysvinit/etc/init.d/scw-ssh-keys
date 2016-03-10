@@ -19,7 +19,7 @@ sshkeys_start() {
     (
 	log_action_begin_msg "Fetching SSH keys from the web console"
     	# Fetching /root/.ssh/authorized_keys from metadata
-	/usr/local/sbin/fetch-ssh-keys &
+	/usr/local/sbin/scw-fetch-ssh-keys &
 
 	# Generate ssh host keys
 	if [ ! -f /etc/ssh/ssh_host_rsa_key ]
