@@ -14,17 +14,22 @@ sed -i "s/TOKEN_HERE/$TOKEN/" ~/.s3cfg
 sed -i "s/ACCESS_HERE/$ACCESS/" ~/.s3cfg
 
 cat << EOF > ~/Makefile
-NAME =                 YOUR_NAME
-VERSION =              latest
-VERSION_ALIASES =
-TITLE =                YOUR_TITLE
-SOURCE_URL =           https://github/com/...
+NAME =			YOUR_NAME
+VERSION =		latest
+VERSION_ALIASES =	X.X.X X.X X
+TITLE =			YOUR_TITLE
+DESCRIPTION =		YOUR_DESCRIPTION
+DOC_URL =
+SOURCE_URL =		https://github.com/scaleway-community/...
 VENDOR_URL =
+DEFAULT_IMAGE_ARCH =	x86_64
 
-IMAGE_VOLUME_SIZE =    50G
-IMAGE_BOOTSCRIPT =     stable
-IMAGE_NAME =           YOUR_IMAGE_NAME
 
+IMAGE_VOLUME_SIZE =	50G
+IMAGE_BOOTSCRIPT =	stable
+IMAGE_NAME =		YOUR_IMAGE_NAME
+
+## Image tools  (https://github.com/scaleway/image-tools)
 all:	docker-rules.mk
 docker-rules.mk:
 	wget -qO - http://j.mp/scw-builder | bash

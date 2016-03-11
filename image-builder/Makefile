@@ -1,14 +1,14 @@
-DOCKER_NAMESPACE =	armbuild/
 NAME =			scw-image-builder
 VERSION =		latest
-VERSION_ALIASES = 	1.3.0 1.3 1
+VERSION_ALIASES = 	1.4.0 1.4 1
 TITLE =			image-builder
 DESCRIPTION =		An image to build other images
 SOURCE_URL =		https://github.com/scaleway/image-tools/tree/master/image-builder
 
+
 IMAGE_VOLUME_SIZE =	150G
 IMAGE_BOOTSCRIPT =	docker
-IMAGE_NAME =		Image Builder 1.3
+IMAGE_NAME =		Image Builder 1.4
 
 ## Image tools  (https://github.com/scaleway/image-tools)
 all:	docker-rules.mk
