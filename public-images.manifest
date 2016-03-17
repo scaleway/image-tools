@@ -63,7 +63,7 @@ helloworld        latest                github.com/scaleway/image-helloworld    
 service-rescue    latest                github.com/scaleway/image-service-rescue      .
 service-travis    latest                github.com/scaleway/image-service-travis      .
 service-tryit     latest                github.com/scaleway/image-service-tryit       .
-image-builder     latest                github.com/scaleway/image-tools               image-builder
+image-builder     latest                github.com/scaleway/image-builder             .
 
 # community apps
 # plex              latest                github.com/coolya/image-app-plex              .
