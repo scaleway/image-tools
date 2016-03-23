@@ -187,6 +187,11 @@ image_on_local: image_dep $(EXPORT_DIR)rootfs.tar
 image:	image_on_s3
 
 
+.PHONY: pull_image
+pull_image:
+	docker pull $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION)
+        
+
 .PHONY: release
 release: build
 	docker push $(DOCKER_NAMESPACE)$(NAME)
