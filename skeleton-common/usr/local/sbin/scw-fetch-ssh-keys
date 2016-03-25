@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # description "fetch SSH keys"
 # author "Scaleway <opensource@scaleway.com>"
 # source "https://github.com/scaleway/image-tools/blob/master/skeleton-common/usr/local/sbin/scw-fetch-ssh-keys"
