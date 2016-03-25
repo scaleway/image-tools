@@ -1,70 +1,75 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # description "checks the version/config of the kernel"
 # author "Scaleway <opensource@scaleway.com>"
+set -eu
 
 CONFIG_FILE=/etc/scw-kernel-check.conf
 
-function warn_version {
-    if [ ! -z "$EXPECT_MINOR_MIN" ]
-    then
-	echo "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.$EXPECT_MINOR_MIN (you are using $KERNEL_VERSION) ; consider using another scaleway bootscript." | tee /dev/stderr /dev/console
-    else
-	echo "Warning: this image expects a Linux kernel >= $EXPECT_MAJOR_MIN.0 (you are using $KERNEL_VERSION), consider using another scaleway bootscript." | tee /dev/stderr /dev/console
-    fi
+warn_expect_kernel() {
+	echo "Warning: this image expects a Linux kernel $*;" \
+		"consider using another scaleway bootscript." \
+		| tee /dev/stderr /dev/console
 }
 
-function warn_config {
-    echo "Warning: this image expects a Linux kernel with $1, consider using another scaleway bootscript." | tee /dev/stderr /dev/console
+warn_version() {
+	warn_expect_kernel \
+		">= $EXPECT_MAJOR_MIN.${EXPECT_MINOR_MIN:-0}" \
+		"(you are using $KERNEL_VERSION)"
 }
 
-if [ -f $CONFIG_FILE ]
-then
-    source $CONFIG_FILE
+warn_config() {
+	warn_expect_kernel "with $1"
+}
 
-    # check if the current kernel version is >= to the expected one
-    KERNEL_VERSION=$(uname -r)
-    MAJOR=$(echo $KERNEL_VERSION | cut -d'.' -f1)
-    MINOR=$(echo $KERNEL_VERSION | cut -d'.' -f2)
-    if [ ! -z "$EXPECT_MAJOR_MIN" ] && [ $MAJOR -lt $EXPECT_MAJOR_MIN ]
-    then
-        warn_version
-        exit 1
-    elif [ ! -z "$EXPECT_MAJOR_MIN" ] && [ $MAJOR -eq $EXPECT_MAJOR_MIN ]
-    then
-        if [ ! -z "$EXPECT_MAJOR_MIN" ] && [ ! -z "$EXPECT_MINOR_MIN" ] && [ $MINOR -lt $EXPECT_MINOR_MIN ]
-        then
-            warn_version
-            exit 1
-        fi
-    fi
+check_version() {
+	[ "${EXPECT_MAJOR_MIN+}" ] || return 0
+	[ "$MAJOR" -gt "$EXPECT_MAJOR_MIN" ] && return 0
+	[ "$MAJOR" -lt "$EXPECT_MAJOR_MIN" ] && return 1
 
-    # check any additional required configs
-    FAILED=0
-    for EXPECT_CONFIG in $(env | grep "EXPECT_CONFIG")
-    do
-	EXPECT_LINE=$(echo "$EXPECT_CONFIG" | sed 's/EXPECT_\(.*\)/\1/')
+	[ "${EXPECT_MINOR_MIN+}" ] || return 0
+	[ "$MINOR" -gt "$EXPECT_MINOR_MIN" ] && return 0
+	[ "$MINOR" -lt "$EXPECT_MINOR_MIN" ] && return 1
 
-	EXPECT_CONF=$(echo $EXPECT_LINE | cut -d'=' -f1)
-	EXPECT_VALUE=$(echo $EXPECT_LINE | cut -d'=' -f2)
+	return 0
+}
 
-	if [ "$EXPECT_VALUE" = "y" ]
-	then
-	    if ! zgrep "$EXPECT_CONF=y" /proc/config.gz &> /dev/null
-	    then
-		warn_config $EXPECT_LINE
-		FAILED=1
-	    fi
-	elif [ "$EXPECT_VALUE" = "n" ]
-	then
-	    if zgrep "$EXPECT_CONF=[ym]" /proc/config.gz &> /dev/null
-	    then
-		warn_config $EXPECT_LINE
-		FAILED=1
-	    fi
+expect_config() {
+	if [ "$EXPECT_VALUE" = y ]; then
+		zcat /proc/config.gz | grep -q "^$EXPECT_CONF=y" || return 1
+	elif [ "$EXPECT_VALUE" = n ]; then
+		zcat /proc/config.gz | grep -q "^$EXPECT_CONF=[ym]" && return 1
 	fi
-    done
-    if [ $FAILED -ne 0 ]
-    then
-	exit 1
-    fi
+	return 0
+}
+
+[ -f "$CONFIG_FILE" ] || exit 0
+. "$CONFIG_FILE"
+
+FAILED=0
+
+# check if the current kernel version is >= to the expected one
+KERNEL_VERSION=$(uname -r)
+# extract number before first dot
+MAJOR=${KERNEL_VERSION%%.*}
+# two-step substitution to extract second number between dots
+MINOR=${KERNEL_VERSION#.*}
+MINOR=${MINOR%%.*}
+
+if ! check_version; then
+	warn_version
+	FAILED=1
 fi
+
+# check any additional required configs
+for EXPECT_CONFIG in $(set | grep '^EXPECT_CONFIG_'); do
+	EXPECT_LINE=${EXPECT_CONFIG#EXPECT_}
+	EXPECT_CONF=${EXPECT_LINE%%=*}
+	eval "EXPECT_VALUE=\${EXPECT_$EXPECT_CONF}"
+
+	if ! expect_config; then
+		warn_config "$EXPECT_LINE"
+		FAILED=1
+	fi
+done
+
+exit "$FAILED"
