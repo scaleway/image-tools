@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # description "generate SSH keys"
 # author "Scaleway <opensource@scaleway.com>"
 

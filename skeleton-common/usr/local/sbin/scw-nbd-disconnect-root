@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 # description "disconnect root NBD volume"
 # author "Scaleway <opensource@scaleway.com>"
 
 XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
-$XNBD_CLIENT --version &> /dev/null
+$XNBD_CLIENT --version > /dev/null 2>&1
 $XNBD_CLIENT -d /dev/nbd0
 echo "b" > /proc/sysrq-trigger
