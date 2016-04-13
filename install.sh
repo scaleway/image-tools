@@ -57,10 +57,11 @@ IMAGE_FLAVORS="${NEW_FLAVORS%?}"
 EOF
 
     # Save image-tools checkout
-    sed -i '/^IMAGE_TOOLS_CHECKOUT=/d' ${ROOTDIR}/etc/scw-release 2>/dev/null
+    sed -i.bak '/^IMAGE_TOOLS_CHECKOUT=/d' ${ROOTDIR}/etc/scw-release 2>/dev/null
     cat <<EOF >> ${ROOTDIR}/etc/scw-release
 IMAGE_TOOLS_CHECKOUT="${BRANCH}"
 EOF
+    rm -f ${ROOTDIR}/etc/scw-release.bak
     clean
 }
 
