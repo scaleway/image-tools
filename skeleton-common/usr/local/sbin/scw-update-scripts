@@ -10,5 +10,5 @@ FLAVORS=${FLAVORS:-common}
 echo -n "This script will update (overwrite) scaleway's scripts, continue (y/N)? "
 read ANSWER
 if [ "$ANSWER" = "y" -o "$ANSWER" = "Y" ]; then
-	curl -Lq http://j.mp/scw-skeleton | FLAVORS=$FLAVORS sh
+	curl -Lq https://j.mp/scw-skeleton | FLAVORS=$FLAVORS sh
 fi

@@ -149,7 +149,7 @@ make rootfs.sqsh
 # From a shell
 wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
 # or
-wget -qO - http://j.mp/scw-builder | bash
+wget -qO - https://j.mp/scw-builder | bash
 ```
 
 Or from a Makefile ([example](https://github.com/scaleway/image-helloworld/blob/master/Makefile))
@@ -158,7 +158,7 @@ Or from a Makefile ([example](https://github.com/scaleway/image-helloworld/blob/
 ## Image tools  (https://github.com/scaleway/image-tools)
 all:    docker-rules.mk
 docker-rules.mk:
-    wget -qO - http://j.mp/scw-builder | bash
+    wget -qO - https://j.mp/scw-builder | bash
 -include docker-rules.mk
 ```
 
@@ -202,18 +202,18 @@ Those scripts are mainly used in the base image (distrib) but can sometimes be u
 An example of usage in the [Ubuntu image](https://github.com/scaleway/image-ubuntu/blob/9cd0f287a1977a55b74b1a37ecb1c03c8ce55c85/14.04/Dockerfile#L12-L17)
 
 ```bash
-wget -qO - http://j.mp/scw-skeleton | bash -e
+wget -qO - https://j.mp/scw-skeleton | bash -e
 
 # Using upstart flavor
-wget -qO - http://j.mp/scw-skeleton | FLAVORS=upstart bash -e
+wget -qO - https://j.mp/scw-skeleton | FLAVORS=upstart bash -e
 # Using sysvinit, docker-based and common flavors
-wget -qO - http://j.mp/scw-skeleton | FLAVORS=sysvinit,docker-based,common bash -e
+wget -qO - https://j.mp/scw-skeleton | FLAVORS=sysvinit,docker-based,common bash -e
 
 # Specific GIT branch
-wget -qO - http://j.mp/scw-skeleton | FLAVORS=upstart BRANCH=feature-xxx bash -e
+wget -qO - https://j.mp/scw-skeleton | FLAVORS=upstart BRANCH=feature-xxx bash -e
 
 # Use curl
-curl -L -q http://j.mp/scw-skeleton | DL=curl bash -e
+curl -L -q https://j.mp/scw-skeleton | DL=curl bash -e
 
 # Alternative URL
 wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/install.sh | ... bash -e
