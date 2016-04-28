@@ -2,9 +2,9 @@
 
 # official distros
 ubuntu            12.04,precise         github.com/scaleway/image-ubuntu              12.04
-ubuntu            14.04,trusty,lts      github.com/scaleway/image-ubuntu              14.04
-ubuntu            15.04,vivid           github.com/scaleway/image-ubuntu              15.04
-ubuntu            15.10,wily,latest     github.com/scaleway/image-ubuntu              15.10
+ubuntu            14.04,trusty          github.com/scaleway/image-ubuntu              14.04
+ubuntu            15.10,wily            github.com/scaleway/image-ubuntu              15.10
+ubuntu            16.04,xenial,lts,latest github.com/scaleway/image-ubuntu              16.04
 debian            8,jessie,latest       github.com/scaleway/image-debian              jessie
 debian            7,wheezy              github.com/scaleway/image-debian              wheezy
 debian            sid                   github.com/scaleway/image-debian              sid
