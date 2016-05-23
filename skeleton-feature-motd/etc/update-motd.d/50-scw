@@ -51,7 +51,14 @@ for i in {0..16}; do
   metadata VOLUMES_${i} | grep " " >/dev/null || continue
 
   SIZE=$(( $(volume_metadata $i SIZE) / 1000 / 1000 / 1000 ))G
-  printf "Disk nbd%s:\t%s\n" "$i" "$(volume_metadata $i VOLUME_TYPE) ${SIZE}"
+
+  volume_export_uri="$(volume_metadata $i EXPORT_URI)"
+  if [ "$(echo "$volume_export_uri" | cut -d: -f1)" = "nbd" ]; then
+    device_name="nbd$i"
+  else
+    device_name="$(echo "$volume_export_uri" | sed s@device://dev/@@)"
+  fi
+  printf "Disk %s:\t%s\n" "$device_name" "$(volume_metadata $i VOLUME_TYPE) ${SIZE}"
 done
 printf "\n"
 printf "Documentation:\t%s\n" "$IMAGE_DOC_URL"
