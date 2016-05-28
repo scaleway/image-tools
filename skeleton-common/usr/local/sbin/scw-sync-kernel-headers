@@ -7,7 +7,7 @@ set -e
 DIR=/usr
 mkdir -p $DIR
 KVERSION=`uname -r`
-
+MACHINE=`uname -m`
 export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
 
-wget -q -O - http://mirror.scaleway.com/kernel/${KVERSION}/include.tar | tar -C ${DIR} -xf -
+wget -q -O - http://mirror.scaleway.com/kernel/${MACHINE}/${KVERSION}/include.tar | tar -C ${DIR} -xf -
