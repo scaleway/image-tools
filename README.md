@@ -9,7 +9,7 @@ This repository contains the tools, documentations, examples and contents for bu
 * The apps and stacks are located on the [scaleway-community](https://github.com/scaleway-community) organization
 
 
-## Getting start
+## Getting started
 
 You can look the docker-based [hello-world](https://github.com/scaleway/image-helloworld) image.
 
