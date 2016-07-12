@@ -25,7 +25,7 @@ cat << EOF > /root/.ssh/authorized_keys
 #   -- Add keys using server tags - https://cloud.scaleway.com/#/servers/$(scw-metadata --cached ID)
 #        - i.e: "AUTHORIZED_KEY=ssh-rsa_XXXXXXXXXXX AUTHORIZED_KEY=ssh-rsa_YYYYYYYYYYYYYYY"
 #        - Be sure to replace all spaces with underscores
-#        - $> sed 's/ /_/g' ~./ssh/id_rsa.pub
+#        - $> sed 's/ /_/g' ~/.ssh/id_rsa.pub
 #   -- Add the keys to '/root/.ssh/instance_keys' which will be imported
 #
 # And recreate your 'authorized_keys' file with the new keys:
