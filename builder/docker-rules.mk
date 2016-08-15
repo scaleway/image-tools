@@ -247,7 +247,7 @@ publish_on_s3.sqsh: $(EXPORT_DIR)rootfs.sqsh
 fclean: clean
 	for tag in latest $(shell docker images | grep "^$(DOCKER_NAMESPACE)$(NAME) " | awk '{print $$2}'); do\
 	  echo "Creating a backup of '$(DOCKER_NAMESPACE)$(NAME):$$tag' for caching"; \
-	  docker tag -f $(DOCKER_NAMESPACE)$(NAME):$$tag old$(DOCKER_NAMESPACE)$(NAME):$$tag; \
+	  docker tag $(DOCKER_NAMESPACE)$(NAME):$$tag old$(DOCKER_NAMESPACE)$(NAME):$$tag; \
 	  docker rmi -f $(DOCKER_NAMESPACE)$(NAME):$$tag; \
 	done
 
@@ -340,8 +340,8 @@ $(TMP_BUILD_DIR)/.overlays: $(OVERLAY_FILES)
 	@find $(BUILD_DIR) -name "*~" -delete || true
 	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(BUILD_DIR)
 	for tag in $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do							                                   \
-	  echo docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;   \
-	  docker tag -f $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;	   \
+	  echo docker tag $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;   \
+	  docker tag $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;	   \
 	done
 	docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) > $@
 
