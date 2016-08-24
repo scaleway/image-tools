@@ -4,6 +4,7 @@
 
 if [ -f /etc/.regen-machine-id ]
 then
+	rm -f /etc/machine-id
 	systemd-machine-id-setup 2> /dev/null
 	rm -f /etc/.regen-machine-id
 fi
