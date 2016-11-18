@@ -33,6 +33,9 @@ cat << EOF > /root/.ssh/authorized_keys
 #
 EOF
 
+# ensure /root/.ssh/authorized_keys has correct permissions
+chmod 0600 /root/.ssh/authorized_keys
+
 # add Scaleway account keys
 /usr/local/bin/scw-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' >> /root/.ssh/authorized_keys
 
