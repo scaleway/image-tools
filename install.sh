@@ -51,7 +51,7 @@ main() {
     NEW_FLAVORS=$(echo "$(echo "${FLAVORS_BACKUP} ${FLAVORS}" | tr ' ' '\n')" | sed '/^\s*$/d' | sort -u | tr '\n' ' ')
 
     touch ${ROOTDIR}/etc/scw-release
-    sed -i '/^IMAGE_FLAVORS=/d' ${ROOTDIR}/etc/scw-release 2>/dev/null
+    sed -i.bak '/^IMAGE_FLAVORS=/d' ${ROOTDIR}/etc/scw-release 2>/dev/null
     cat << EOF >> ${ROOTDIR}/etc/scw-release
 IMAGE_FLAVORS="${NEW_FLAVORS%?}"
 EOF
