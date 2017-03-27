@@ -272,7 +272,8 @@ test:  .docker-container-$(TARGET_UNAME_ARCH).built
 .PHONY: travis
 travis:
 	npm install dockerfile_lint
-	find . -name Dockerfile -print0 | xargs -L 1 -r -0 ./node_modules/.bin/dockerfile_lint -f
+	wget https://raw.githubusercontent.com/scaleway/image-tools/master/builder/dockerlint.rules
+	find . -name Dockerfile -print0 | xargs -L 1 -r -0 ./node_modules/.bin/dockerfile_lint -r dockerlint.rules -f
 
 .PHONY:
 setup_binfmt:
