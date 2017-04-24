@@ -31,48 +31,56 @@ ARCH ?=			$(HOST_ARCH)
 ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
 ifeq ($(ARCH),arm)
 	TARGET_QEMU_ARCH=arm
+	TARGET_IMAGE_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
 	TARGET_DOCKER_TAG_ARCH=armhf
 	TARGET_GOLANG_ARCH=arm
 endif
 ifeq ($(ARCH),armhf)
 	TARGET_QEMU_ARCH=arm
+	TARGET_IMAGE_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
 	TARGET_DOCKER_TAG_ARCH=armhf
 	TARGET_GOLANG_ARCH=arm
 endif
 ifeq ($(ARCH),armv7l)
 	TARGET_QEMU_ARCH=arm
+	TARGET_IMAGE_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
 	TARGET_DOCKER_TAG_ARCH=armhf
 	TARGET_GOLANG_ARCH=arm
 endif
 ifeq ($(ARCH),arm64)
 	TARGET_QEMU_ARCH=aarch64
+	TARGET_IMAGE_ARCH=arm64
 	TARGET_UNAME_ARCH=arm64
 	TARGET_DOCKER_TAG_ARCH=arm64
 	TARGET_GOLANG_ARCH=arm64
 endif
 ifeq ($(ARCH),x86_64)
 	TARGET_QEMU_ARCH=x86_64
+	TARGET_IMAGE_ARCH=x86_64
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
 	TARGET_GOLANG_ARCH=amd64
 endif
 ifeq ($(ARCH),amd64)
 	TARGET_QEMU_ARCH=x86_64
+	TARGET_IMAGE_ARCH=x86_64
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
 	TARGET_GOLANG_ARCH=amd64
 endif
 ifeq ($(ARCH),mips)
 	TARGET_QEMU_ARCH=mips
+	TARGET_IMAGE_ARCH=mips
 	TARGET_UNAME_ARCH=mips
 	TARGET_DOCKER_TAG_ARCH=mips
 	TARGET_GOLANG_ARCH=unsupported
 endif
 ifeq ($(ARCH),powerpc)
 	TARGET_QEMU_ARCH=powerpc
+	TARGET_IMAGE_ARCH=powerpc
 	TARGET_UNAME_ARCH=powerpc
 	TARGET_DOCKER_TAG_ARCH=powerpc
 	TARGET_GOLANG_ARCH=unsupported
@@ -164,12 +172,12 @@ image_dep:
 image_on_s3: image_dep
 	s3cmd ls $(S3_URL) || s3cmd mb $(S3_URL)
 	s3cmd ls $(S3_FULL_URL) | grep -q '.tar' || $(MAKE) publish_on_s3.tar
-	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
+	IMAGE_ARCH="$(TARGET_IMAGE_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh $(shell s3cmd info $(S3_FULL_URL) | grep URL | awk '{print $$2}')
 
 
 .PHONY: image_on_store
 image_on_store: image_dep
-	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
+	IMAGE_ARCH="$(TARGET_IMAGE_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(STORE_HOSTNAME)/$(STORE_PATH)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: image_on_local
@@ -180,7 +188,7 @@ image_on_local: image_dep $(EXPORT_DIR)rootfs.tar
 		$(eval LOCAL_HTTPD_PORT := $(shell for candidate in $$(seq 8000 8100); do lsof -i tcp:$$candidate >/dev/null 2>&1; if [ $$? = 1 ]; then echo $$candidate; break; fi; done)) \
 		$(shell sh -c '$(call EMBEDDED_HTTPD,$(EXPORT_DIR)rootfs.tar,$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar,application/x-tar,$(LOCAL_HTTPD_PORT))') \
 	)
-	IMAGE_ARCH="$(TARGET_QEMU_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell scw-metadata --cached PUBLIC_IP_ADDRESS):$(LOCAL_HTTPD_PORT)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
+	IMAGE_ARCH="$(TARGET_IMAGE_ARCH)" VOLUME_SIZE="$(IMAGE_VOLUME_SIZE)" IMAGE_NAME="$(IMAGE_NAME)" IMAGE_BOOTSCRIPT="$(IMAGE_BOOTSCRIPT)" /tmp/create-image-from-http.sh http://$(shell scw-metadata --cached PUBLIC_IP_ADDRESS):$(LOCAL_HTTPD_PORT)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION)/$(TARGET_UNAME_ARCH)-$(NAME)-$(VERSION).tar
 
 
 .PHONY: image
