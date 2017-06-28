@@ -49,3 +49,6 @@ rm -f /var/log/journal/*
 
 # Update locate cache
 updatedb 2>/dev/null || true
+
+# Remove machine-id (will be regenerated on first boot)
+rm -f /etc/machine-id /var/lib/dbus/machine-id

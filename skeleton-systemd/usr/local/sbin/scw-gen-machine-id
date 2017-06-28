@@ -4,7 +4,9 @@
 
 if [ -f /etc/.regen-machine-id ]
 then
+	rm -f /var/lib/dbus/machine-id
 	rm -f /etc/machine-id
+	dbus-uuidgen --ensure
 	systemd-machine-id-setup 2> /dev/null
 	rm -f /etc/.regen-machine-id
 fi
