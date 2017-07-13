@@ -19,6 +19,7 @@ TITLE ?=                $(NAME)
 VERSION_ALIASES ?=
 BUILD_OPTS ?=
 HOST_ARCH :=            $(shell uname -m)
+QEMU_PATCH_VERSION ?=	2.8.4
 IMAGE_VOLUME_SIZE ?=    50G
 IMAGE_NAME ?=           $(NAME)
 IMAGE_BOOTSCRIPT ?=     stable
@@ -26,7 +27,6 @@ S3_FULL_URL ?=          $(S3_URL)/$(FULL_NAME).tar
 ADDITIONAL_ASSETS ?=
 LOCAL_HTTPD_PORT ?=	80
 EMBEDDED_HTTPD = (printf "HTTP/1.1 200 OK\r\nContent-type: $(3)\r\nContent-Disposition: attachment; filename=\"$(2)\"\r\nContent-Length: $(shell stat -c %s $(1))\r\nConnection: close\r\n\r\n"; cat $(1)) | nc -l -p $(4) > /dev/null &
-DEFAULT_IMAGE_ARCH ?=	armv7l
 ARCH ?=			$(HOST_ARCH)
 ARCHS :=		amd64 x86_64 i386 arm armhf armel arm64 mips mipsel powerpc
 ifeq ($(ARCH),arm)
@@ -87,8 +87,7 @@ ifeq ($(ARCH),powerpc)
 endif
 OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH) overlay-image-tools
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
-TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
-BUILD_DIR :=		$(shell test $(TARGET_UNAME_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
+BUILD_DIR :=		tmp-$(TARGET_UNAME_ARCH)
 EXPORT_DIR ?=           /tmp/build/$(TARGET_UNAME_ARCH)-$(FULL_NAME)/
 
 
@@ -148,7 +147,6 @@ info:
 	@echo "Arch:"
 	@echo "-----"
 	@echo "- HOST_ARCH            $(HOST_ARCH)"
-	@echo "- DEFAULT_IMAGE_ARCH   $(DEFAULT_IMAGE_ARCH)"
 	@echo "- ARCH                 $(ARCH)"
 	@echo "- TARGET_QEMU_ARCH     $(TARGET_QEMU_ARCH)"
 	@echo "- TARGET_UNAME_ARCH    $(TARGET_UNAME_ARCH)"
@@ -305,10 +303,14 @@ run: shell
 .PHONY: re
 re: rebuild
 
+.PHONY: qemu-patch
+qemu-patch: patches/usr/bin/qemu-$(TARGET_QEMU_ARCH)-static
+
+
 
 # File-based rules
-$(TMP_BUILD_DIR)/Dockerfile: Dockerfile
-	mkdir -p "$(TMP_BUILD_DIR)"
+$(BUILD_DIR)/Dockerfile: Dockerfile
+	mkdir -p "$(BUILD_DIR)"
 	cp $< $@
 	for arch in $(ARCHS); do							\
 	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then				\
@@ -321,26 +323,21 @@ $(TMP_BUILD_DIR)/Dockerfile: Dockerfile
 	sed '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@.tmp > $@
 	mv $@ $@.tmp
 	sed 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@.tmp > $@
-	if [ "`grep ^FROM $(TMP_BUILD_DIR)/Dockerfile | wc -l`" = "2" ]; then		\
+	if [ "`grep ^FROM $(BUILD_DIR)/Dockerfile | wc -l`" = "2" ]; then		\
 	  mv $@ $@.tmp;									\
 	  sed 0,/^FROM/d $@.tmp > $@;							\
 	fi
 	rm -f $@.tmp
-	#cat $@
 
 
-$(TMP_BUILD_DIR)/.overlays: $(OVERLAY_FILES)
-	mkdir -p $(TMP_BUILD_DIR)
-	for dir in $(OVERLAY_DIRS); do                           			\
-	  if [ -d "$$dir" ]; then				 			\
-	    rm -rf "$(TMP_BUILD_DIR)/$$dir";             				\
-	    cp -rf "$$dir" "$(TMP_BUILD_DIR)/$$dir";     				\
-	  fi                                                     			\
+$(BUILD_DIR)/.overlays: $(OVERLAY_FILES)
+	mkdir -p $(BUILD_DIR)
+	for dir in $(OVERLAY_DIRS); do							\
+	  if [ -d "$$dir" ]; then							\
+	    rm -rf "$(BUILD_DIR)/$$dir";						\
+	    cp -rf "$$dir" "$(BUILD_DIR)/$$dir";					\
+	  fi										\
 	done
-	touch $@
-
-
-.overlays:
 	touch $@
 
 
@@ -411,10 +408,11 @@ $(EXPORT_DIR)export.tar: .docker-container-$(TARGET_UNAME_ARCH).built
 
 
 patches/usr/bin/qemu-$(TARGET_QEMU_ARCH)-static:
-	mkdir -p patches/usr/bin
-	wget https://github.com/multiarch/qemu-user-static/releases/download/v2.0.0/amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
-	tar -xf amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
-	rm -f amd64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	mkdir -p patches/usr/bin/
+	wget https://github.com/multiarch/qemu-user-static/releases/download/v$(QEMU_PATCH_VERSION)/x86_64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	tar -xf x86_64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	rm -f x86_64_qemu-$(TARGET_QEMU_ARCH)-static.tar.gz
+	mv qemu-$(TARGET_QEMU_ARCH)-static patches/usr/bin/
 
 
 .PHONY: sync-image-tools
