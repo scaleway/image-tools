@@ -8,6 +8,18 @@ CACHE_FILE=/run/scw-metadata.cache
 METADATA_IP=${METADATA_IP:-169.254.42.42}
 METADATA_URL=${METADATA_URL:-"http://${METADATA_IP}/conf"}
 
+if [ "$1" = -h ] || [ "$1" = --help ]; then
+    cat <<EOF
+Usage: $0 [--cached] [KEY]
+Retrieves metadata about this server (All available metadata by default).
+	  --cached Use the previously fetched metadata if available.
+
+$0 outputs the value of the key if given, or a newline separated list of KEY=value couples otherwise.
+The value might be an empty string.
+EOF
+    exit 0
+fi
+
 if [ "$1" = "--cached" -a -f $CACHE_FILE ]; then
     shift
     BODY=$(cat $CACHE_FILE)
