@@ -87,8 +87,6 @@ ifeq ($(ARCH),powerpc)
 endif
 OVERLAY_DIRS :=		overlay overlay-common overlay-$(TARGET_UNAME_ARCH) patches patches-common patches-$(TARGET_UNAME_ARCH) overlay-image-tools
 OVERLAY_FILES :=	$(shell for dir in $(OVERLAY_DIRS); do test -d $$dir && find $$dir -type f; done || true)
-TMP_BUILD_DIR :=	tmp-$(TARGET_UNAME_ARCH)
-BUILD_DIR :=		$(shell test $(TARGET_UNAME_ARCH) = $(DEFAULT_IMAGE_ARCH) && echo "." || echo $(TMP_BUILD_DIR))
 EXPORT_DIR ?=           /tmp/build/$(TARGET_UNAME_ARCH)-$(FULL_NAME)/
 
 
@@ -130,7 +128,6 @@ info:
 	@echo "Makefile variables:"
 	@echo "-------------------"
 	@echo "- EXPORT_DIR           $(EXPORT_DIR)"
-	@echo "- BUILD_DIR            $(BUILD_DIR)"
 	@echo "- DESCRIPTION          $(DESCRIPTION)"
 	@echo "- DISK                 $(DISK)"
 	@echo "- DOCKER_NAMESPACE     $(DOCKER_NAMESPACE)"
@@ -306,48 +303,10 @@ run: shell
 re: rebuild
 
 
-# File-based rules
-$(TMP_BUILD_DIR)/Dockerfile: Dockerfile
-	mkdir -p "$(TMP_BUILD_DIR)"
-	cp $< $@
-	for arch in $(ARCHS); do							\
-	  if [ "$$arch" != "$(TARGET_UNAME_ARCH)" ]; then				\
-	    mv $@ $@.tmp;								\
-	    sed "/#[[:space:]]*arch=$$arch[[:space:]]*$$/d" $@.tmp > $@;		\
-	    rm -f $@.tmp;								\
-	  fi										\
-	done
-	mv $@ $@.tmp
-	sed '/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$/s/^#//' $@.tmp > $@
-	mv $@ $@.tmp
-	sed 's/#[[:space:]]*arch=$(TARGET_UNAME_ARCH)[[:space:]]*$$//g' $@.tmp > $@
-	if [ "`grep ^FROM $(TMP_BUILD_DIR)/Dockerfile | wc -l`" = "2" ]; then		\
-	  mv $@ $@.tmp;									\
-	  sed 0,/^FROM/d $@.tmp > $@;							\
-	fi
-	rm -f $@.tmp
-	#cat $@
-
-
-$(TMP_BUILD_DIR)/.overlays: $(OVERLAY_FILES)
-	mkdir -p $(TMP_BUILD_DIR)
-	for dir in $(OVERLAY_DIRS); do                           			\
-	  if [ -d "$$dir" ]; then				 			\
-	    rm -rf "$(TMP_BUILD_DIR)/$$dir";             				\
-	    cp -rf "$$dir" "$(TMP_BUILD_DIR)/$$dir";     				\
-	  fi                                                     			\
-	done
-	touch $@
-
-
-.overlays:
-	touch $@
-
-
-.docker-container-$(TARGET_UNAME_ARCH).built: $(BUILD_DIR)/Dockerfile $(BUILD_DIR)/.overlays $(ADDITIONAL_ASSETS)
+.docker-container-$(TARGET_UNAME_ARCH).built: $(OVERLAY_FILES) $(ADDITIONAL_ASSETS)
 	test $(HOST_ARCH) = $(TARGET_UNAME_ARCH) || $(MAKE) setup_binfmt
-	@find $(BUILD_DIR) -name "*~" -delete || true
-	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(BUILD_DIR)
+	@find . -name "*~" -delete || true
+	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) --build-arg arch=$(TARGET_DOCKER_TAG_ARCH) .
 	for tag in $(shell date +%Y-%m-%d) $(VERSION_ALIASES); do							                                   \
 	  echo docker tag $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;   \
 	  docker tag $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$(VERSION) $(DOCKER_NAMESPACE)$(NAME):$(TARGET_DOCKER_TAG_ARCH)-$$tag;	   \
