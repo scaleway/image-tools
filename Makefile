@@ -134,3 +134,10 @@ rootfs.tar: $(EXPORT_DIR)/rootfs.tar
 	ls -la $<
 	@echo $<
 
+.PHONY: scaleway_image
+scaleway_image:
+	env OUTPUT_ID_TO=server.id scripts/create_image.sh
+
+.PHONY: tests
+tests: scaleway_image
+	scripts/test_image.sh
