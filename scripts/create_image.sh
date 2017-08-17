@@ -43,7 +43,7 @@ key=$(cat $SSH_KEY_FILE | cut -d' ' -f1,2 | tr ' ' '_')
 server_type=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | cut -d',' -f1)
 server_name="image-writer-$(date +%Y-%m-%d_%H:%M)"
 
-server_id=$(create_server $server_type $server_name 50G "AUTHORIZED_KEY=$key boot=live rescue_image=$rootfs_url")
+server_id=$(create_server $server_type $server_name 50G "AUTHORIZED_KEY=$key boot=live rescue_image=$rootfs_url DONT_FORWARD_NET_CONFIG=1 DONT_GEN_ROOT_PASSWD=1 INITRD_DROPBEAR=1")
 
 boot_server $server_id
 
