@@ -140,14 +140,14 @@ scaleway_image: rootfs.tar
 ifeq ($(SERVE_ROOTFS), y)
 	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
 	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
-	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) & echo $$!
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)"
+	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) >/dev/null 2>&1 & echo $$!
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)" "$(IMAGE_BOOTSCRIPT)"
 	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
 else
 ifndef ROOTFS_URL
 	$(error "Self httpd not enabled (SERVE_ROOTFS) and rootfs URL not provided (ROOTFS_URL)")
 endif
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)"
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)" "$(IMAGE_BOOTSCRIPT)"
 endif
 
 .PHONY: tests

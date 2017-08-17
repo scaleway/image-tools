@@ -24,6 +24,7 @@ fi
 image_name=$1
 arch=$2
 rootfs_url=$3
+image_bootscript=$4
 
 if ! [ -f $HOME/.scwrc ]; then
     logerr "Please log into Scaleway first : scw login"
@@ -52,6 +53,6 @@ stop_server $server_id
 
 _scw wait $server_id
 
-image_from_volume $server_id $arch "$image_name" >$OUTPUT_ID_TO
+image_from_volume $server_id $arch "$image_name" "$image_bootscript" >$OUTPUT_ID_TO
 
 rm_server $server_id
