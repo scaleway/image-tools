@@ -16,7 +16,7 @@ endif
 DOCKER_NAMESPACE ?= scaleway
 BUILD_OPTS ?=
 SERVE_ROOTFS ?= y
-SERVE_IP ?= $(shell scw-metadata --cached PUBLIC_IP_ADDRESS)
+REGION ?= par1
 
 # Architecture variables setup
 HOST_ARCH := $(shell uname -m)
@@ -139,15 +139,16 @@ rootfs.tar: $(EXPORT_DIR)/rootfs.tar
 scaleway_image: rootfs.tar
 ifeq ($(SERVE_ROOTFS), y)
 	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
+	$(eval SERVE_IP ?= $(shell scw-metadata --cached PUBLIC_IP_ADDRESS))
 	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
 	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) >/dev/null 2>&1 & echo $$!
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)" "$(IMAGE_BOOTSCRIPT)"
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
 	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
 else
 ifndef ROOTFS_URL
 	$(error "Self httpd not enabled (SERVE_ROOTFS) and rootfs URL not provided (ROOTFS_URL)")
 endif
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)" "$(IMAGE_BOOTSCRIPT)"
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
 endif
 
 .PHONY: tests

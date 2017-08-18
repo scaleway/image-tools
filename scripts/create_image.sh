@@ -21,10 +21,11 @@ if [ -z "$OUTPUT_ID_TO" ]; then
     OUTPUT_ID_TO="image_id.txt"
 fi
 
-image_name=$1
-arch=$2
-rootfs_url=$3
-image_bootscript=$4
+rootfs_url=$1
+REGION=$2
+image_name=$3
+arch=$4
+image_bootscript=$5
 
 if ! [ -f $HOME/.scwrc ]; then
     logerr "Please log into Scaleway first : scw login"
@@ -35,15 +36,15 @@ if [ -z "$SCW_ORGANIZATION" ] || [ -z "$SCW_TOKEN" ]; then
     logerr "Could not get authentication information from $HOME/.scwrc"
     exit 1
 fi
-export SCW_ORGANIZATION
-export SCW_TOKEN
 
 key=$(cat $SSH_KEY_FILE | cut -d' ' -f1,2 | tr ' ' '_')
+
+bootscript_id=$(grep -E "$REGION\|$arch\>" bootscript_ids | cut -d'|' -f3)
 
 server_type=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | cut -d',' -f1)
 server_name="image-writer-$(date +%Y-%m-%d_%H:%M)"
 
-server_id=$(create_server $server_type $server_name 50G "AUTHORIZED_KEY=$key boot=live rescue_image=$rootfs_url DONT_FORWARD_NET_CONFIG=1 DONT_GEN_ROOT_PASSWD=1 INITRD_DROPBEAR=1")
+server_id=$(create_server $server_type $server_name 50G "AUTHORIZED_KEY=$key boot=live rescue_image=$rootfs_url DONT_FORWARD_NET_CONFIG=1 DONT_GEN_ROOT_PASSWD=1 INITRD_DROPBEAR=1" "$bootscript_id")
 
 boot_server $server_id
 

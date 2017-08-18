@@ -18,8 +18,12 @@ logdebug() {
     log "[DEBUG]" "$@"
 }
 
+__scw() {
+    scw --region=$REGION "$@"
+}
+
 _scw() {
-    scw "$@" >/dev/null 2>&1
+    __scw "$@" >/dev/null 2>&1
 }
 
 _ssh() {
@@ -32,7 +36,7 @@ _ssh() {
 get_server() {
     server_id=$1
 
-    res=$(curl --fail -s https://api.scaleway.com/servers/$server_id -H "x-auth-token: $SCW_TOKEN")
+    res=$(curl --fail -s https://cp-${REGION}.scaleway.com/servers/$server_id -H "x-auth-token: $SCW_TOKEN")
     if [ $? -ne 0 ]; then
         return 1
     else
@@ -45,8 +49,9 @@ create_server() {
     server_name=$2
     image=$3
     server_env=$4
+    bootscript=$5
 
-    if [ -n "$SSH_GATEWAY" ] || (which scw-metadata >/dev/null); then
+    if [ -n "$SSH_GATEWAY" ] || (which scw-metadata >/dev/null && (scw-metadata --cached LOCATION_ZONE_ID | grep -q $REGION)); then
         ipaddress="--ip-address=none"
     fi
 
@@ -224,7 +229,7 @@ image_from_volume() {
     maximum_snapshot_tries=3
     failed=true
     for try in `seq 1 $maximum_snapshot_tries`; do
-        snapshot_id_tmp=$(scw commit --volume=0 $server_id "snapshot-${server_id}-$(date +%Y-%m-%d_%H:%M)")
+        snapshot_id_tmp=$(__scw commit --volume=0 $server_id "snapshot-${server_id}-$(date +%Y-%m-%d_%H:%M)")
         if [ $? = 0 ]; then
             snapshot_id=$snapshot_id_tmp
             failed=false
@@ -245,7 +250,7 @@ image_from_volume() {
     maximum_mkimage_tries=3
     failed=true
     for try in `seq 1 $maximum_mkimage_tries`; do
-        image_id_tmp=$(scw tag --arch="$image_arch" $bootscript_opt $snapshot_id "$image_name")
+        image_id_tmp=$(__scw tag --arch="$image_arch" $bootscript_opt $snapshot_id "$image_name")
         if [ $? = 0 ]; then
             image_id=$image_id_tmp
             failed=false
