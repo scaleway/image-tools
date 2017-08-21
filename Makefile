@@ -13,9 +13,10 @@ ifndef IMAGE_TITLE
 $(error "No image title found (IMAGE_TITLE), e.g. 'Ubuntu Xenial (16.04)'")
 endif
 
-EXPORT_ROOTFS ?= $(TARGET_UNAME_ARCH)-$(FULL_NAME)
 DOCKER_NAMESPACE ?= scaleway
 BUILD_OPTS ?=
+SERVE_ROOTFS ?= y
+SERVE_IP ?= $(shell scw-metadata --cached PUBLIC_IP_ADDRESS)
 
 # Architecture variables setup
 HOST_ARCH := $(shell uname -m)
@@ -65,7 +66,7 @@ ifeq ($(ARCH),amd64)
 	TARGET_DOCKER_TAG_ARCH=amd64
 	TARGET_GOLANG_ARCH=amd64
 endif
-
+EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_IMAGE_ARCH)
 
 # Default action: display usage
 .PHONY: usage
@@ -101,7 +102,7 @@ image:
 
 $(EXPORT_DIR)/export.tar: image
 	-mkdir -p $(EXPORT_DIR)/
-	docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export --entrypoint /dontexists $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) 2>/dev/null || true
+	docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export --entrypoint /bin/true $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) 2>/dev/null || true
 	docker export $(IMAGE_NAME)-$(IMAGE_VERSION)-export > $@.tmp
 	docker rm $(IMAGE_NAME)-$(IMAGE_VERSION)-export
 	mv $@.tmp $@
@@ -135,8 +136,19 @@ rootfs.tar: $(EXPORT_DIR)/rootfs.tar
 	@echo $<
 
 .PHONY: scaleway_image
-scaleway_image:
-	env OUTPUT_ID_TO=server.id scripts/create_image.sh
+scaleway_image: rootfs.tar
+ifeq ($(SERVE_ROOTFS), y)
+	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
+	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
+	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) & echo $$!
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)"
+	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
+else
+ifndef ROOTFS_URL
+	$(error "Self httpd not enabled (SERVE_ROOTFS) and rootfs URL not provided (ROOTFS_URL)")
+endif
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(ROOTFS_URL)"
+endif
 
 .PHONY: tests
 tests: scaleway_image
