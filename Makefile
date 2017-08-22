@@ -68,6 +68,20 @@ ifeq ($(ARCH),amd64)
 endif
 EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_IMAGE_ARCH)
 
+ifeq ($(shell which scw-metadata >/dev/null 2>&1; echo $$?), 0)
+IS_SCW_HOST := y
+LOCAL_SCW_REGION := $(shell scw-metadata --cached LOCATION_ZONE_ID)
+export LOCAL_SCW_REGION
+ifeq ($(LOCAL_SCW_REGION), $(REGION))
+SERVE_IP := $(shell scw-metadata --cached PRIVATE_IP)
+else
+SERVE_IP := $(shell scw-metadata --cached PUBLIC_IP_ADDRESS)
+endif
+else
+IS_SCW_HOST := n
+endif
+export IS_SCW_HOST
+
 # Default action: display usage
 .PHONY: usage
 usage:
@@ -77,9 +91,6 @@ usage:
 	@echo ' scaleway_image          create a Scaleway image, requires a working `scaleway-cli'
 	@echo ' local_tests             run TIM tests against the Docker image'
 	@echo ' tests                   run TIM tests against the image on Scaleway'
-
-.PHONY: image
-scaleway_image: $(EXPORT_DIR)/rootfs.tar
 
 .PHONY: fclean
 fclean: clean
@@ -138,15 +149,18 @@ rootfs.tar: $(EXPORT_DIR)/rootfs.tar
 .PHONY: scaleway_image
 scaleway_image: rootfs.tar
 ifeq ($(SERVE_ROOTFS), y)
+ifdef SERVE_IP
 	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
-	$(eval SERVE_IP ?= $(shell scw-metadata --cached PUBLIC_IP_ADDRESS))
 	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
 	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) >/dev/null 2>&1 & echo $$!
 	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
 	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
 else
+	$(error "No ip given (SERVE_IP) while self httpd enabled (SERVE_ROOTFS)")
+endif
+else
 ifndef ROOTFS_URL
-	$(error "Self httpd not enabled (SERVE_ROOTFS) and rootfs URL not provided (ROOTFS_URL)")
+	$(error "Rootfs URL not provided (ROOTFS_URL) while self httpd not enabled (SERVE_ROOTFS)")
 endif
 	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
 endif

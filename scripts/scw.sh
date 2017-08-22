@@ -27,7 +27,7 @@ _scw() {
 }
 
 _ssh() {
-    if [ -n "$SSH_GATEWAY" ] && [ -z "$SSH_FORCE_NOPROXY" ]; then
+    if [ -n "$SSH_GATEWAY" ]; then
         proxyjump="-J $SSH_GATEWAY"
     fi
     ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" $proxyjump -i $SSH_KEY_FILE "$@"
@@ -51,7 +51,7 @@ create_server() {
     server_env=$4
     bootscript=$5
 
-    if [ -n "$SSH_GATEWAY" ] || (which scw-metadata >/dev/null && (scw-metadata --cached LOCATION_ZONE_ID | grep -q $REGION)); then
+    if [ -n "$SSH_GATEWAY" ] || ([ "$IS_SCW_HOST" = y ] && [ "$LOCAL_SCW_REGION" = "$REGION" ]); then
         ipaddress="--ip-address=none"
     fi
 
@@ -124,29 +124,43 @@ wait_for_ssh() {
         ssh_up_timeout=300
     fi
 
+    time_begin=$(date +%s)
     while true; do
-        server_ip=$(get_server $server_id | jq -r '.server.private_ip')
-        if [ -n "$SSH_GATEWAY" ]; then
-            prefix="env SSH_FORCE_NOPROXY=true _ssh $SSH_GATEWAY "
-        elif ! (which scw-metadata >/dev/null && ping $server_ip -c 3 >/dev/null); then
+        if [ "$IS_SCW_HOST" = "y" ] && [ "$LOCAL_SCW_REGION" = "$REGION" ]; then
+            server_ip=$(get_server $server_id | jq -r '.server.private_ip')
+        elif [ -n "$SSH_GATEWAY" ]; then
+            server_ip=$(get_server $server_id | jq -r '.server.private_ip')
+            cmd_prefix="ssh $SSH_GATEWAY"
+        else
             server_ip=$(get_server $server_id | jq -r '.server.public_ip.address // empty')
         fi
+        time_now=$(date +%s)
+        time_diff=$(echo "$time_now-$time_begin" | bc)
         if [ -n "$server_ip" ]; then
+            failed=false
             break
+        elif [ $time_diff -gt 120 ]; then
+            failed=true
+            break
+        else
+            sleep 5
         fi
-        sleep 5
     done
+    if $failed; then
+        logerr "Could not get a reachable ip for the server"
+        return 1
+    fi
 
     # Check that we can reach the node
-    if ! $prefix ping $server_ip -c 3 >/dev/null 2>&1; then
+    if ! $cmd_prefix ping $server_ip -c 3 >/dev/null 2>&1; then
         logerr "Could not reach $server_ip"
-        return 1
+        return 2
     fi
 
     # Wait for ssh
     loginfo "Waiting for ssh to be available on $server_ip..."
     time_begin=$(date +%s)
-    while ! $prefix nc -zv $server_ip 22 >/dev/null 2>&1; do
+    while ! $cmd_prefix nc -zv $server_ip 22 >/dev/null 2>&1; do
         time_now=$(date +%s)
         time_diff=$(echo "$time_now-$time_begin" | bc)
         if [ $time_diff -gt $ssh_up_timeout ]; then
@@ -241,16 +255,12 @@ image_from_volume() {
         return 1
     fi
 
-    if [ -n "$image_bootscript" ]; then
-        bootscript_opt="--bootscript=$image_bootscript"
-    fi
-
     loginfo "Creating image from snapshot"
     image_id=""
     maximum_mkimage_tries=3
     failed=true
     for try in `seq 1 $maximum_mkimage_tries`; do
-        image_id_tmp=$(__scw tag --arch="$image_arch" $bootscript_opt $snapshot_id "$image_name")
+        image_id_tmp=$(__scw tag --arch="$image_arch" --bootscript="$image_bootscript" $snapshot_id "$image_name")
         if [ $? = 0 ]; then
             image_id=$image_id_tmp
             failed=false
