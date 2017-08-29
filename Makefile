@@ -167,4 +167,7 @@ endif
 
 .PHONY: tests
 tests: scaleway_image
-	scripts/test_image.sh
+	scripts/test_image.sh start $(TARGET_IMAGE_ARCH) $(IMAGE_ID) $(EXPORT_DIR)/$(IMAGE_ID).servers
+ifneq ($(NO_CLEANUP), true)
+	scripts/test_image.sh stop $(EXPORT_DIR)/$(IMAGE_ID).servers
+endif

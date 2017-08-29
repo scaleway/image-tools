@@ -21,7 +21,7 @@ test_start() {
         boot_server $server_id
 
         server_ip=$(get_server $server_id | jq -r '.server.private_ip')
-        echo "$server_type $server_name $server_id $server_ip" >>$servers_list_file
+        echo "$server_id $server_type $server_name $server_ip" >>$servers_list_file
 
         wait_for_ssh $server_ip
 
@@ -30,12 +30,16 @@ test_start() {
             exit 1
         fi
     done
+    loginfo "Tested image $image_id on server(s):"
+    cat $servers_list_file | while read server_id server_type server_name server_ip; do
+        loginfo "Name ${server_name}, type $server_type (id ${server_id}, ip ${server_ip})"
+    done
 }
 
 test_stop() {
     servers_list_file=$1
 
-    cat $servers_list_file | while read server_type server_name server_id server_ip; do
+    cat $servers_list_file | while read server_id server_type server_name server_ip; do
         rm_server $server_id
     done
 }
