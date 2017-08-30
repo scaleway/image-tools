@@ -26,11 +26,20 @@ _scw() {
     __scw "$@" >/dev/null 2>&1
 }
 
-_ssh() {
+_ssh_get_options() {
+    options="StrictHostKeyChecking=no\nUserKnownHostsFile=/dev/null\nIdentityFile=$SSH_KEY_FILE"
     if [ -n "$SSH_GATEWAY" ]; then
-        proxyjump="-J $SSH_GATEWAY"
+        options="${options}\nProxyJump=$SSH_GATEWAY"
     fi
-    ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" $proxyjump -i $SSH_KEY_FILE "$@"
+    echo -e $options
+}
+
+_ssh() {
+    cmd_options=""
+    _ssh_get_options | while read option; do
+        cmd_options="${cmd_options}-o ${option} "
+    done
+    ssh $cmd_options "$@"
 }
 
 get_server() {
@@ -41,6 +50,17 @@ get_server() {
         return 1
     else
         echo $res
+    fi
+}
+
+get_server_ip() {
+    server_id=$1
+    if [ "$IS_SCW_HOST" = "y" ] && [ "$LOCAL_SCW_REGION" = "$REGION" ]; then
+        get_server $server_id | jq -r '.server.private_ip'
+    elif [ -n "$SSH_GATEWAY" ]; then
+        get_server $server_id | jq -r '.server.private_ip'
+    else
+        get_server $server_id | jq -r '.server.public_ip.address // empty'
     fi
 }
 
@@ -126,13 +146,9 @@ wait_for_ssh() {
 
     time_begin=$(date +%s)
     while true; do
-        if [ "$IS_SCW_HOST" = "y" ] && [ "$LOCAL_SCW_REGION" = "$REGION" ]; then
+        server_ip=$(get_server_ip $server_id)
+        if [ -n "$SSH_GATEWAY" ]; then
             server_ip=$(get_server $server_id | jq -r '.server.private_ip')
-        elif [ -n "$SSH_GATEWAY" ]; then
-            server_ip=$(get_server $server_id | jq -r '.server.private_ip')
-            cmd_prefix="ssh $SSH_GATEWAY"
-        else
-            server_ip=$(get_server $server_id | jq -r '.server.public_ip.address // empty')
         fi
         time_now=$(date +%s)
         time_diff=$(echo "$time_now-$time_begin" | bc)
