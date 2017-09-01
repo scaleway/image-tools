@@ -2,8 +2,7 @@
 
 SRC_DIR=$(dirname $(readlink -f $0))
 source $SRC_DIR/scw.sh
-
-_scw login -o "$SCW_ORGANIZATION" -t "$SCW_TOKEN" -s
+source $SRC_DIR/setup_credentials.sh
 
 test_start() {
     arch=$1
@@ -12,7 +11,7 @@ test_start() {
     servers_list_file=$4
     tests_dir=$5
 
-    key=$(cat ~/.ssh/id_builder.pub | cut -d' ' -f1,2 | tr ' ' '_')
+    key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
     server_types=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | tr ',' ' ')
     : >$servers_list_file
 

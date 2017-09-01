@@ -2,20 +2,7 @@
 
 SRC_DIR=$(dirname $(readlink -f $0))
 source $SRC_DIR/scw.sh
-
-if [ -z "$SSH_KEY_FILE" ]; then
-    for candidate in "id_rsa" "id_dsa" "id_ecdsa" "id_ed25519"; do
-        candidate_file="$HOME/.ssh/$candidate.pub"
-        if [ -f $candidate_file ]; then
-            export SSH_KEY_FILE=$candidate_file
-            break
-        fi
-    done
-    if [ -z "$SSH_KEY_FILE" ]; then
-        logerr "Could not find any ssh identity to use"
-        exit 1
-    fi
-fi
+source $SRC_DIR/setup_credentials.sh
 
 if [ -z "$OUTPUT_ID_TO" ]; then
     OUTPUT_ID_TO="image_id.txt"
@@ -27,17 +14,8 @@ image_name=$3
 arch=$4
 image_bootscript=$5
 
-if ! [ -f $HOME/.scwrc ]; then
-    logerr "Please log into Scaleway first : scw login"
-    exit 1
-fi
-read SCW_ORGANIZATION SCW_TOKEN < <(jq -r '"\(.organization) \(.token)"' $HOME/.scwrc)
-if [ -z "$SCW_ORGANIZATION" ] || [ -z "$SCW_TOKEN" ]; then
-    logerr "Could not get authentication information from $HOME/.scwrc"
-    exit 1
-fi
 
-key=$(cat $SSH_KEY_FILE | cut -d' ' -f1,2 | tr ' ' '_')
+key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
 
 bootscript_id=$(grep -E "$REGION\|$arch\>" bootscript_ids | cut -d'|' -f3)
 
