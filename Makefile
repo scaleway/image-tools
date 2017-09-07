@@ -68,6 +68,10 @@ ifeq ($(ARCH),amd64)
 endif
 EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_IMAGE_ARCH)
 
+ifdef IMAGE_BOOTSCRIPT_$(TARGET_IMAGE_ARCH)
+IMAGE_BOOTSCRIPT = $(IMAGE_BOOTSCRIPT$(TARGET_IMAGE_ARCH))
+endif
+
 ifeq ($(shell which scw-metadata >/dev/null 2>&1; echo $$?), 0)
 IS_SCW_HOST := y
 LOCAL_SCW_REGION := $(shell scw-metadata --cached LOCATION_ZONE_ID)
