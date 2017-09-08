@@ -142,7 +142,7 @@ $(EXPORT_DIR)/rootfs: $(EXPORT_DIR)/export.tar
 	mv $@.tmp $@
 
 $(EXPORT_DIR)/rootfs.tar: $(EXPORT_DIR)/rootfs
-	tar --format=gnu -C $< -cf $@.tmp .
+	tar --format=gnu -C $< -cf $@.tmp --owner=0 --group=0 .
 	mv $@.tmp $@
 
 .PHONY: rootfs.tar
