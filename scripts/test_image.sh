@@ -31,7 +31,7 @@ test_start() {
             ssh_tmp_config=$(mktemp)
             ssh -G $server_ip >$ssh_tmp_config
             _ssh_get_options >>$ssh_tmp_config
-            yamltest --timdir $tests_dir --pytestarg "--connection=ssh" --pytestarg "--ssh-config=$ssh_tmp_config" root@$server_ip
+            yamltest --timdir $tests_dir --pytestarg="--connection=ssh" --pytestarg="--ssh-config=$ssh_tmp_config" root@$server_ip
             rm $ssh_tmp_config
         elif ! (_ssh root@$server_ip "uname -a; lsmod"); then
             logerr "Command 'uname -a; lsmod' failed to execute"
