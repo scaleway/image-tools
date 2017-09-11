@@ -274,6 +274,8 @@ image_from_volume() {
             failed=false
             break
         fi
+        backoff=$(echo "(2^($try-1))*60" | bc)
+        sleep $backoff
     done
     if $failed; then
         logerr "Could not create snapshot"
@@ -291,6 +293,8 @@ image_from_volume() {
             failed=false
             break
         fi
+        backoff=$(echo "(2^($try-1))*60" | bc)
+        sleep $backoff
     done
     if $failed; then
         logerr "Could not create image"
