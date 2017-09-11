@@ -18,6 +18,15 @@ logdebug() {
     log "[DEBUG]" "$@"
 }
 
+exiterr() {
+    logerr "Exiting on previous errors."
+    if [ -n "$1" ]; then
+        exit $1
+    else
+        exit 1
+    fi
+}
+
 __scw() {
     scw --region=$REGION "$@"
 }
