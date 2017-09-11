@@ -30,6 +30,7 @@ test_start() {
 
 
         if [ -n "$tests_dir" ]; then
+            loginfo "Running tests in $tests_dir"
             ssh_tmp_config=$(mktemp)
             ssh -G $server_ip >$ssh_tmp_config
             _ssh_get_options >>$ssh_tmp_config
