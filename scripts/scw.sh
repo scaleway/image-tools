@@ -2,20 +2,24 @@ log() {
     echo "$@" >&2
 }
 
+if [ -z "$LOG_LEVEL" ]; then
+    LOG_LEVEL=3
+fi
+
 logerr() {
-    log "[ERROR]" "$@"
+    [ $LOG_LEVEL -gt 0 ] && log "[ERROR]" "$@"
 }
 
 logwarn() {
-    log "[WARNING]" "$@"
+    [ $LOG_LEVEL -gt 1 ] && log "[WARNING]" "$@"
 }
 
 loginfo() {
-    log "[INFO]" "$@"
+    [ $LOG_LEVEL -gt 2 ] && log "[INFO]" "$@"
 }
 
 logdebug() {
-    log "[DEBUG]" "$@"
+    [ $LOG_LEVEL -gt 3 ] && log "[DEBUG]" "$@"
 }
 
 exiterr() {
