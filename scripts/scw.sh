@@ -87,24 +87,27 @@ create_server() {
     # Try to create the server
     loginfo "Creating $server_type server $server_name..."
     maximum_create_tries=5
-    failed=true
     for try in `seq 1 $maximum_create_tries`; do
-        _scw create $ipaddress --commercial-type="$server_type" --bootscript="$bootscript" --name="$server_name" --env="$server_env" $image
+        server_id=$(__scw create $ipaddress --commercial-type="$server_type" --bootscript="$bootscript" --name="$server_name" --env="$server_env" $image)
+        logdebug "$server_id"
+        if [ -z "$server_id" ]; then
+            continue
+        fi
         sleep 1
-        if [ $(scw ps -a -q --filter="name=$server_name" | wc -l) -gt 0 ]; then
-            failed=false
-            break
+        server_info=$(get_server $server_id)
+        if [ $? -eq 0 ]; then
+            loginfo "Created server $server_name, id: $server_id"
+            echo $server_info | jq '.' | while IFS="\n" read line; do
+                logdebug "$line"
+            done
+            echo "$server_id"
+            return 0
         fi
         backoff=$(echo "(2^($try-1))*60" | bc)
         sleep $backoff
     done
-    if $failed; then
-        logerr "Could not create server"
-        return 1
-    fi
-    server_id=$(scw ps -a -q --filter="name=$server_name" | head -1)
-    loginfo "Created server $server_name, id: $server_id"
-    echo "$server_id"
+    logerr "Could not create server"
+    return 1
 }
 
 boot_server() {
