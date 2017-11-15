@@ -1,0 +1,33 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:                 scw-force-dhclient
+# Required-Start:           $remote_fs $local_fs
+# Required-Stop:
+# Default-Start:            2 3 4 5
+# Default-Stop:
+# Short-Description:        Ensure dhclient is running
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+set -e
+
+forcedhclient_start() {
+    log_action_begin_msg "Ensuring dhclient is running on eth0"
+    pgrep dhclient >/dev/null || dhclient eth0
+    log_action_end_msg 0
+}
+
+export PATH="${PATH:+$PATH:}/usr/sbin:/sbin"
+
+case "$1" in
+  start|reload|force-reload|restart)
+        forcedhclient_start
+        ;;
+  *)
+        log_action_msg "Usage: /etc/init.d/scw-force-dhclient {start|restart|reload|force-reload}" || true
+        exit 1
+esac
+
+exit 0

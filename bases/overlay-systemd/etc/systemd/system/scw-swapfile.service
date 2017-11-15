@@ -1,0 +1,12 @@
+[Unit]
+Description=SCW swapfile
+DefaultDependencies=no
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/scw-swapfile start
+ExecStop=-/usr/local/sbin/scw-swapfile stop
+
+[Install]
+WantedBy=multi-user.target

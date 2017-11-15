@@ -1,0 +1,50 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		scw-ssh-keys
+# Required-Start:	$remote_fs $sshd
+# Required-Stop:	$remote_fs $sshd
+# Default-Start:	2 3 4 5
+# Default-Stop:
+# Short-Description:	SSH Keys
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+set -e
+
+export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/sbin"
+
+sshkeys_start() {
+    (
+	log_action_begin_msg "Fetching SSH keys from the web console"
+    	# Fetching /root/.ssh/authorized_keys from metadata
+	/usr/local/sbin/scw-fetch-ssh-keys &
+
+	# Generate ssh host keys
+	if [ ! -f /etc/ssh/ssh_host_rsa_key ]
+        then
+                ssh-keygen -t rsa -b 2048 -N '' -f /etc/ssh/ssh_host_rsa_key &
+                ssh-keygen -t dsa -N '' -f /etc/ssh/ssh_host_dsa_key &
+                ssh-keygen -t ecdsa -N '' -f /etc/ssh/ssh_host_ecdsa_key &
+                ssh-keygen -t ed25519 -N '' -f /etc/ssh/ssh_host_ed25519_key || true &
+        fi
+
+	# Wait for all jobs to finish
+	wait `jobs -p` || true
+	log_action_end_msg 0
+    )
+}
+
+
+
+case "$1" in
+  start|reload|force-reload|restart)
+	sshkeys_start
+	;;
+  *)
+	log_action_msg "Usage: /etc/init.d/scw-ssh-keys {start|restart}" || true
+	exit 1
+esac
+
+exit 0

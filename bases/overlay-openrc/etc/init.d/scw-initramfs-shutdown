@@ -1,0 +1,16 @@
+#!/sbin/runscript
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Run the initramfs shutdown script."
+
+
+depend() {
+    #after *
+    after killprocs savecache mount-ro
+}
+
+start() {
+    DO_PIVOT=1 /run/initramfs/shutdown reboot
+    return 0
+}

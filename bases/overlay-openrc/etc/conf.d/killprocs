@@ -1,0 +1,5 @@
+# If you wish to pass any options to killall5 during shutdown,
+# you should do so here.
+
+# Kill all processes except the one matching @xnbd.
+killall5_opts="-o $(pgrep -f '@xnbd-client.*/dev/nbd0')"

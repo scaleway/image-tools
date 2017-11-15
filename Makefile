@@ -110,6 +110,9 @@ clean:
 	-rm -rf $(EXPORT_DIR)/rootfs
 
 image:
+ifdef IMAGE_BASE_FLAVORS
+	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
+endif
 	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) --build-arg ARCH=$(TARGET_DOCKER_TAG_ARCH) $(IMAGE_DIR)
 	$(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d))
 	$(foreach v,$(IMAGE_VERSION_ALIASES),docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v;)
