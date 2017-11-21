@@ -109,17 +109,22 @@ clean:
 	-rm -f $(EXPORT_DIR)/rootfs.tar $(EXPORT_DIR)/export.tar
 	-rm -rf $(EXPORT_DIR)/rootfs
 
-image:
+$(EXPORT_DIR):
+	-mkdir -p $(EXPORT_DIR)/
+
+image: $(EXPORT_DIR)
 ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
 	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) --build-arg ARCH=$(TARGET_DOCKER_TAG_ARCH) $(IMAGE_DIR)
+	echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags
 	$(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d))
-	$(foreach v,$(IMAGE_VERSION_ALIASES),docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v;)
+	$(foreach v,$(IMAGE_VERSION_ALIASES),\
+	    docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v;\
+	    echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;)
 	docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION)
 
 $(EXPORT_DIR)/export.tar: image
-	-mkdir -p $(EXPORT_DIR)/
 	docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export --entrypoint /bin/true $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) 2>/dev/null || true
 	docker export $(IMAGE_NAME)-$(IMAGE_VERSION)-export > $@.tmp
 	docker rm $(IMAGE_NAME)-$(IMAGE_VERSION)-export
