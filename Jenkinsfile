@@ -37,7 +37,7 @@ pipeline {
           checkout([
             $class: 'GitSCM',
             poll: false,
-            branches: [[name: 'master']],
+            branches: [[name: env.IMAGE_GIT_BRANCH ?: 'master' ]],
             userRemoteConfigs: [[url: env.IMAGE_GIT_SOURCE]]
           ])
         }
