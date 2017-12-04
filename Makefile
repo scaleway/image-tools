@@ -19,52 +19,39 @@ SERVE_ROOTFS ?= y
 REGION ?= par1
 
 # Architecture variables setup
+## Normalize host arch
 HOST_ARCH := $(shell uname -m)
-ARCH ?=	$(HOST_ARCH)
-ifneq ($(ARCH), $(HOST_ARCH))
-$(shell docker run --rm --privileged multiarch/qemu-user-static:register --reset)
+ifeq ($(HOST_ARCH), $(filter $(HOST_ARCH),arm armhf armv7l))
+	HOST_ARCH = arm
+else ifeq ($(HOST_ARCH), $(filter $(HOST_ARCH),arm64 aarch64))
+	HOST_ARCH = arm64
+else ifeq ($(HOST_ARCH), $(filter $(HOST_ARCH),x86_64 amd64))
+	HOST_ARCH = x86_64
 endif
-ifeq ($(ARCH),arm)
+ARCH ?= $(HOST_ARCH)
+
+## Normalize other arch variables
+ifeq ($(ARCH), $(filter $(ARCH),arm armhf armv7l))
 	TARGET_QEMU_ARCH=arm
 	TARGET_IMAGE_ARCH=arm
 	TARGET_UNAME_ARCH=armv7l
 	TARGET_DOCKER_TAG_ARCH=armhf
 	TARGET_GOLANG_ARCH=arm
-endif
-ifeq ($(ARCH),armhf)
-	TARGET_QEMU_ARCH=arm
-	TARGET_IMAGE_ARCH=arm
-	TARGET_UNAME_ARCH=armv7l
-	TARGET_DOCKER_TAG_ARCH=armhf
-	TARGET_GOLANG_ARCH=arm
-endif
-ifeq ($(ARCH),armv7l)
-	TARGET_QEMU_ARCH=arm
-	TARGET_IMAGE_ARCH=arm
-	TARGET_UNAME_ARCH=armv7l
-	TARGET_DOCKER_TAG_ARCH=armhf
-	TARGET_GOLANG_ARCH=arm
-endif
-ifeq ($(ARCH),arm64)
+else ifeq ($(ARCH), $(filter $(ARCH),arm64 aarch64))
 	TARGET_QEMU_ARCH=aarch64
 	TARGET_IMAGE_ARCH=arm64
 	TARGET_UNAME_ARCH=arm64
 	TARGET_DOCKER_TAG_ARCH=arm64
 	TARGET_GOLANG_ARCH=arm64
-endif
-ifeq ($(ARCH),x86_64)
+else ifeq ($(ARCH), $(filter $(ARCH),x86_64 amd64))
 	TARGET_QEMU_ARCH=x86_64
 	TARGET_IMAGE_ARCH=x86_64
 	TARGET_UNAME_ARCH=x86_64
 	TARGET_DOCKER_TAG_ARCH=amd64
 	TARGET_GOLANG_ARCH=amd64
 endif
-ifeq ($(ARCH),amd64)
-	TARGET_QEMU_ARCH=x86_64
-	TARGET_IMAGE_ARCH=x86_64
-	TARGET_UNAME_ARCH=x86_64
-	TARGET_DOCKER_TAG_ARCH=amd64
-	TARGET_GOLANG_ARCH=amd64
+ifneq ($(TARGET_IMAGE_ARCH), $(HOST_ARCH))
+$(info "$(shell docker run --rm --privileged multiarch/qemu-user-static:register --reset)")
 endif
 EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_IMAGE_ARCH)
 
