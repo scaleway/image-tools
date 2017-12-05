@@ -50,9 +50,6 @@ else ifeq ($(ARCH), $(filter $(ARCH),x86_64 amd64))
 	TARGET_DOCKER_TAG_ARCH=amd64
 	TARGET_GOLANG_ARCH=amd64
 endif
-ifneq ($(TARGET_IMAGE_ARCH), $(HOST_ARCH))
-$(info "$(shell docker run --rm --privileged multiarch/qemu-user-static:register --reset)")
-endif
 EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_IMAGE_ARCH)
 
 ifdef IMAGE_BOOTSCRIPT_$(TARGET_IMAGE_ARCH)
@@ -100,6 +97,9 @@ $(EXPORT_DIR):
 	-mkdir -p $(EXPORT_DIR)/
 
 image: $(EXPORT_DIR)
+ifneq ($(TARGET_IMAGE_ARCH), $(HOST_ARCH))
+	docker run --rm --privileged multiarch/qemu-user-static:register --reset
+endif
 ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
