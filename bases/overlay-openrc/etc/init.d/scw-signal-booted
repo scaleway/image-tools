@@ -1,0 +1,15 @@
+#!/sbin/runscript
+# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Signals the control pane the vm booted"
+
+depend() {
+    need net
+}
+
+start() {
+    ebegin "Sending Signal booted"
+    /usr/local/sbin/scw-signal-booted
+    eend $?
+}
