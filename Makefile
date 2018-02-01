@@ -103,7 +103,7 @@ endif
 ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
-	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) --build-arg ARCH=$(TARGET_DOCKER_TAG_ARCH) $(IMAGE_DIR)
+	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) --build-arg ARCH=$(TARGET_DOCKER_TAG_ARCH) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $(IMAGE_DIR)
 	echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags
 	$(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d))
 	$(foreach v,$(IMAGE_VERSION_ALIASES),\
