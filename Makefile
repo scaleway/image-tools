@@ -17,6 +17,7 @@ DOCKER_NAMESPACE ?= scaleway
 BUILD_OPTS ?=
 SERVE_ROOTFS ?= y
 REGION ?= par1
+BUILD_METHOD ?= from-rootfs
 
 # Architecture variables setup
 ## Normalize host arch
@@ -145,14 +146,13 @@ rootfs.tar: $(EXPORT_DIR)/rootfs.tar
 	ls -la $<
 	@echo $<
 
-.PHONY: scaleway_image
-scaleway_image: rootfs.tar
+from-rootfs: rootfs.tar
 ifeq ($(SERVE_ROOTFS), y)
 ifdef SERVE_IP
 	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
 	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
 	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) >/dev/null 2>&1 & echo $$!
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
 	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
 else
 	$(error "No ip given (SERVE_IP) while self httpd enabled (SERVE_ROOTFS)")
@@ -161,8 +161,29 @@ else
 ifndef ROOTFS_URL
 	$(error "Rootfs URL not provided (ROOTFS_URL) while self httpd not enabled (SERVE_ROOTFS)")
 endif
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
 endif
+
+unpartitioned-from-rootfs: rootfs.tar
+ifeq ($(SERVE_ROOTFS), y)
+ifdef SERVE_IP
+	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
+	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
+	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) >/dev/null 2>&1 & echo $$!
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=unpartitioned-from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
+else
+	$(error "No ip given (SERVE_IP) while self httpd enabled (SERVE_ROOTFS)")
+endif
+else
+ifndef ROOTFS_URL
+	$(error "Rootfs URL not provided (ROOTFS_URL) while self httpd not enabled (SERVE_ROOTFS)")
+endif
+	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=unpartitioned-from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+endif
+
+.PHONY: scaleway_image
+scaleway_image: $(BUILD_METHOD)
 
 .PHONY: tests
 tests:

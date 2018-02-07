@@ -8,7 +8,7 @@ if [ -z "$OUTPUT_ID_TO" ]; then
     OUTPUT_ID_TO="image_id.txt"
 fi
 
-rootfs_url=$1
+build_args=$1
 REGION=$2
 image_name=$3
 arch=$4
@@ -22,7 +22,7 @@ bootscript_id=$(grep -E "$REGION\|$arch\>" bootscript_ids | cut -d'|' -f3)
 server_type=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | cut -d',' -f1)
 server_name="image-writer-$(date +%Y-%m-%d_%H:%M)"
 
-server_id=$(create_server $server_type $server_name 50G "AUTHORIZED_KEY=$key build_method=from-rootfs rootfs_url=$rootfs_url $SERVER_ENV" "$bootscript_id")
+server_id=$(create_server $server_type $server_name 50G "AUTHORIZED_KEY=$key $build_args $SERVER_ENV" "$bootscript_id")
 [ $? -eq 0 ] || exiterr
 
 boot_server $server_id || exiterr
