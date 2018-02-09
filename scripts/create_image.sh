@@ -19,10 +19,11 @@ key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
 
 bootscript_id=$(grep -E "$REGION\|$arch\>" bootscript_ids | cut -d'|' -f3)
 
-server_type=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | cut -d',' -f1)
+server_type=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | cut -d',' -f1 | tr -d '\n')
+server_creation_opts=$(grep -E "$arch\>" server_types | cut -d'|' -f3 | tr -d '\n')
 server_name="image-writer-$(date +%Y-%m-%d_%H:%M)"
 
-server_id=$(create_server $server_type $server_name 50G "AUTHORIZED_KEY=$key $build_args $SERVER_ENV" "$bootscript_id")
+server_id=$(create_server "$server_type" "$server_creation_opts" "$server_name" 50G "AUTHORIZED_KEY=$key $build_args $SERVER_ENV" "$bootscript_id")
 [ $? -eq 0 ] || exiterr
 
 boot_server $server_id || exiterr

@@ -79,10 +79,11 @@ get_server_ip() {
 
 create_server() {
     server_type=$1
-    server_name=$2
-    image=$3
-    server_env=$4
-    bootscript=$5
+    server_creation_opts=$2
+    server_name=$3
+    image=$4
+    server_env=$5
+    bootscript=$6
 
     if [ -n "$SSH_GATEWAY" ] || ([ "$IS_SCW_HOST" = y ] && [ "$LOCAL_SCW_REGION" = "$REGION" ]); then
         ipaddress="--ip-address=none"
@@ -92,7 +93,7 @@ create_server() {
     loginfo "Creating $server_type server $server_name..."
     maximum_create_tries=5
     for try in `seq 1 $maximum_create_tries`; do
-        server_id=$(__scw create $ipaddress --commercial-type="$server_type" --bootscript="$bootscript" --name="$server_name" --env="$server_env" $image)
+        server_id=$(__scw create $ipaddress --commercial-type="$server_type" --bootscript="$bootscript" --name="$server_name" --env="$server_env" $server_creation_opts $image)
         logdebug "$server_id"
         if [ -z "$server_id" ]; then
             continue
