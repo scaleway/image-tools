@@ -13,12 +13,6 @@ ifndef IMAGE_TITLE
 $(error "No image title found (IMAGE_TITLE), e.g. 'Ubuntu Xenial (16.04)'")
 endif
 
-DOCKER_NAMESPACE ?= scaleway
-BUILD_OPTS ?=
-SERVE_ROOTFS ?= y
-REGION ?= par1
-BUILD_METHOD ?= from-rootfs
-
 # Architecture variables setup
 ## Normalize host arch
 HOST_ARCH := $(shell uname -m)
@@ -51,7 +45,17 @@ else ifeq ($(ARCH), $(filter $(ARCH),x86_64 amd64))
 	TARGET_DOCKER_TAG_ARCH=amd64
 	TARGET_GOLANG_ARCH=amd64
 endif
+
+DOCKER_NAMESPACE ?= scaleway
+BUILD_OPTS ?=
+REGION ?= par1
+export REGION
+BUILD_METHOD ?= from-rootfs
+SERVE_ASSETS ?= y
 EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_IMAGE_ARCH)
+ASSETS_DIR ?= $(EXPORT_DIR)/assets
+OUTPUT_ID_TO ?= $(EXPORT_DIR)/image_id
+export OUTPUT_ID_TO
 
 ifdef IMAGE_BOOTSCRIPT_$(TARGET_IMAGE_ARCH)
 IMAGE_BOOTSCRIPT = $(IMAGE_BOOTSCRIPT_$(TARGET_IMAGE_ARCH))
@@ -66,8 +70,17 @@ SERVE_IP := $(shell scw-metadata --cached PRIVATE_IP)
 else
 SERVE_IP := $(shell scw-metadata --cached PUBLIC_IP_ADDRESS)
 endif
+SERVE_PORT := $(shell shuf -i 10000-60000 -n 1)
 else
 IS_SCW_HOST := n
+ifeq ($(SERVE_ASSETS), n)
+ifndef SERVE_IP
+$(error "Not a Scaleway host and no server IP given")
+endif
+ifndef SERVE_PORT
+$(error "Not a Scaleway host and no server port given")
+endif
+endif
 endif
 export IS_SCW_HOST
 
@@ -91,12 +104,16 @@ fclean: clean
 
 .PHONY: clean
 clean:
-	-rm -f $(EXPORT_DIR)/rootfs.tar $(EXPORT_DIR)/export.tar
+	-rm -f $(ASSETS_DIR) $(EXPORT_DIR)/export.tar $(EXPORT_DIR)/image_built
 	-rm -rf $(EXPORT_DIR)/rootfs
 
 $(EXPORT_DIR):
-	-mkdir -p $(EXPORT_DIR)/
+	mkdir -p $(EXPORT_DIR)
 
+$(ASSETS_DIR):
+	mkdir -p $(ASSETS_DIR)
+
+.PHONY: image
 image: $(EXPORT_DIR)
 ifneq ($(TARGET_IMAGE_ARCH), $(HOST_ARCH))
 	docker run --rm --privileged multiarch/qemu-user-static:register --reset
@@ -105,14 +122,19 @@ ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
 	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) --build-arg ARCH=$(TARGET_DOCKER_TAG_ARCH) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $(IMAGE_DIR)
-	echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags
-	$(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d))
-	$(foreach v,$(IMAGE_VERSION_ALIASES),\
-	    docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v;\
-	    echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;)
-	docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION)
+	$(eval IMAGE_BUILT_UUID := $(shell docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION)))
+	if [ "$$(cat $(EXPORT_DIR)/image_built)" != "$(IMAGE_BUILT_UUID)" ]; then \
+	    printf "%s" "$(IMAGE_BUILT_UUID)" > $(EXPORT_DIR)/image_built; \
+	    echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags; \
+	    $(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d)) \
+	    $(foreach v,$(IMAGE_VERSION_ALIASES),\
+	        docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v;\
+	        echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;) \
+	fi
 
-$(EXPORT_DIR)/export.tar: image
+$(EXPORT_DIR)/image_built: image
+
+$(EXPORT_DIR)/export.tar: $(EXPORT_DIR)/image_built
 	docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export --entrypoint /bin/true $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) 2>/dev/null || true
 	docker export $(IMAGE_NAME)-$(IMAGE_VERSION)-export > $@.tmp
 	docker rm $(IMAGE_NAME)-$(IMAGE_VERSION)-export
@@ -137,50 +159,33 @@ $(EXPORT_DIR)/rootfs: $(EXPORT_DIR)/export.tar
 	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/scw-release
 	mv $@.tmp $@
 
-$(EXPORT_DIR)/rootfs.tar: $(EXPORT_DIR)/rootfs
+$(ASSETS_DIR)/rootfs.tar: $(EXPORT_DIR)/rootfs $(ASSETS_DIR)
 	tar --format=gnu -C $< -cf $@.tmp --owner=0 --group=0 .
 	mv $@.tmp $@
 
-.PHONY: rootfs.tar
-rootfs.tar: $(EXPORT_DIR)/rootfs.tar
+rootfs.tar: $(ASSETS_DIR)/rootfs.tar
 	ls -la $<
 	@echo $<
 
-from-rootfs: rootfs.tar
-ifeq ($(SERVE_ROOTFS), y)
-ifdef SERVE_IP
-	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
+from-rootfs-common: rootfs.tar
 	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
-	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) >/dev/null 2>&1 & echo $$!
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
-	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
-else
-	$(error "No ip given (SERVE_IP) while self httpd enabled (SERVE_ROOTFS)")
+ifeq ($(SERVE_ASSETS), y)
+	scripts/assets_server.sh start $(SERVE_PORT) $(ASSETS_DIR)
 endif
-else
-ifndef ROOTFS_URL
-	$(error "Rootfs URL not provided (ROOTFS_URL) while self httpd not enabled (SERVE_ROOTFS)")
-endif
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+ifeq ($(SERVE_ASSETS), y)
+	scripts/assets_server.sh stop $(SERVE_PORT)
 endif
 
-unpartitioned-from-rootfs: rootfs.tar
-ifeq ($(SERVE_ROOTFS), y)
-ifdef SERVE_IP
-	$(eval SERVE_PORT ?= $(shell shuf -i 10000-60000 -n 1))
-	$(eval ROOTFS_URL := $(SERVE_IP):$(SERVE_PORT)/rootfs.tar)
-	cd $(EXPORT_DIR) && python3 -m http.server $(SERVE_PORT) >/dev/null 2>&1 & echo $$!
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=unpartitioned-from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
-	kill $$(lsof -i :$(SERVE_PORT) -t | tr '\n' ' ')
-else
-	$(error "No ip given (SERVE_IP) while self httpd enabled (SERVE_ROOTFS)")
-endif
-else
-ifndef ROOTFS_URL
-	$(error "Rootfs URL not provided (ROOTFS_URL) while self httpd not enabled (SERVE_ROOTFS)")
-endif
-	env OUTPUT_ID_TO=$(EXPORT_DIR)/image.id scripts/create_image.sh "build_method=unpartitioned-from-rootfs rootfs_url=$(ROOTFS_URL)" "$(REGION)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
-endif
+partitioned-variant:
+	$(eval FROM_ROOTFS_TYPE := "from-rootfs")
+
+unpartitioned-variant:
+	$(eval FROM_ROOTFS_TYPE := "unpartitioned-from-rootfs")
+
+from-rootfs: partitioned-variant from-rootfs-common
+
+unpartitioned-from-rootfs: unpartitioned-variant from-rootfs-common
 
 .PHONY: scaleway_image
 scaleway_image: $(BUILD_METHOD)

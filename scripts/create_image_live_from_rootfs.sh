@@ -8,11 +8,15 @@ if [ -z "$OUTPUT_ID_TO" ]; then
     OUTPUT_ID_TO="image_id.txt"
 fi
 
-build_args=$1
-REGION=$2
-image_name=$3
-arch=$4
-image_bootscript=$5
+rootfs_url=$1
+image_name=$2
+arch=$3
+image_bootscript=$4
+if [ "$5" = "unpartitioned" ]; then
+    build_method="unpartitioned-from-rootfs"
+else
+    build_method="from-rootfs"
+fi
 
 
 key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
@@ -22,13 +26,15 @@ bootscript_id=$(grep -E "$REGION\|$arch\>" bootscript_ids | cut -d'|' -f3)
 server_type=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | cut -d',' -f1 | tr -d '\n')
 server_creation_opts=$(grep -E "$arch\>" server_types | cut -d'|' -f3 | tr -d '\n')
 server_name="image-writer-$(date +%Y-%m-%d_%H:%M)"
+signal_port=$(shuf -i 10000-60000 -n 1)
+server_env="build_method=$build_method rootfs_url=$rootfs_url signal_build_done_port=$signal_port AUTHORIZED_KEY=$key $SERVER_ENV"
 
-server_id=$(create_server "$server_type" "$server_creation_opts" "$server_name" 50G "AUTHORIZED_KEY=$key $build_args $SERVER_ENV" "$bootscript_id")
+server_id=$(create_server "$server_type" "$server_creation_opts" "$server_name" 50G "$server_env" "$bootscript_id")
 [ $? -eq 0 ] || exiterr
 
 boot_server $server_id || exiterr
 
-wait_for_ssh $server_id || exiterr
+wait_for_port $server_id $signal_port || exiterr
 
 stop_server $server_id
 

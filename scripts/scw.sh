@@ -154,9 +154,10 @@ boot_server() {
     loginfo "Server booted"
 }
 
-wait_for_ssh() {
+wait_for_port() {
     server_id=$1
-    ssh_up_timeout=$2
+    signal_port=$2
+    ssh_up_timeout=$3
     if [ -z "$ssh_up_timeout" ]; then
         ssh_up_timeout=300
     fi
@@ -191,13 +192,13 @@ wait_for_ssh() {
     fi
 
     # Wait for ssh
-    loginfo "Waiting for ssh to be available on $server_ip..."
+    loginfo "Waiting for port $signal_port to be open on $server_ip..."
     time_begin=$(date +%s)
-    while ! $cmd_prefix nc -zv $server_ip 22 >/dev/null 2>&1; do
+    while ! $cmd_prefix nc -zv $server_ip $signal_port >/dev/null 2>&1; do
         time_now=$(date +%s)
         time_diff=$(echo "$time_now-$time_begin" | bc)
         if [ $time_diff -gt $ssh_up_timeout ]; then
-            logerr "Could not detect a listening sshd on $server_ip"
+            logerr "Port $signal_port never opened on $server_ip"
             return 3
         fi
         sleep 1
