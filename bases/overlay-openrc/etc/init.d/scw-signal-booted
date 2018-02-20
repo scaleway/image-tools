@@ -10,6 +10,6 @@ depend() {
 
 start() {
     ebegin "Sending Signal booted"
-    /usr/local/sbin/scw-signal-booted
+    /usr/local/sbin/scw-signal-state booted
     eend $?
 }

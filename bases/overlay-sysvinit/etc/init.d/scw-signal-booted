@@ -16,7 +16,7 @@ export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sb
 signal() {
 	log_action_begin_msg "Sending BOOTED Signal"
 
-	/usr/local/sbin/scw-signal-booted
+	/usr/local/sbin/scw-signal-state booted
 
 	log_action_end_msg 0
 }

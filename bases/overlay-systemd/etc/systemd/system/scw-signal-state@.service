@@ -1,10 +1,10 @@
 [Unit]
-Description=SCW Signal Booted
+Description=SCW Signal state %i
 Requires=network.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/sbin/scw-signal-booted
+ExecStart=/usr/local/sbin/scw-signal-state %i
 StandardOutput=journal
 
 [Install]
