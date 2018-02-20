@@ -1,1 +1,0 @@
-This file is a hack to bypass systemd's behavior when no /etc/machine-id is specified.
