@@ -1,0 +1,11 @@
+[Unit]
+Description=SCW Signal Booted
+Requires=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/scw-signal-booted
+StandardOutput=journal
+
+[Install]
+WantedBy=default.target

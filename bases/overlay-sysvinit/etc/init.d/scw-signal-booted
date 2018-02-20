@@ -1,0 +1,26 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:		scw-signal-booted
+# Required-Start:	$network
+# Required-Stop:	
+# Default-Start:	2 3 4 5
+# Default-Stop:
+# Short-Description:	Send signal booted to control plane
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+export PATH="${PATH:+$PATH:}/bin:/usr/bin:/usr/local/bin:/usr/sbin:/usr/local/sbin:/sbin"
+
+signal() {
+	log_action_begin_msg "Sending BOOTED Signal"
+
+	/usr/local/sbin/scw-signal-booted
+
+	log_action_end_msg 0
+}
+
+signal
+
+exit 0
