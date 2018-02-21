@@ -3,8 +3,8 @@ Description=SCW generate ssh keys on first boot
 Before=sshd.service
 
 [Service]
-ExecStart=/usr/local/sbin/scw-generate-ssh-keys
 Type=oneshot
+ExecStart=/usr/local/sbin/scw-generate-ssh-keys
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

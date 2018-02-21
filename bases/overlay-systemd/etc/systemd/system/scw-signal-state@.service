@@ -1,11 +1,11 @@
 [Unit]
 Description=SCW Signal state %i
-Requires=network.target
+Requires=network.target network-online.target
+After=network.target network-online.target
 
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/scw-signal-state %i
-StandardOutput=journal
 
 [Install]
 WantedBy=default.target
