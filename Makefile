@@ -28,26 +28,27 @@ ARCH ?= $(HOST_ARCH)
 ## Normalize other arch variables
 ifeq ($(ARCH), $(filter $(ARCH),arm armhf armv7l))
 	TARGET_QEMU_ARCH=arm
-	TARGET_IMAGE_ARCH=arm
-	TARGET_UNAME_ARCH=armv7l
-	TARGET_DOCKER_TAG_ARCH=armhf
+	TARGET_SCW_ARCH=arm
+	TARGET_DOCKER_REPO_ARCH=arm32v7
+	TARGET_MULTIARCH_ARCH=armhf
 	TARGET_GOLANG_ARCH=arm
 else ifeq ($(ARCH), $(filter $(ARCH),arm64 aarch64))
 	TARGET_QEMU_ARCH=aarch64
-	TARGET_IMAGE_ARCH=arm64
-	TARGET_UNAME_ARCH=arm64
-	TARGET_DOCKER_TAG_ARCH=arm64
+	TARGET_SCW_ARCH=arm64
+	TARGET_DOCKER_REPO_ARCH=arm64v8
+	TARGET_MULTIARCH_ARCH=arm64
 	TARGET_GOLANG_ARCH=arm64
 else ifeq ($(ARCH), $(filter $(ARCH),x86_64 amd64))
 	TARGET_QEMU_ARCH=x86_64
-	TARGET_IMAGE_ARCH=x86_64
-	TARGET_UNAME_ARCH=x86_64
-	TARGET_DOCKER_TAG_ARCH=amd64
+	TARGET_SCW_ARCH=x86_64
+	TARGET_DOCKER_REPO_ARCH=amd64
+	TARGET_MULTIARCH_ARCH=amd64
 	TARGET_GOLANG_ARCH=amd64
 endif
 
 DOCKER_NAMESPACE ?= scaleway
 BUILD_OPTS ?=
+override BUILD_ARGS += SCW_ARCH=$(TARGET_SCW_ARCH) MULTIARCH_ARCH=$(TARGET_MULTIARCH_ARCH) DOCKER_ARCH=$(TARGET_DOCKER_REPO_ARCH)
 REGION ?= par1
 export REGION
 BUILD_METHOD ?= from-rootfs
@@ -57,8 +58,8 @@ ASSETS_DIR ?= $(EXPORT_DIR)/assets
 OUTPUT_ID_TO ?= $(EXPORT_DIR)/image_id
 export OUTPUT_ID_TO
 
-ifdef IMAGE_BOOTSCRIPT_$(TARGET_IMAGE_ARCH)
-IMAGE_BOOTSCRIPT = $(IMAGE_BOOTSCRIPT_$(TARGET_IMAGE_ARCH))
+ifdef IMAGE_BOOTSCRIPT_$(TARGET_SCW_ARCH)
+IMAGE_BOOTSCRIPT = $(IMAGE_BOOTSCRIPT_$(TARGET_SCW_ARCH))
 endif
 
 ifeq ($(shell which scw-metadata >/dev/null 2>&1; echo $$?), 0)
@@ -115,27 +116,27 @@ $(ASSETS_DIR):
 
 .PHONY: image
 image: $(EXPORT_DIR)
-ifneq ($(TARGET_IMAGE_ARCH), $(HOST_ARCH))
+ifneq ($(TARGET_SCW_ARCH), $(HOST_ARCH))
 	docker run --rm --privileged multiarch/qemu-user-static:register --reset
 endif
 ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
-	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) --build-arg ARCH=$(TARGET_DOCKER_TAG_ARCH) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $(IMAGE_DIR)
-	$(eval IMAGE_BUILT_UUID := $(shell docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION)))
+	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $(IMAGE_DIR)
+	$(eval IMAGE_BUILT_UUID := $(shell docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION)))
 	if [ "$$(cat $(EXPORT_DIR)/image_built)" != "$(IMAGE_BUILT_UUID)" ]; then \
 	    printf "%s" "$(IMAGE_BUILT_UUID)" > $(EXPORT_DIR)/image_built; \
-	    echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags; \
+	    echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags; \
 	    $(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d)) \
 	    $(foreach v,$(IMAGE_VERSION_ALIASES),\
-	        docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v;\
-	        echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;) \
+	        docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v;\
+	        echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;) \
 	fi
 
 $(EXPORT_DIR)/image_built: image
 
 $(EXPORT_DIR)/export.tar: $(EXPORT_DIR)/image_built
-	docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export --entrypoint /bin/true $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_DOCKER_TAG_ARCH)-$(IMAGE_VERSION) 2>/dev/null || true
+	docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export --entrypoint /bin/true $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) 2>/dev/null || true
 	docker export $(IMAGE_NAME)-$(IMAGE_VERSION)-export > $@.tmp
 	docker rm $(IMAGE_NAME)-$(IMAGE_VERSION)-export
 	mv $@.tmp $@
@@ -172,7 +173,7 @@ from-rootfs-common: rootfs.tar
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh start $(SERVE_PORT) $(ASSETS_DIR)
 endif
-	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_IMAGE_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_SCW_ARCH)" "$(IMAGE_BOOTSCRIPT)"
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh stop $(SERVE_PORT)
 endif
@@ -192,7 +193,7 @@ scaleway_image: $(BUILD_METHOD)
 
 .PHONY: tests
 tests:
-	scripts/test_image.sh start $(TARGET_IMAGE_ARCH) $(REGION) $(IMAGE_ID) $(EXPORT_DIR)/$(IMAGE_ID).servers $(IMAGE_DIR)/tim_tests
+	scripts/test_image.sh start $(TARGET_SCW_ARCH) $(REGION) $(IMAGE_ID) $(EXPORT_DIR)/$(IMAGE_ID).servers $(IMAGE_DIR)/tim_tests
 ifneq ($(NO_CLEANUP), true)
 	scripts/test_image.sh stop $(EXPORT_DIR)/$(IMAGE_ID).servers
 endif
