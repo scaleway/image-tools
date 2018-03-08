@@ -122,7 +122,7 @@ endif
 ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
-	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $(IMAGE_DIR)
+	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $$([ -r Dockerfile.$(TARGET_SCW_ARCH) ] && echo "-f Dockerfile.$(TARGET_SCW_ARCH)") $(IMAGE_DIR)
 	$(eval IMAGE_BUILT_UUID := $(shell docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION)))
 	if [ "$$(cat $(EXPORT_DIR)/image_built)" != "$(IMAGE_BUILT_UUID)" ]; then \
 	    printf "%s" "$(IMAGE_BUILT_UUID)" > $(EXPORT_DIR)/image_built; \
