@@ -161,7 +161,7 @@ $(EXPORT_DIR)/rootfs: $(EXPORT_DIR)/export.tar
 	mv $@.tmp $@
 
 $(ASSETS_DIR)/rootfs.tar: $(EXPORT_DIR)/rootfs $(ASSETS_DIR)
-	tar --format=gnu -C $< -cf $@.tmp --owner=0 --group=0 .
+	tar --format=gnu -C $< -cf $@.tmp .
 	mv $@.tmp $@
 
 rootfs.tar: $(ASSETS_DIR)/rootfs.tar

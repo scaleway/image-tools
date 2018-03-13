@@ -1,7 +1,7 @@
 [Unit]
 Description=SCW fetch ssh keys from metadata
 Before=sshd.service
-Requires=network.target network-online.target
+Requires=network-online.target
 After=network.target network-online.target
 
 [Service]
@@ -9,4 +9,4 @@ Type=oneshot
 ExecStart=/usr/local/sbin/scw-fetch-ssh-keys
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

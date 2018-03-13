@@ -1,9 +1,5 @@
 enable scw-fetch-ssh-keys
 enable scw-sync-kernel-modules
-enable scw-generate-ssh-keys
-enable scw-kernel-check
-enable scw-signal-state@booted
-disable kmod-static-nodes.service
-disable proc-sys-fs-binfmt_misc.automount
-disable systemd-modules-load.service
-disable systemd-update-utmp-runlevel
+enable scw-signal-booted
+enable scw-set-hostname
+enable scw-generate-root-passwd

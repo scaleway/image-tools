@@ -1,0 +1,11 @@
+[Unit]
+Description=SCW signal successful boot
+Requires=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/scw-signal-state booted
+
+[Install]
+WantedBy=basic.target

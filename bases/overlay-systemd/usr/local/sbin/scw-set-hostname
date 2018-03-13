@@ -1,0 +1,10 @@
+#! /bin/bash
+
+old_hostname=$(hostnamectl status | grep 'hostname' | cut -d ":" -f2 | tr -d " ")
+new_hostname=$(scw-metadata --cached HOSTNAME)
+hostnamectl set-hostname $new_hostname
+if grep -q "$old_hostname" /etc/hosts; then
+    sed -i "/$old_hostname/s/.*/127.0.0.1\t$new_hostname/" /etc/hosts
+else
+    echo -e "127.0.0.1\t$new_hostname" >> /etc/hosts
+fi
