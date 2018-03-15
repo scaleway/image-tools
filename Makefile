@@ -151,13 +151,13 @@ $(EXPORT_DIR)/rootfs: $(EXPORT_DIR)/export.tar
 	-chmod 555 $@.tmp/sys
 	-chmod 700 $@.tmp/root
 	-mv $@.tmp/etc/hosts.default $@.tmp/etc/hosts || true
-	echo "IMAGE_ID=\"$(TITLE)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_ID=\"$(IMAGE_TITLE)\"" >> $@.tmp/etc/scw-release
 	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $@.tmp/etc/scw-release
 	echo "IMAGE_CODENAME=$(IMAGE_NAME)" >> $@.tmp/etc/scw-release
-	echo "IMAGE_DESCRIPTION=\"$(DESCRIPTION)\"" >> $@.tmp/etc/scw-release
-	echo "IMAGE_HELP_URL=\"$(HELP_URL)\"" >> $@.tmp/etc/scw-release
-	echo "IMAGE_SOURCE_URL=\"$(SOURCE_URL)\"" >> $@.tmp/etc/scw-release
-	echo "IMAGE_DOC_URL=\"$(DOC_URL)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_DESCRIPTION=\"$(IMAGE_DESCRIPTION)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_HELP_URL=\"$(IMAGE_SOURCE_URL)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_SOURCE_URL=\"$(IMAGE_SOURCE_URL)\"" >> $@.tmp/etc/scw-release
+	echo "IMAGE_DOC_URL=\"$(IMAGE_SOURCE_URL)\"" >> $@.tmp/etc/scw-release
 	mv $@.tmp $@
 
 $(ASSETS_DIR)/rootfs.tar: $(EXPORT_DIR)/rootfs $(ASSETS_DIR)
