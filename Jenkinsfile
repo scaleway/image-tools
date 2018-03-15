@@ -46,8 +46,9 @@ pipeline {
     stage('Set environment') {
       steps {
         script {
-          image_versions_file = readFile("${env.IMAGE_DIR_BASE}/image_versions.json")
-          image_versions = new groovy.json.JsonSlurperClassic().parseText(image_versions_file)
+          manifest = readFile("${env.IMAGE_DIR_BASE}/manifest.json")
+          manifest_data = new groovy.json.JsonSlurperClassic().parseText(manifest)
+          image_versions = manifest_data['images']
           env.IMAGE_DIR = env.IMAGE_DIR_BASE + '/' + image_versions[env.IMAGE_VERSION]['directory']
           env.MARKETPLACE_IMAGE_NAME = image_versions[env.IMAGE_VERSION]['marketplace-name']
           if (params.noCache) {
