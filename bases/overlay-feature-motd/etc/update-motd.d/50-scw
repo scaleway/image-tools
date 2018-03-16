@@ -17,7 +17,7 @@ swap_usage=`free -m | awk '/Swap/ { printf("%3.1f%%", "exit !$2;$3/$2*100") }'`
 users=`users | wc -w`
 time=`uptime | grep -ohe 'up .*' | sed 's/,/\ hours/g' | awk '{ printf $2" "$3 }'`
 processes=`ps aux | wc -l`
-ip=`ifconfig $(route | grep default | awk '{ print $8 }') | grep "inet addr" | awk -F: '{print $2}' | awk '{print $1}'`
+ip=$(scw-metadata --cached PRIVATE_IP)
 public_ip=$(scw-metadata --cached PUBLIC_IP_ADDRESS)
 
 metadata() {
