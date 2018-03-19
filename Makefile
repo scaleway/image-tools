@@ -76,10 +76,10 @@ else
 IS_SCW_HOST := n
 ifeq ($(SERVE_ASSETS), n)
 ifndef SERVE_IP
-$(error "Not a Scaleway host and no server IP given")
+$(error "Not a Scaleway host and no server IP given, export SERVE_IP")
 endif
 ifndef SERVE_PORT
-$(error "Not a Scaleway host and no server port given")
+$(error "Not a Scaleway host and no server port given, export SERVE_PORT")
 endif
 endif
 endif
