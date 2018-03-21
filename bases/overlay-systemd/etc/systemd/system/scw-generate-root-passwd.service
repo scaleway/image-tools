@@ -1,0 +1,10 @@
+[Unit]
+Description=SCW generate root password if empty
+ConditionPathExists=!/root/.pw
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/scw-generate-root-passwd
+
+[Install]
+WantedBy=basic.target

@@ -1,0 +1,16 @@
+#!/bin/sh
+# description "signals the hypervisor that the machine is booted"
+# author "Scaleway <opensource@scaleway.com>"
+
+SERVER=169.254.42.42
+STATE=$1
+
+curl -s --fail -XPATCH -H "Content-Type: application/json" "$SERVER"/state \
+     -d "{\"state_detail\": \"$STATE\"}" -o /dev/null
+
+if [ $? -eq 0 ]; then
+  echo "$STATE signal sent!"
+else
+  echo "Can't send $STATE signal"
+  exit 1
+fi

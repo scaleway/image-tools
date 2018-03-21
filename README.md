@@ -1,229 +1,92 @@
 # Scaleway Image Toolbox
 
-This repository contains the tools, documentations, examples and contents for building, debug and running images on [Scaleway](https://www.scaleway.com/).
+This repository contains the tools, documentation, examples and content for creating images on [Scaleway](https://www.scaleway.com/).
 
 
-## Distribs & Community
+## Distribution images & Instant Apps
 
-* The distribution images are located on the [scaleway](https://github.com/scaleway) organization
-* The apps and stacks are located on the [scaleway-community](https://github.com/scaleway-community) organization
+Official Scaleway images are found as git repositories on Github, in two organizations:
+* [scaleway](https://github.com/scaleway), which focuses on bases images and distributions, with names prefixed by "image-"
+* [scaleway-community](https://github.com/scaleway-community) is dedicated to Instant Apps and ready-to-use images, where names are prefixed with "scaleway-".
+
+Your contributions are welcome !
+
+Your custom images can be anywhere, though, they don't even need to be in repositories.
 
 
 ## Getting started
 
-You can look the docker-based [hello-world](https://github.com/scaleway/image-helloworld) image.
+### Simple images
 
-See [Building images on Scaleway with Docker](http://www.slideshare.net/manfredtouron/while42-paris13-scaleway) presentation on Slideshare.
+On Scaleway, images are created by tagging an existing snapshot appropriately. This can be done with the [`scw` CLI tool](https://github.com/scaleway/scaleway-cli) (or alternatively, using the [console](https://cloud.scaleway.com) or directly through [the API](https://developer.scaleway.com)):
 
----
+```
+# Using the scw tool -- this assumes you've already set it up.
+# Create a snapshot first:
+$ scw commit -v 1 my-server my-snapshot
+f3af311c-53f7-4f5d-9252-0bf69f017269
 
-The [multiarch](https://hub.docker.com/u/multiarch/) Docker organization contains some base images you can start with (ubuntu, debian, centos, alpine, busybox, ...), they all are ported for multiple architectures.
-All the [ImageHub](https://hub.scaleway.com) images are also available as standard Docker images in the  [scaleway](https://hub.docker.com/u/scaleway/) Docker organization. They are also a good choice for starting a new project.
+# Now make an image out of it:
+$ scw tag --arch=x86_64 --bootscript="mainline 4.14"  my-snapshot my-image
+a601dbac-08cb-4af3-9ff6-73b7e8dfd34f
 
-**Not maintained** (historical): our first ported images are hosted in the [armbuild](https://hub.docker.com/u/armbuild/) Docker organization.
-
----
-
-[dockerpatch](https://github.com/moul/dockerpatch) may help you to convert existing Docker images from `x86_64` to `armhf`.
-
-## Repository
-
-This repository contains :
-
-- Common scripts in [./skeleton-* directories](#how-to-download-the-common-scripts-on-a-target-image) used in the images (upstart, sysvinit, openrc, common helpers, etc)
-- The [Builder](https://github.com/scaleway/image-tools/tree/master/builder)
-
-
-## Official images built with **image-tools**
-
-Official images are available when creating a new server
-
-Type      | Name           | State    | Versions                   | Parent | Links
-----------|----------------|----------|----------------------------|--------|---------
-distrib   | Ubuntu         | released | 12.04, 14.04, 14.10, 15.05 | n/a    | [Source](https://github.com/scaleway/image-ubuntu)
-distrib   | Debian         | released | wheezy                     | n/a    | [Source](https://github.com/scaleway/image-debian)
-distrib   | Fedora         | released | 21                         | n/a    | [Source](https://github.com/scaleway/image-fedora)
-distrib   | Alpine Linux   | released | 3.1                        | n/a    | [Source](https://github.com/scaleway/image-alpine)
-distrib   | Arch Linux     | released | n/a                        | n/a    | [Source](https://github.com/scaleway/image-archlinux)
-distrib   | Opensuse       | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-opensuse)
-distrib   | Slackware      | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-slackware)
-distrib   | Busybox        | wip      | n/a                        | n/a    | [Source](https://github.com/scaleway/image-busybox)
-app       | Docker         | released | 1.5                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-docker)
-app       | Ghost          | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-ghost)
-app       | Owncloud       | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-owncloud)
-app       | Pydio          | released | 6                          | ubuntu | [Source](https://github.com/scaleway-community/image-app-pydio)
-app       | Wordpress      | released | 4                          | ubuntu | [Source](https://github.com/scaleway-community/image-app-wordpress)
-app       | Torrents       | released | 1                          | ubuntu | [Source](https://github.com/scaleway-community/image-app-torrents)
-app       | OpenVPN        | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-openvpn)
-app       | TimeMachine    | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-timemachine)
-app       | SeedBox        | planned  | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-seedbox)
-app       | Mesos          | planned  | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-mesos)
-app       | Proxy          | planned  | n/a                        | n/a    | n/a
-app       | LEMP           | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-lemp)
-app       | Node.js        | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-node)
-app       | Python         | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-python)
-app       | Discourse      | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-discourse)
-app       | Gitlab         | wip      | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-gitlab)
-app       | Java           | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-java)
-app       | ELK            | released | n/a                        | ubuntu | [Source](https://github.com/scaleway-community/image-app-elk)
-service   | Try-it         | released | n/a                        | docker | [Source](https://github.com/scaleway/image-service-tryit)
-service   | Rescue         | released | n/a                        | ubuntu | [Source](https://github.com/scaleway/image-service-rescue)
-community | moul' dev      | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-devbox)
-community | moul' bench    | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
-community | mxs' 3.2 perf  | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
-community | mxs' 3.17 perf | private  | n/a                        | ubuntu | [Source](https://github.com/moul/ocs-image-bench)
-community | Camlistore     | private  | n/a                        | ubuntu | [Source](https://github.com/aimxhaisse/image-app-camlistore)
-community | Serendipity    | released | n/a                        | ubuntu | [Source](https://github.com/onli/image-app-serendipity)
-community | Tor            | private  | n/a                        | debian | [Source](https://github.com/coolya/image-app-tor)
-
-* [ImageLayers](https://imagelayers.io/?images=scaleway%2Fdebian:latest,scaleway%2Fubuntu:latest,scaleway%2Falpine:latest,scaleway%2Fcentos:latest,scaleway%2Farchlinux:latest,scaleway%2Ffedora:latest) for distrib images
-
-# Builder
-
-We use the [Docker's building system](https://docs.docker.com/reference/builder/) to build, debug and even run the generated images.
-
-We added some small hacks to let the image be fully runnable on a C1 server without Docker.
-
-The advantages are :
-
-- Lots of available base images and examples on the [Docker's official registry](https://registry.hub.docker.com)
-- Easy inheritance between images ([app-timemachine](https://github.com/scaleway-community/image-app-timemachine) image inherits from [app-openvpn](https://github.com/scaleway-community/image-app-openvpn) image which inherits from [ubuntu](https://github.com/scaleway-community/image-ubuntu) image)
-- Easy debug with `docker run ...`
-- A well-known build format file (Dockerfile)
-- Docker's amazing builder advantages (speed, cache, tagging system)
-
-
-## Install
-
-The minimal command to install an image on an attached volume :
-
-```bash
-# write the image to /dev/nbd1
-make install
+$ scw images
+REPOSITORY           TAG                 IMAGE ID            CREATED             REGION              ARCH
+user/my-image        latest              a601dbac            5 seconds           [     par1]         [x86_64]
+---- snipping all stock images 8< ----
 ```
 
-## Commands
+### Docker-based images
 
-```bash
-# Clone the hello world docker-based app on an armhf server with Docker
-git clone https://github.com/scaleway/image-helloworld.git
+Using the tools contained in this repository, it is possible to create Scaleway images from Docker images. At its core, this process uses the tools we explored above and is pretty straightforward to use: 
+  1. Clone this repository and the repository of the image (if there is one) on a Scaleway instance
+  2. In your terminal, navigate to the image-tools directory, and type `make IMAGE_DIR=<the image's directory> scaleway_image`
+  3. ???
+  4. Profit !
 
-# Run the image in Docker
-make shell
+As a first example, let's simply rebuild our Ubuntu Xenial image without changing anything. Note that this is not needed to build your own Docker-based images, and is shown here only for demonstration purposes.
 
-# push the rootfs.tar on s3 (requires `s3cmd`)
-make publish_on_s3 S3_URL=s3://my-bucket/my-subdir/
+[![asciicast](https://asciinema.org/a/foiok7e9gWnyqKK6HbWQIaAQz.png)](https://asciinema.org/a/foiok7e9gWnyqKK6HbWQIaAQz)
 
-# push the image on docker registry
-make release DOCKER_NAMESPACE=myusername
+Now that we've had a first taste, let's create a custom image based on Scaleway's Ubuntu image:
 
-# remove build directories
-make clean
+[![asciicast](https://asciinema.org/a/qRVW81Ciqd1eeoki3Enyn3X7e.png)](https://asciinema.org/a/qRVW81Ciqd1eeoki3Enyn3X7e)
 
-# remove build directories and docker images
-make fclean
+To recap, here's what's needed for a custom Docker-based image:
+  - A Dockerfile with an `ARCH` buildarg, based on any Docker image as long as the `FROM` chain can be traced back to one of Scaleway's official images on the Dockerhub: this is needed so that your custom image will ship with the needed tools, configuration and initialization scripts.
+  - An env.mk file, containing metadata for the builder tool. It must be valid makefile syntax and will be included at the beginning of the build process. It must at least set the following variables: `IMAGE_NAME`, `IMAGE_VERSION` and `IMAGE_TITLE` but can also set other information, such as authorship, or extra buildargs for Docker with `BUILD_ARGS`.
+  
+All the rest is up to you and your creativity ! You can, for example, upload your images to the Dockerhub and start using them as bases for other images.
+
+After building, the image and associated snapshots will be available for use with your account. Note that introducing name conflicts will force you to use the ids to interact with the images through the CLI.
+
+
+## Diving below the surface
+
+This section mainly deals with explaining with what happens during the build process. Reading it is not required to be able to create images.
+
+As explained above, images are created by tagging a snapshot. Snapshots capture the state of a server's volume at a certain point in time. The simplicity of this step is what makes it versatile: as long as you can somehow get a server to boot and populate one of its volume with some data, you can create a Scaleway Image.
+
+From there, images can be built in many ways. An example would be to use a server with two volumes, using the first as a system volume and populating the second one as needed (parted, mkfs, debootstrap, pacstrap, etc...) before taking a snapshot of it. Snapshots can only be created when the server is off, though, so you would need to stop it. This can get a bit complicated when you need to build images repeatedly, and requires you to have a dedicated server for the pupose of image creation, so it might be a bit unpractical. 
+
+### The build initrd
+
+To make things easier, we created a lightweight tool for the purpose of image creation in the form of a [special initrd](https://github.com/scaleway/initrd/tree/master/build). An initrd, short for **initial ramdisk**, is a minimal root filesystem that is loaded in memory and mounted from there. In its classic form, an initrd is used to setup the core components of the system and finding the real root filesystem, before surrendering execution to the OS' *init*.
+
+This build initrd is a bit different, as it does not aim to hook into a complete boot and will never call init. It is a intended to be used via a remote boot through preset bootscripts, which are specifications of a kernel + initrd that we feed into [IPXE](http://ipxe.org), the network boot firmware. A server can be assigned a bootscript at creation. The ids of the build bootscripts for different architectures can be found in the `bootscript_ids` file at the root of this project. It can also be accessed with the name "Image creation bootscript".
+
+Detailed information can be found in the initrd's repository, but let's recap its features broadly.
+
+The build initrd offers different methods for building images, which are a collection of scripts. After setting up the network and retrieving metadata, it will use the method specified in the `build_method` parameter given through the metadata environment. Each method requires specific arguments.
+
+The main method used by the image-tools suite is `from-rootfs`, which will retrieve a tarred rootfs from a given location and will apply it to the volume after setting up partitions (Linux, EFI) and their associated filesystem (ext4, fat32). GRUB EFI will then be installed to the partition. For example:
+
+```
+$ scw create --bootscript="image creation" --env="build_method=from-rootfs rootfs_url=<url of the rootfs.tar>" 50G
 ```
 
-Debug commands
-
-```bash
-# push the rootfs.tar.gz on s3 (requires `s3cmd`)
-make publish_on_s3.tar.gz S3_URL=s3://my-bucket/my-subdir/
-
-# push the rootfs.sqsh on s3 (requires `s3cmd`)
-make publish_on_s3.sqsh S3_URL=s3://my-bucket/my-subdir/
-
-# build the image in a rootfs directory
-make build
-
-# build a tarball of the image
-make rootfs.tar
-
-# build a squashfs of the image
-make rootfs.sqsh
-```
-
-## Install builder's `.mk` files
-
-```bash
-# From a shell
-wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/builder/install.sh | bash
-# or
-wget -qO - https://j.mp/scw-builder | bash
-```
-
-Or from a Makefile ([example](https://github.com/scaleway/image-helloworld/blob/master/Makefile))
-
-```Makefile
-## Image tools  (https://github.com/scaleway/image-tools)
-all:    docker-rules.mk
-docker-rules.mk:
-    wget -qO - https://j.mp/scw-builder | bash
--include docker-rules.mk
-```
-
-
-# Unit test a running instance
-
-At runtime, you can proceed to unit tests by calling
-
-```bash
-# using curl
-SCRIPT=$(mktemp); curl -s -o ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash && bash ${SCRIPT}
-# using wget
-SCRIPT=$(mktemp); wget -qO ${SCRIPT} https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash && bash ${SCRIPT}
-```
-
-# Image check list
-
-List of features, scripts and modifications to check for proper **scaleway** image creation.
-
-- [ ] Add sysctl entry `vm.min_free_kbytes=65536`
-- [ ] Configure NTP to use internal server
-- [ ] Configure SSH to only accept login through public keys and deny environment customization to avoid errors due to users locale
-- [ ] Configure default locale to `en_US.UTF-8`
-- [ ] Configure network scripts to use DHCP and enable them
-  Although not, strictly speaking, needed since kernel already has IP address and gateway this allows DHCP hooks to be called for setting hostname, etc
-- [ ] Install custom DHCP hook for hostname to set entry in `/etc/hosts` for software using `getent_r` to get hostname
-- [ ] Install scripts to fetch SSH keys
-- [ ] Install scripts to fetch kernel modules
-- [ ] Install scripts to connect and/or mount NBD volumes
-- [ ] Install scripts to manage NBD root volume
-- [ ] Disable all physical TTY initialization
-- [ ] Enable STTY @ 9600 bps
-
-Before making the image public, do not forget to check it boots, stops and restarts from the OS without any error (most notably kernel) since a failure could lead to deadlocked instances.
-
-
-# How to download the common scripts on a target image
-
-Those scripts are mainly used in the base image (distrib) but can sometimes be useful in the app images (inherited from distrib).o
-
-An example of usage in the [Ubuntu image](https://github.com/scaleway/image-ubuntu/blob/9cd0f287a1977a55b74b1a37ecb1c03c8ce55c85/14.04/Dockerfile#L12-L17)
-
-```bash
-wget -qO - https://j.mp/scw-skeleton | bash -e
-
-# Using upstart flavor
-wget -qO - https://j.mp/scw-skeleton | FLAVORS=upstart bash -e
-# Using sysvinit, docker-based and common flavors
-wget -qO - https://j.mp/scw-skeleton | FLAVORS=sysvinit,docker-based,common bash -e
-
-# Specific GIT branch
-wget -qO - https://j.mp/scw-skeleton | FLAVORS=upstart BRANCH=feature-xxx bash -e
-
-# Use curl
-curl -L -q https://j.mp/scw-skeleton | DL=curl bash -e
-
-# Alternative URL
-wget -qO - https://raw.githubusercontent.com/scaleway/image-tools/master/install.sh | ... bash -e
-```
-
-A running instance can be updated by calling the same commands.
-It is planned to to create packages (.deb) for distributions.
-
-
-# Licensing
-
-© 2014-2015 Scaleway - [MIT License](https://github.com/scaleway/image-tools/blob/master/LICENSE).
-A project by [![Scaleway](https://avatars1.githubusercontent.com/u/5185491?v=3&s=42)](https://www.scaleway.com/)
+Other build methods also exist:
+  - `from-qcow2`, which will copy a qcow2 file's content to the device,
+  - `unpartitioned-from-rootfs` which will skip the partitions and EFI setup and use the raw device with an ext4 filesystem. Obviously, these images can only be booted remotely.
+  
+Finally, the build initrd will signal the completion of its job by opening a port given to it through the `signal_build_done_port` parameter, or 22 by default.

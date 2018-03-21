@@ -1,0 +1,5 @@
+enable scw-fetch-ssh-keys
+enable scw-sync-kernel-modules
+enable scw-signal-booted
+enable scw-set-hostname
+enable scw-generate-root-passwd

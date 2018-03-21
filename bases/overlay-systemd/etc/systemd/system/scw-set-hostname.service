@@ -1,0 +1,12 @@
+[Unit]
+Description=SCW set hostname from metadata on first boot
+Requires=network-online.target
+After=network.target network-online.target
+ConditionFileNotEmpty=!/etc/hostname
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/scw-set-hostname
+
+[Install]
+WantedBy=basic.target
