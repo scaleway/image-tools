@@ -135,33 +135,17 @@ endif
 
 $(EXPORT_DIR)/image_built: image
 
-$(EXPORT_DIR)/export.tar: $(EXPORT_DIR)/image_built
-	docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export --entrypoint /bin/true $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) 2>/dev/null || true
-	docker export $(IMAGE_NAME)-$(IMAGE_VERSION)-export > $@.tmp
+$(ASSETS_DIR)/rootfs.tar: $(EXPORT_DIR)/image_built $(ASSETS_DIR)
+	echo "IMAGE_ID=\"$(IMAGE_TITLE)\"" >> $(EXPORT_DIR)/scw-release
+	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $(EXPORT_DIR)/scw-release
+	echo "IMAGE_CODENAME=$(IMAGE_NAME)" >> $(EXPORT_DIR)/scw-release
+	echo "IMAGE_DESCRIPTION=\"$(IMAGE_DESCRIPTION)\"" >> $(EXPORT_DIR)/scw-release
+	echo "IMAGE_HELP_URL=\"$(IMAGE_SOURCE_URL)\"" >> $(EXPORT_DIR)/scw-release
+	echo "IMAGE_SOURCE_URL=\"$(IMAGE_SOURCE_URL)\"" >> $(EXPORT_DIR)/scw-release
+	echo "IMAGE_DOC_URL=\"$(IMAGE_SOURCE_URL)\"" >> $(EXPORT_DIR)/scw-release
+	cat $(EXPORT_DIR)/scw-release | docker run --name $(IMAGE_NAME)-$(IMAGE_VERSION)-export -i $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) sh -c "rm /.dockerenv; cat >/etc/scw-release" 2>/dev/null || true
+	docker export -o $@.tmp $(IMAGE_NAME)-$(IMAGE_VERSION)-export
 	docker rm $(IMAGE_NAME)-$(IMAGE_VERSION)-export
-	mv $@.tmp $@
-
-$(EXPORT_DIR)/rootfs: $(EXPORT_DIR)/export.tar
-	-rm -rf $@ $@.tmp
-	-mkdir -p $@.tmp
-	tar -C $@.tmp -xf $<
-	rm -f $@.tmp/.dockerenv $@.tmp/.dockerinit
-	-chmod 1777 $@.tmp/tmp
-	-chmod 755 $@.tmp/etc $@.tmp/usr $@.tmp/usr/local $@.tmp/usr/sbin
-	-chmod 555 $@.tmp/sys
-	-chmod 700 $@.tmp/root
-	-mv $@.tmp/etc/hosts.default $@.tmp/etc/hosts || true
-	echo "IMAGE_ID=\"$(IMAGE_TITLE)\"" >> $@.tmp/etc/scw-release
-	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $@.tmp/etc/scw-release
-	echo "IMAGE_CODENAME=$(IMAGE_NAME)" >> $@.tmp/etc/scw-release
-	echo "IMAGE_DESCRIPTION=\"$(IMAGE_DESCRIPTION)\"" >> $@.tmp/etc/scw-release
-	echo "IMAGE_HELP_URL=\"$(IMAGE_SOURCE_URL)\"" >> $@.tmp/etc/scw-release
-	echo "IMAGE_SOURCE_URL=\"$(IMAGE_SOURCE_URL)\"" >> $@.tmp/etc/scw-release
-	echo "IMAGE_DOC_URL=\"$(IMAGE_SOURCE_URL)\"" >> $@.tmp/etc/scw-release
-	mv $@.tmp $@
-
-$(ASSETS_DIR)/rootfs.tar: $(EXPORT_DIR)/rootfs $(ASSETS_DIR)
-	tar --format=gnu -C $< -cf $@.tmp .
 	mv $@.tmp $@
 
 rootfs.tar: $(ASSETS_DIR)/rootfs.tar
