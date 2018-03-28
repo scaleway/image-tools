@@ -74,7 +74,7 @@ pipeline {
             echo "Creating image for $arch"
             sh "make ARCH=$arch IMAGE_DIR=${env.IMAGE_DIR} EXPORT_DIR=${env.EXPORT_DIR_BASE}/$arch BUILD_OPTS='${env.BUILD_OPTS}' scaleway_image"
             script {
-              imageId = readFile("${env.EXPORT_DIR_BASE}/$arch/image.id").trim()
+              imageId = readFile("${env.EXPORT_DIR_BASE}/$arch/image_id").trim()
               docker_tags = readFile("${env.EXPORT_DIR_BASE}/$arch/docker_tags").trim().split('\n')
               images.add([
                 arch: arch,
