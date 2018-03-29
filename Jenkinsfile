@@ -142,6 +142,12 @@ pipeline {
   post {
     always {
       deleteDir()
+      script {
+        for (Map image : images) {
+          docker_tag = image['docker_tags'][-1]
+          sh "docker image rm ${docker_tag} && docker system prune -f"
+        }
+      }
     }
   }
 }
