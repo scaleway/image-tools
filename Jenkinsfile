@@ -22,7 +22,6 @@ pipeline {
   }
 
   parameters {
-    booleanParam(name: 'noCache', defaultValue: true, description: 'Force building a fresh image')
     booleanParam(name: 'test', defaultValue: true, description: 'Test the image')
     booleanParam(name: 'needAdminApproval', defaultValue: false, description: 'Wait for admin approval after testing')
     booleanParam(name: 'release', defaultValue: true, description: 'Release the image')
@@ -51,11 +50,7 @@ pipeline {
           image_versions = manifest_data['images']
           env.IMAGE_DIR = env.IMAGE_DIR_BASE + '/' + image_versions[env.IMAGE_VERSION]['directory']
           env.MARKETPLACE_IMAGE_NAME = image_versions[env.IMAGE_VERSION]['marketplace-name']
-          if (params.noCache) {
-            env.BUILD_OPTS = "--no-cache"
-          } else {
-            env.BUILD_OPTS = ""
-          }
+          env.BUILD_OPTS = "--pull"
           env.LOG_LEVEL = params.logLevel
         }
       }
