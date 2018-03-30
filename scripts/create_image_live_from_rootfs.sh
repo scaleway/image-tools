@@ -18,13 +18,23 @@ else
     build_method="from-rootfs"
 fi
 
-
 key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
 
 bootscript_id=$(grep -E "$REGION\|$arch\>" bootscript_ids | cut -d'|' -f3)
+if [ "$arch" = "arm" ]; then
+    logwarn "Local boot is not supported on C1, defaulting to unpartitioned image creation"
+    build_method="unpartitioned-from-rootfs"
+    bootscript_id=$(grep -E "$REGION\|x86_64\>" bootscript_ids | cut -d'|' -f3)
+    server_type="VC1M"
+    server_creation_opts=""
+elif [ "$arch" = "x86_64" ]; then
+    server_type="VC1M"
+    server_creation_opts=""
+elif [ "$arch" = "arm64" ]; then
+    server_type="ARM64-4GB"
+    server_creation_opts=""
+fi
 
-server_type=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | cut -d',' -f1 | tr -d '\n')
-server_creation_opts=$(grep -E "$arch\>" server_types | cut -d'|' -f3 | tr -d '\n')
 server_name="image-writer-$(date +%Y-%m-%d_%H:%M)"
 signal_port=$(shuf -i 10000-60000 -n 1)
 server_env="build_method=$build_method rootfs_url=$rootfs_url signal_build_done_port=$signal_port AUTHORIZED_KEY=$key $SERVER_ENV"
