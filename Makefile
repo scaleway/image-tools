@@ -157,20 +157,14 @@ from-rootfs-common: rootfs.tar
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh start $(SERVE_PORT) $(ASSETS_DIR)
 endif
-	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_SCW_ARCH)" "$(IMAGE_BOOTSCRIPT)" "$(FROM_ROOTFS_TYPE)"
+	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_SCW_ARCH)" "$(IMAGE_BOOTSCRIPT)" "$(BUILD_METHOD)"
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh stop $(SERVE_PORT)
 endif
 
-partitioned-variant:
-	$(eval FROM_ROOTFS_TYPE := "from-rootfs")
+from-rootfs: from-rootfs-common
 
-unpartitioned-variant:
-	$(eval FROM_ROOTFS_TYPE := "unpartitioned-from-rootfs")
-
-from-rootfs: partitioned-variant from-rootfs-common
-
-unpartitioned-from-rootfs: unpartitioned-variant from-rootfs-common
+unpartitioned-from-rootfs: from-rootfs-common
 
 .PHONY: scaleway_image
 scaleway_image: $(BUILD_METHOD)

@@ -12,11 +12,7 @@ rootfs_url=$1
 image_name=$2
 arch=$3
 image_bootscript=$4
-if [ "$5" = "unpartitioned" ]; then
-    build_method="unpartitioned-from-rootfs"
-else
-    build_method="from-rootfs"
-fi
+build_method=$5
 
 key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
 
