@@ -157,7 +157,7 @@ from-rootfs-common: rootfs.tar
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh start $(SERVE_PORT) $(ASSETS_DIR)
 endif
-	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_SCW_ARCH)" "$(IMAGE_BOOTSCRIPT)"
+	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_SCW_ARCH)" "$(IMAGE_BOOTSCRIPT)" "$(FROM_ROOTFS_TYPE)"
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh stop $(SERVE_PORT)
 endif
