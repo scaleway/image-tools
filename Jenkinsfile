@@ -58,7 +58,7 @@ pipeline {
     stage('Log into Scaleway') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'scw-test-orga-token', usernameVariable: 'SCW_ORGANIZATION', passwordVariable: 'SCW_TOKEN')]) {
-          sh "scw login -o '${SCW_ORGANIZATION}' -t '${SCW_TOKEN}' -s >/dev/null 2>&1"
+          sh 'scw login -o "$SCW_ORGANIZATION" -t "$SCW_TOKEN" -s >/dev/null 2>&1'
         }
       }
     }
@@ -113,6 +113,9 @@ pipeline {
       }
       steps {
         script {
+          withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')]) {
+            sh 'echo -n "$DOCKERHUB_PASSWD" | docker login -u "$DOCKERHUB_USER" --password-stdin'
+          }
           for (Map image : images) {
             docker_tags = image['docker_tags'].join(' ')
             sh "docker push ${docker_tags}"
