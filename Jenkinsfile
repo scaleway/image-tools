@@ -116,10 +116,11 @@ pipeline {
           withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')]) {
             sh 'echo -n "$DOCKERHUB_PASSWD" | docker login -u "$DOCKERHUB_USER" --password-stdin'
           }
-          for (Map image : images) {
+          for (image in images) {
             for (tag in image['docker_tags']) {
               sh "docker push ${tag}"
             }
+            image.remove('docker_tags')
           }
           message = groovy.json.JsonOutput.toJson([
             type: "image",
