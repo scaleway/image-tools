@@ -1,5 +1,6 @@
 def images = []
 def image_versions = [:]
+def removable_tags = []
 
 pipeline {
   agent {
@@ -120,6 +121,7 @@ pipeline {
             for (tag in image['docker_tags']) {
               sh "docker push ${tag}"
             }
+            removable_tags.add(image['docker_tags'][-1])
             image.remove('docker_tags')
           }
           message = groovy.json.JsonOutput.toJson([
@@ -143,10 +145,7 @@ pipeline {
     always {
       deleteDir()
       script {
-        for (Map image : images) {
-          docker_tag = image['docker_tags'][-1]
-          sh "docker image rm ${docker_tag} && docker system prune -f"
-        }
+        sh "docker image rm ${removable_tags.join(' ')} && docker system prune -f"
       }
     }
   }
