@@ -133,7 +133,7 @@ pipeline {
           ])
           versionId = input(
             message: "${message}",
-            parameters: [string(name: 'version_id', description: 'ID of the new image version')]
+            parameters: [string(name: 'image_id', description: 'ID of the new image version')]
           )
         }
         echo "Created new marketplace version of image: ${versionId}"
