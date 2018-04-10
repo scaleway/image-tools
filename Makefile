@@ -123,9 +123,8 @@ ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
 	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $$([ -r Dockerfile.$(TARGET_SCW_ARCH) ] && echo "-f Dockerfile.$(TARGET_SCW_ARCH)") $(IMAGE_DIR)
-	$(eval IMAGE_BUILT_UUID := $(shell docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION)))
-	if [ "$$(cat $(EXPORT_DIR)/image_built 2>/dev/null)" != "$(IMAGE_BUILT_UUID)" ]; then \
-	    printf "%s" "$(IMAGE_BUILT_UUID)" > $(EXPORT_DIR)/image_built; \
+	IMAGE_BUILT_UUID=$$(docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION)) && if [ "$$(cat $(EXPORT_DIR)/image_built 2>/dev/null)" != "$$IMAGE_BUILT_UUID" ]; then \
+	    printf "%s" "$$IMAGE_BUILT_UUID" > $(EXPORT_DIR)/image_built; \
 	    echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags; \
 	    $(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d)) \
 	    $(foreach v,$(IMAGE_VERSION_ALIASES),\
