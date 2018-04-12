@@ -46,3 +46,6 @@ if [ -f /root/.ssh/instance_keys ]; then
 EOF
 	(cat /root/.ssh/instance_keys | grep -v "^#" || true) >> /root/.ssh/authorized_keys
 fi
+
+# authorized_keys should only be readable by the owner and no one else
+chmod 0600 /root/.ssh/authorized_keys
