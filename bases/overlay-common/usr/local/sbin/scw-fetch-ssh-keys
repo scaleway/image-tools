@@ -9,6 +9,10 @@ set -e
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
 
+# ensure /root has the correct permissions
+chown root:root /root
+chmod 700 /root
+
 # `--upgrade` refreshes the metadata cache
 if [ "$1" = "--upgrade" ]; then
 	/usr/local/bin/scw-metadata > /dev/null
