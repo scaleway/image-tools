@@ -12,12 +12,18 @@ test_start() {
     tests_dir=$5
 
     key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
-    server_types=$(grep -E "$arch\>" server_types | cut -d'|' -f2 | tr ',' ' ')
+    if [ "$arch" = "arm" ]; then
+        server_types="C1"
+    elif [ "$arch" = "x86_64" ]; then
+        server_types="VC1S C2S"
+    elif [ "$arch" = "arm64" ]; then
+        server_types="ARM64-2GB"
+    fi
     : >$servers_list_file
 
     for server_type in $server_types; do
         server_name="image-test-$(uuidgen -r)"
-        server_id=$(create_server $server_type $server_name $image_id "AUTHORIZED_KEY=$key")
+        server_id=$(create_server "$server_type" "" "$server_name" "$image_id" "AUTHORIZED_KEY=$key" "")
         [ $? -eq 0 ] || exiterr
 
         boot_server $server_id || exiterr
@@ -26,8 +32,7 @@ test_start() {
         [ $? -eq 0 ] || exiterr
         echo "$server_id $REGION $server_type $server_name $server_ip" >>$servers_list_file
 
-        wait_for_ssh $server_id || exiterr
-
+        wait_for_port $server_id 22 || exiterr
 
         if [ -n "$tests_dir" ]; then
             loginfo "Running tests in $tests_dir"
