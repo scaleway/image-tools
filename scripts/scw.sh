@@ -157,9 +157,9 @@ boot_server() {
 wait_for_port() {
     server_id=$1
     signal_port=$2
-    ssh_up_timeout=$3
-    if [ -z "$ssh_up_timeout" ]; then
-        ssh_up_timeout=300
+    port_open_timeout=$3
+    if [ -z "$port_open_timeout" ]; then
+        port_open_timeout=300
     fi
 
     time_begin=$(date +%s)
@@ -167,6 +167,7 @@ wait_for_port() {
         server_ip=$(get_server_ip $server_id)
         if [ -n "$SSH_GATEWAY" ]; then
             server_ip=$(get_server $server_id | jq -r '.server.private_ip')
+            cmd_prefix="ssh $SSH_GATEWAY"
         fi
         time_now=$(date +%s)
         time_diff=$(echo "$time_now-$time_begin" | bc)
@@ -197,7 +198,7 @@ wait_for_port() {
     while ! $cmd_prefix nc -zv $server_ip $signal_port >/dev/null 2>&1; do
         time_now=$(date +%s)
         time_diff=$(echo "$time_now-$time_begin" | bc)
-        if [ $time_diff -gt $ssh_up_timeout ]; then
+        if [ $time_diff -gt $port_open_timeout ]; then
             logerr "Port $signal_port never opened on $server_ip"
             return 3
         fi
