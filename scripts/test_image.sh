@@ -32,7 +32,7 @@ test_start() {
         [ $? -eq 0 ] || exiterr
         echo "$server_id $REGION $server_type $server_name $server_ip" >>$servers_list_file
 
-        wait_for_port $server_id 22 || exiterr
+        wait_for_port $server_id 22 600 || exiterr
 
         if [ -n "$tests_dir" ]; then
             loginfo "Running tests in $tests_dir"
