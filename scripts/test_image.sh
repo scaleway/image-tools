@@ -26,6 +26,8 @@ test_start() {
         server_id=$(create_server "$server_type" "" "$server_name" "$image_id" "AUTHORIZED_KEY=$key" "")
         [ $? -eq 0 ] || exiterr
 
+        curl --fail -s -X PATCH -H "Content-Type: application/json" -H "x-auth-token: $SCW_TOKEN" -d '{"boot_type":"local"}' https://cp-$REGION.scaleway.com/servers/$server_id || logwarn "Could not set server boot type to local"
+
         boot_server $server_id || exiterr
 
         server_ip=$(get_server_ip $server_id)
@@ -34,7 +36,7 @@ test_start() {
 
         wait_for_port $server_id 22 600 || exiterr
 
-        if [ -n "$tests_dir" ]; then
+        if [ -n "$tests_dir" ] && [ -d "$tests_dir" ]; then
             loginfo "Running tests in $tests_dir"
             ssh_tmp_config=$(mktemp)
             _ssh_get_options >$ssh_tmp_config
