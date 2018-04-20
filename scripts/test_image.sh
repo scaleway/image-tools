@@ -26,7 +26,7 @@ test_start() {
         server_id=$(create_server "$server_type" "" "$server_name" "$image_id" "AUTHORIZED_KEY=$key" "")
         [ $? -eq 0 ] || exiterr
 
-        curl --fail -s -X PATCH -H "Content-Type: application/json" -H "x-auth-token: $SCW_TOKEN" -d '{"boot_type":"local"}' https://cp-$REGION.scaleway.com/servers/$server_id || logwarn "Could not set server boot type to local"
+        curl --fail -s -X PATCH -H "Content-Type: application/json" -H "x-auth-token: $SCW_TOKEN" -d '{"boot_type":"local"}' https://cp-$REGION.scaleway.com/servers/$server_id >/dev/null || logwarn "Could not set server boot type to local"
 
         boot_server $server_id || exiterr
 
