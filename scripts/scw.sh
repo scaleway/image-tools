@@ -49,9 +49,9 @@ _ssh_get_options() {
 
 _ssh() {
     cmd_options=""
-    _ssh_get_options | while read option; do
+    while read option; do
         cmd_options="${cmd_options}-o ${option} "
-    done
+    done < <(_ssh_get_options)
     logdebug "ssh $cmd_options $@"
     ssh $cmd_options "$@"
 }
