@@ -38,6 +38,8 @@ server_env="build_method=$build_method rootfs_url=$rootfs_url signal_build_done_
 server_id=$(create_server "$server_type" "$server_creation_opts" "$server_name" 50G "$server_env" "$bootscript_id")
 [ $? -eq 0 ] || exiterr
 
+curl --fail -s -X PATCH -H "X-Auth-Token: ${SCW_TOKEN}" -H "Content-type: application/json" -d '{"boot_type":"bootscript"}' "https://cp-${REGION}.scaleway.com/servers/${server_id}" >/dev/null || exiterr
+
 boot_server $server_id || exiterr
 
 wait_for_port $server_id $signal_port || exiterr
