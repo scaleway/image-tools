@@ -13,7 +13,7 @@ pipeline {
 
   triggers {
     pollSCM("H */2 * * *")
-    cron('H H * * H')
+    cron('H H H * *')
   }
 
   environment {
