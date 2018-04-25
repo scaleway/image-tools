@@ -62,6 +62,8 @@ ifdef IMAGE_BOOTSCRIPT_$(TARGET_SCW_ARCH)
 IMAGE_BOOTSCRIPT = $(IMAGE_BOOTSCRIPT_$(TARGET_SCW_ARCH))
 endif
 
+IMAGE_DISK_SIZE ?= 50G
+
 ifeq ($(shell which scw-metadata >/dev/null 2>&1; echo $$?), 0)
 IS_SCW_HOST := y
 LOCAL_SCW_REGION := $(shell scw-metadata --cached LOCATION_ZONE_ID)
@@ -156,7 +158,7 @@ from-rootfs-common: rootfs.tar
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh start $(SERVE_PORT) $(ASSETS_DIR)
 endif
-	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_SCW_ARCH)" "$(IMAGE_BOOTSCRIPT)" "$(BUILD_METHOD)"
+	scripts/create_image_live_from_rootfs.sh "$(ROOTFS_URL)" "$(IMAGE_TITLE)" "$(TARGET_SCW_ARCH)" "$(IMAGE_DISK_SIZE)" "$(IMAGE_BOOTSCRIPT)" "$(BUILD_METHOD)"
 ifeq ($(SERVE_ASSETS), y)
 	scripts/assets_server.sh stop $(SERVE_PORT)
 endif
