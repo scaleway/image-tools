@@ -2,6 +2,10 @@
 # description "generate SSH keys"
 # author "Scaleway <opensource@scaleway.com>"
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 # Generate ssh host keys if not present
 if [ ! -f /etc/ssh/ssh_host_rsa_key ]
 then

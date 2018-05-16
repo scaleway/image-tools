@@ -3,6 +3,10 @@
 # author "Scaleway <opensource@scaleway.com>"
 set -eu
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 CONFIG_FILE=/etc/scw-kernel-check.conf
 
 warn_expect_kernel() {

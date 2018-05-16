@@ -2,6 +2,10 @@
 # description "executable which retrieves server metadata (JSON)"
 # author "Scaleway <opensource@scaleway.com>"
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 export PATH="${PATH:+$PATH:}/usr/bin:/bin"
 
 CODE=0

@@ -1,5 +1,9 @@
 #! /bin/bash
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 rootpasswd=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 12)
 printf '%s' $rootpasswd >/root/.pw
 (echo $rootpasswd; echo $rootpasswd) | passwd root

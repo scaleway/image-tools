@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 if [ "$FLAVORS" = "" ]; then
 	if [ -f /etc/scw-release ]; then
 		FLAVORS=$(cat /etc/scw-release | grep "^IMAGE_FLAVORS=" | tr -d '"' | tr ' ' ',' | cut -d'=' -f2)

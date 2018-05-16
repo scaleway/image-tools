@@ -2,6 +2,10 @@
 # description "disconnect extra NBD volumes"
 # author "Scaleway <opensource@scaleway.com>"
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 XNBD_CLIENT=/run/initramfs/usr/sbin/xnbd-client
 
 for device in /dev/nbd[!0]*

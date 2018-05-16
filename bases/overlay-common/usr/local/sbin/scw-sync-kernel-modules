@@ -2,6 +2,10 @@
 # description "synchronizes kernel module"
 # author "Scaleway <opensource@scaleway.com>"
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 set -e -o pipefail
 
 DIR=/lib/modules

@@ -4,6 +4,10 @@
 
 set -e
 
+if [[ $EUID -ne 0 ]]; then
+   exit 1
+fi
+
 export PATH="${PATH:+$PATH:}/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin"
 
 curl -s https://raw.githubusercontent.com/scaleway/image-tools/master/builder/unit.bash > /tmp/scw-image-unit-suite.bash
