@@ -24,10 +24,16 @@ return {
       }
     }
     stage('Set environment') {
+      env.IMAGE_VERSION = env.JOB_NAME.split('-').drop(2).join('-')
       manifest = readFile("${env.WORKSPACE}/image/manifest.json")
       manifest_data = new groovy.json.JsonSlurperClassic().parseText(manifest)
       image_version = manifest_data['images'][env.IMAGE_VERSION]
-      env.MARKETPLACE_IMAGE_NAME = image_version['marketplace-name']
+      try {
+        env.MARKETPLACE_IMAGE_NAME = image_version['marketplace-name']
+      }
+      catch (Exception e) {
+        throw new hudson.AbortException("Error: does version '${env.IMAGE_VERSION}' exist in manifest?")
+      }
       env.IMAGE_DISK_SIZE = "50G"
       if (image_version.containsKey('options')) {
         if (image_version['options'].containsKey('disk-size')) {
