@@ -51,7 +51,7 @@ return {
     def tmp_arch = arch
     image_builders[tmp_arch] = {
       stage("Create image for ${tmp_arch} on Scaleway") {
-        node("${tmp_arch}&&docker") {
+        node("${tmp_arch}&&docker&&scw-cli") {
           unstash 'image-source'
           sh 'tree'
           withCredentials([usernamePassword(credentialsId: 'scw-test-orga-token', usernameVariable: 'SCW_ORGANIZATION', passwordVariable: 'SCW_TOKEN')]) {
@@ -81,7 +81,7 @@ return {
   }
   parallel image_builders
 
-  node {
+  node("scw-cli") {
     if(params.test) {
       stage('Test the images') {
         try {
@@ -107,7 +107,7 @@ return {
     }
   }
 
-  node {
+  node("docker") {
     if(params.release) {
       stage('Release the image') {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')]) {
