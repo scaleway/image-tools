@@ -107,7 +107,7 @@ fclean: clean
 
 .PHONY: clean
 clean:
-	-rm -f $(ASSETS_DIR) $(EXPORT_DIR)/export.tar $(EXPORT_DIR)/image_built
+	-rm -f $(ASSETS_DIR) $(EXPORT_DIR)/export.tar
 	-rm -rf $(EXPORT_DIR)/rootfs
 
 $(EXPORT_DIR):
@@ -125,18 +125,13 @@ ifdef IMAGE_BASE_FLAVORS
 	$(foreach bf,$(IMAGE_BASE_FLAVORS),rsync -az bases/overlay-$(bf)/ $(IMAGE_DIR)/overlay-base;)
 endif
 	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $$([ -r Dockerfile.$(TARGET_SCW_ARCH) ] && echo "-f Dockerfile.$(TARGET_SCW_ARCH)") $(IMAGE_DIR)
-	IMAGE_BUILT_UUID=$$(docker inspect -f '{{.Id}}' $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION)) && if [ "$$(cat $(EXPORT_DIR)/image_built 2>/dev/null)" != "$$IMAGE_BUILT_UUID" ]; then \
-	    printf "%s" "$$IMAGE_BUILT_UUID" > $(EXPORT_DIR)/image_built; \
-	    echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags; \
-	    $(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d)) \
-	    $(foreach v,$(IMAGE_VERSION_ALIASES),\
-	        docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v;\
-	        echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;) \
-	fi
+	echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags
+	$(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d))
+	$(foreach v,$(IMAGE_VERSION_ALIASES),\
+		docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v;\
+		echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;)
 
-$(EXPORT_DIR)/image_built: image
-
-$(ASSETS_DIR)/rootfs.tar: $(EXPORT_DIR)/image_built $(ASSETS_DIR)
+$(ASSETS_DIR)/rootfs.tar: image $(ASSETS_DIR)
 	echo "IMAGE_ID=\"$(IMAGE_TITLE)\"" >> $(EXPORT_DIR)/scw-release
 	echo "IMAGE_RELEASE=$(shell date +%Y-%m-%d)" >> $(EXPORT_DIR)/scw-release
 	echo "IMAGE_CODENAME=$(IMAGE_NAME)" >> $(EXPORT_DIR)/scw-release
@@ -171,7 +166,7 @@ unpartitioned-from-rootfs: from-rootfs-common
 scaleway_image: $(BUILD_METHOD)
 
 .PHONY: tests
-tests:
+tests: $(EXPORT_DIR)
 	scripts/test_image.sh start $(TARGET_SCW_ARCH) $(REGION) $(IMAGE_ID) $(EXPORT_DIR)/$(IMAGE_ID).servers $(IMAGE_DIR)/tim_tests
 ifneq ($(NO_CLEANUP), true)
 	scripts/test_image.sh stop $(EXPORT_DIR)/$(IMAGE_ID).servers

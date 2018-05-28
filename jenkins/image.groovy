@@ -120,7 +120,7 @@ return {
         for (image in compute_images) {
           dir('tmp-image-extract') {
             unstash "docker-export-${image['arch']}"
-            sh "docker load -i docker-export-${image['arch']}"
+            sh "docker load -i docker-export-${image['arch']}.tar"
           }
           for (tag in image['docker_tags']) {
             sh "docker push ${tag}"
