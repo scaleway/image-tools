@@ -44,6 +44,7 @@ return {
       env.LOG_LEVEL = params.logLevel
     }
     stash 'image-source'
+    deleteDir()
   }
 
   def image_builders = [:]
@@ -52,6 +53,7 @@ return {
     image_builders[tmp_arch] = {
       stage("Create image for ${tmp_arch} on Scaleway") {
         node("${tmp_arch}&&docker&&scw-cli") {
+          deleteDir()
           unstash 'image-source'
           sh 'tree'
           withCredentials([usernamePassword(credentialsId: 'scw-test-orga-token', usernameVariable: 'SCW_ORGANIZATION', passwordVariable: 'SCW_TOKEN')]) {
@@ -73,7 +75,6 @@ return {
             sh "docker save -o docker-export-${tmp_arch}.tar ${docker_image}"
             stash "docker-export-${tmp_arch}"
             sh "docker image rm ${docker_tags[-1]} && docker system prune -f"
-            deleteDir()
           }
         }
       }
@@ -83,6 +84,8 @@ return {
 
   node("scw-cli") {
     if(params.test) {
+      deleteDir()
+      unstash 'image-source'
       stage('Test the images') {
         try {
           for (Map image : compute_images) {
@@ -109,6 +112,7 @@ return {
 
   node("docker") {
     if(params.release) {
+      deleteDir()
       stage('Release the image') {
         withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')]) {
           sh 'echo -n "$DOCKERHUB_PASSWD" | docker login -u "$DOCKERHUB_USER" --password-stdin'
