@@ -8,18 +8,22 @@ fi
 
 logerr() {
     [ $LOG_LEVEL -gt 0 ] && log "[ERROR]" "$@"
+    true
 }
 
 logwarn() {
     [ $LOG_LEVEL -gt 1 ] && log "[WARNING]" "$@"
+    true
 }
 
 loginfo() {
     [ $LOG_LEVEL -gt 2 ] && log "[INFO]" "$@"
+    true
 }
 
 logdebug() {
     [ $LOG_LEVEL -gt 3 ] && log "[DEBUG]" "$@"
+    true
 }
 
 exiterr() {
@@ -156,16 +160,20 @@ boot_server() {
 }
 
 wait_for_port() {
-    server_id=$1
-    signal_port=$2
-    timeout=$3
+    local server_id=$1
+    local signal_port=$2
+    local timeout=$3
     if [ -z "$timeout" ]; then
         timeout=300
     fi
 
-    time_begin=$(date +%s)
+    local time_begin=$(date +%s)
+    local time_now
+    local time_diff
+    local failed
+
     while true; do
-        server_ip=$(get_server_ip $server_id)
+        local server_ip=$(get_server_ip $server_id)
         if [ -n "$SSH_GATEWAY" ]; then
             server_ip=$(get_server $server_id | jq -r '.server.private_ip')
             cmd_prefix="ssh $SSH_GATEWAY"
@@ -189,15 +197,21 @@ wait_for_port() {
 
     loginfo "Waiting for host to be up and port $signal_port to be open on $server_ip..."
     time_begin=$(date +%s)
-    host_up=false
-    port_open=false
+    local host_up=false
+    local port_open=false
     while true; do
         if ! $host_up; then
             $cmd_prefix ping $server_ip -c 3 >/dev/null 2>&1 && host_up=true
-            $host_up && logdebug "Host is now up" && continue
+            if $host_up; then
+                logdebug "Host is now up"
+                continue
+            fi
         else
             $cmd_prefix nc -zv $server_ip $signal_port >/dev/null 2>&1 && port_open=true
-            $port_open && logdebug "Port $signal_port is now open" && break
+            if $port_open; then
+                logdebug "Port $signal_port is now open"
+                break
+            fi
         fi
         time_now=$(date +%s)
         time_diff=$(echo "$time_now-$time_begin" | bc)
