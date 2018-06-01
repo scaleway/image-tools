@@ -55,7 +55,6 @@ return {
         node("${tmp_arch}&&docker&&scw-cli") {
           deleteDir()
           unstash 'image-source'
-          sh 'tree'
           withCredentials([usernamePassword(credentialsId: 'scw-test-orga-token', usernameVariable: 'SCW_ORGANIZATION', passwordVariable: 'SCW_TOKEN')]) {
             sh 'scw login -o "$SCW_ORGANIZATION" -t "$SCW_TOKEN" -s >/dev/null 2>&1'
           }
