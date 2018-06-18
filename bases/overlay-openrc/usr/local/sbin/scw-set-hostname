@@ -1,0 +1,16 @@
+#!/usr/bin/env ash
+
+old_hostname=$(hostname)
+new_hostname=$(scw-metadata --cached HOSTNAME)
+
+if [ ! -z "$new_hostname" ]; then
+	echo $new_hostname > /etc/hostname
+	if grep -q "$old_hostname" /etc/hosts; then
+		sed -i "/$old_hostname/s/.*/127.0.0.1\t$new_hostname/" /etc/hosts
+	else
+		echo -e "127.0.0.1\t$new_hostname" >> /etc/hosts
+	fi
+fi
+
+# activate the new hostname
+hostname -F /etc/hostname

@@ -1,16 +1,17 @@
-#!/sbin/runscript
-# Copyright (c) 2015 Scaleway <opensource@scaleway.com>
+#!/sbin/openrc-run
+# Copyright (c) 2015-2018 Scaleway <opensource@scaleway.com>
 # Released under the MIT license.
 
 description="Set SCW hostname"
 
 depend() {
     need root
-    before hostname
+    after net
 }
 
 start() {
     ebegin "Setting SCW hostname"
+    /usr/local/sbin/scw-set-hostname
     echo "hostname=\"$(cat /etc/hostname)\"" > /etc/conf.d/hostname
     eend $?
 }

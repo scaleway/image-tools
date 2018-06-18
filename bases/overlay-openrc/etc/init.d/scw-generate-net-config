@@ -1,0 +1,17 @@
+#!/sbin/openrc-run
+# Copyright (c) 2018 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Generate network configuration"
+
+depend() {
+    need root
+    after bootmisc hwdrivers modules
+    before net
+}
+
+start() {
+    ebegin "Generating network configuration"
+    /usr/local/sbin/scw-generate-net-config
+    eend $?
+}

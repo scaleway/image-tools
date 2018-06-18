@@ -1,4 +1,4 @@
-#!/sbin/runscript
+#!/sbin/openrc-run
 # Copyright (c) 2015 Scaleway <opensource@scaleway.com>
 # Released under the MIT license.
 
