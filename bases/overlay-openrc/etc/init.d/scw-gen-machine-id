@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+# Copyright (c) 2018 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Generate VM UUID"
+
+depend() {
+    need root
+    after net
+}
+
+start() {
+    if ! [ -f /etc/machine-id ]; then
+        ebegin "Generating machine UUID"
+        uuidgen >/etc/machine-id
+        eend $?
+    fi
+}

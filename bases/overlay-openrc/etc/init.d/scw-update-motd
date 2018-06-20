@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+# Copyright (c) 2015-2018 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Update /etc/motd"
+
+depend() {
+    need net root
+    use dns
+}
+
+start() {
+    ebegin "Generating /etc/motd"
+    run-parts /etc/update-motd.d/ > /etc/motd
+    eend $?
+}

@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+# Copyright (c) 2018 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Generate root password"
+
+depend() {
+    need root
+    before net
+}
+
+start() {
+    # only run the service if there is no root password defined in shadow
+    if [ $(grep root /etc/shadow | awk -F':' '{print $2}' | wc -c) -eq 1 ]; then
+        ebegin "Generating root password"
+        /usr/local/sbin/scw-generate-root-passwd
+        res=$?
+        eend $res
+        # if we successfully set the root password, disable this service
+        if [ $res -eq 0 ]; then
+            rc-update del scw-gen-root-passwd default
+        fi
+    fi
+}

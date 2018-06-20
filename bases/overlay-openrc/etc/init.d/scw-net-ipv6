@@ -1,0 +1,16 @@
+#!/sbin/openrc-run
+# Copyright (c) 2018 Scaleway <opensource@scaleway.com>
+# Released under the MIT license.
+
+description="Configure IPv6 networking"
+
+depend() {
+    need root
+    after net
+}
+
+start() {
+    ebegin "Configuring IPv6 networking"
+    /usr/local/sbin/scw-net-ipv6
+    eend $?
+}
