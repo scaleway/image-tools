@@ -1,0 +1,16 @@
+#!/bin/sh
+# description "fetch SSH keys"
+# author "Scaleway <opensource@scaleway.com>"
+
+if test -n "$(find /run/scw-metadata.cache -mmin +1)" ; then
+    /usr/local/bin/scw-metadata > /dev/null
+fi
+
+# add Scaleway account keys
+/usr/local/bin/scw-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | sed -e "s/^'//" -e "s/'$//"
+
+# add Server tags keys
+/usr/local/bin/scw-metadata --cached | grep TAGS_.*=AUTHORIZED_KEY | cut -d'=' -f 3- | sed -e "s/^'//" -e "s/'$//"
+
+# use classic key management
+cat /root/.ssh/authorized_keys /root/.ssh/instance_keys | sed '/^\w*#/d'
