@@ -1,0 +1,10 @@
+[Unit]
+Description=Configure IPv6 networking
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/scw-net-ipv6
+
+[Install]
+WantedBy=multi-user.target
