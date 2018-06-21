@@ -1,3 +1,5 @@
+enable scw-generate-net-config
+enable scw-net-ipv6
 enable scw-fetch-ssh-keys
 enable scw-generate-ssh-keys
 enable scw-sync-kernel-modules
