@@ -1,10 +1,11 @@
 [Unit]
 Description=Generate network configuration
-Before=networking.service
+Before=network-pre.target
+Wants=network-pre.target
 
 [Service]
 Type=oneshot
 ExecStart=/usr/local/sbin/scw-generate-net-config
 
 [Install]
-WantedBy=networking.service
+WantedBy=network.target
