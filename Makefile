@@ -126,7 +126,7 @@ ifdef IMAGE_BASE_FLAVORS
 endif
 	docker build $(BUILD_OPTS) -t $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(foreach ba,$(BUILD_ARGS),--build-arg $(ba)) $$([ -r Dockerfile.$(TARGET_SCW_ARCH) ] && echo "-f Dockerfile.$(TARGET_SCW_ARCH)") $(IMAGE_DIR)
 	echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) >$(EXPORT_DIR)/docker_tags
-	$(eval IMAGE_VERSION_ALIASES += $(shell date +%Y-%m-%d))
+	$(eval IMAGE_VERSION_ALIASES += $(IMAGE_VERSION)-$(shell date +%Y-%m-%d))
 	$(foreach v,$(IMAGE_VERSION_ALIASES),\
 		docker tag $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$(IMAGE_VERSION) $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v;\
 		echo $(DOCKER_NAMESPACE)/$(IMAGE_NAME):$(TARGET_SCW_ARCH)-$v >>$(EXPORT_DIR)/docker_tags;)
