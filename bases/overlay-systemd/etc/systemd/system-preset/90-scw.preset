@@ -1,8 +1,8 @@
-enable scw-generate-net-config
-enable scw-net-ipv6
-enable scw-fetch-ssh-keys
-enable scw-generate-ssh-keys
-enable scw-sync-kernel-modules
-enable scw-signal-booted
-enable scw-set-hostname
-enable scw-generate-root-passwd
+enable scw-generate-net-config.service
+enable scw-net-ipv6.service
+enable scw-fetch-ssh-keys.service
+enable scw-generate-ssh-keys.service
+enable scw-sync-kernel-modules.service
+enable scw-signal-booted.service
+enable scw-set-hostname.service
+enable scw-generate-root-passwd.service
