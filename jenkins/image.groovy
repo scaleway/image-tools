@@ -34,10 +34,15 @@ return {
       catch (Exception e) {
         throw new hudson.AbortException("Error: does version '${env.IMAGE_VERSION}' exist in manifest?")
       }
+      // All of this is a hack, it needs to be fixed properly. Notably, images need to be per-product
       env.IMAGE_DISK_SIZE = "50G"
       if (image_version.containsKey('options')) {
         if (image_version['options'].containsKey('disk-size')) {
           env.IMAGE_DISK_SIZE = image_version['options']['disk-size']
+          // This part especially, is a quickfix to be reverted soon for something cleaner
+          if (env.IMAGE_DISK_SIZE == "25G") {
+             env.TEST_SERVER_TYPES = "START1-XS"
+          }
         }
       }
       env.BUILD_OPTS = "--pull"

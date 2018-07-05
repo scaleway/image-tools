@@ -12,10 +12,12 @@ test_start() {
     tests_dir=$5
 
     key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
-    if [ "$arch" = "arm" ]; then
+    if [ -n "$TEST_SERVER_TYPES" ]; then
+        server_types="$TEST_SERVER_TYPES"
+    elif [ "$arch" = "arm" ]; then
         server_types="C1"
     elif [ "$arch" = "x86_64" ]; then
-        server_types="VC1S C2S"
+        server_types="START1-S C2S"
     elif [ "$arch" = "arm64" ]; then
         server_types="ARM64-2GB"
     fi
