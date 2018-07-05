@@ -22,11 +22,11 @@ if [ "$arch" = "arm" ]; then
     logwarn "Local boot is not supported on C1, defaulting to unpartitioned image creation"
     build_method="unpartitioned-from-rootfs"
     bootscript_id=$(grep -E "$REGION\|x86_64\>" bootscript_ids | cut -d'|' -f3)
-    server_type="VC1M"
+    server_type="START1-M"
     minimum_total_volume_size=100
     server_creation_opts=""
 elif [ "$arch" = "x86_64" ]; then
-    server_type="VC1M"
+    server_type="START1-M"
     minimum_total_volume_size=100
     server_creation_opts=""
 elif [ "$arch" = "arm64" ]; then
