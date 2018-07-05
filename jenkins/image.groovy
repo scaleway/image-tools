@@ -1,6 +1,7 @@
 return {
   properties([
       [$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', numToKeepStr: '1']],
+      disableConcurrentBuilds(),
       pipelineTriggers([
           cron('H H H * *'),
           pollSCM('H */2 * * *')
