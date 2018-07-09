@@ -1,0 +1,22 @@
+# This set of udev rules is aimed at ensuring udev sets up the appropriate
+# disk/by-<uuid|label|partuuid|partlabel> on nbd devices on Scaleway hosts.
+# It is only run if /run/scaleway exists, as this means we are on a baremetal
+# node where we know the initrd will have run and setup the nbd connections,
+# so the nbd devices are ready to be read from.
+
+KERNEL!="nbd*", GOTO="end_scaleway_nbd"
+
+IMPORT{builtin}="blkid"
+
+TEST!="/run/scaleway", GOTO="end_scaleway_nbd"
+PROGRAM="/bin/sh -c '! blkid $DEVNAME'", GOTO="end_scaleway_nbd"
+
+# by-label/by-uuid links (filesystem metadata)
+ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{ID_FS_UUID_ENC}=="?*", SYMLINK+="disk/by-uuid/$env{ID_FS_UUID_ENC}"
+ENV{ID_FS_USAGE}=="filesystem|other", ENV{ID_FS_LABEL_ENC}=="?*", SYMLINK+="disk/by-label/$env{ID_FS_LABEL_ENC}"
+
+# by-partlabel/by-partuuid links (partition metadata)
+ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_UUID}=="?*", SYMLINK+="disk/by-partuuid/$env{ID_PART_ENTRY_UUID}"
+ENV{ID_PART_ENTRY_SCHEME}=="gpt", ENV{ID_PART_ENTRY_NAME}=="?*", SYMLINK+="disk/by-partlabel/$env{ID_PART_ENTRY_NAME}"
+
+LABEL="end_scaleway_nbd"
