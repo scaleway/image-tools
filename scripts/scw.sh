@@ -35,6 +35,22 @@ exiterr() {
     fi
 }
 
+test_dependency() {
+    which "$1" > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        logerr "$1 not found in \$PATH"
+        exit 1
+    fi
+}
+
+test_dependency curl
+test_dependency ssh
+test_dependency ping
+test_dependency jq
+test_dependency nc
+test_dependency scw
+
+
 __scw() {
     scw --region=$REGION "$@"
 }
