@@ -80,8 +80,8 @@ return {
             sh "docker save -o docker-export-${tmp_arch}.tar ${docker_image}"
             stash "docker-export-${tmp_arch}"
             sh "docker image rm ${docker_tags[-1]} && docker system prune -f"
-            deleteDir()
           }
+          deleteDir()
         }
       }
     }
@@ -147,6 +147,7 @@ return {
         )
         echo "Created new marketplace version of image ${image_version['marketplace-id']}: ${versionId}"
       }
+      deleteDir()
     }
   }
 }
