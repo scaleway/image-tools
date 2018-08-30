@@ -10,7 +10,8 @@ return {
           booleanParam(name: 'test', defaultValue: true, description: 'Test the image'),
           booleanParam(name: 'needAdminApproval', defaultValue: false, description: 'Wait for admin approval after testing'),
           booleanParam(name: 'release', defaultValue: true, description: 'Release the image'),
-          string(name: 'logLevel', defaultValue: '3', description: 'Log level')
+          string(name: 'logLevel', defaultValue: '3', description: 'Log level'),
+          string(name: 'buildOpts', defaultValue: '--pull', description: 'Image build options')
       ])
   ])
 
@@ -46,7 +47,7 @@ return {
           }
         }
       }
-      env.BUILD_OPTS = "--pull"
+      env.BUILD_OPTS = params.buildOpts
       env.LOG_LEVEL = params.logLevel
     }
     stash 'image-source'
