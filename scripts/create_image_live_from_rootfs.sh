@@ -15,6 +15,8 @@ image_disk_size=$4
 image_bootscript=$5
 build_method=$6
 
+wait_port_timeout=900
+
 key=$(cat ${SSH_KEY_FILE}.pub | cut -d' ' -f1,2 | tr ' ' '_')
 
 bootscript_id=$(grep -E "$REGION\|$arch\>" bootscript_ids | cut -d'|' -f3)
@@ -48,7 +50,7 @@ curl --fail -s -X PATCH -H "X-Auth-Token: ${SCW_TOKEN}" -H "Content-type: applic
 
 boot_server $server_id || exiterr
 
-wait_for_port $server_id $signal_port || exiterr
+wait_for_port $server_id $signal_port $wait_port_timeout || exiterr
 
 stop_server $server_id
 
