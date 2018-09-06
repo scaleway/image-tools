@@ -9,7 +9,7 @@ return {
       parameters([
           booleanParam(name: 'test', defaultValue: true, description: 'Test the image'),
           booleanParam(name: 'needAdminApproval', defaultValue: false, description: 'Wait for admin approval after testing'),
-          booleanParam(name: 'release', defaultValue: true, description: 'Release the image'),
+          booleanParam(name: 'release', defaultValue: false, description: 'Release the image'),
           string(name: 'logLevel', defaultValue: '3', description: 'Log level'),
           string(name: 'buildOpts', defaultValue: '--pull', description: 'Image build options')
       ])
