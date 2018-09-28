@@ -53,7 +53,7 @@ REGION ?= par1
 export REGION
 BUILD_METHOD ?= from-rootfs
 SERVE_ASSETS ?= y
-EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_IMAGE_ARCH)
+EXPORT_DIR ?= $(IMAGE_DIR)/export/$(TARGET_SCW_ARCH)
 ASSETS_DIR ?= $(EXPORT_DIR)/assets
 OUTPUT_ID_TO ?= $(EXPORT_DIR)/image_id
 export OUTPUT_ID_TO
