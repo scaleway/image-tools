@@ -62,7 +62,7 @@ ifdef IMAGE_BOOTSCRIPT_$(TARGET_SCW_ARCH)
 IMAGE_BOOTSCRIPT = $(IMAGE_BOOTSCRIPT_$(TARGET_SCW_ARCH))
 endif
 
-IMAGE_DISK_SIZE ?= 50G
+IMAGE_DISK_SIZE ?= 10G
 
 ifeq ($(shell which scw-metadata >/dev/null 2>&1; echo $$?), 0)
 IS_SCW_HOST := y
