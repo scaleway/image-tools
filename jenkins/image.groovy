@@ -75,11 +75,8 @@ return {
           compute_images.add([
             arch: tmp_arch,
             id: imageId,
-            docker_tags: docker_tags
           ])
           dir("${env.WORKSPACE}/export/${tmp_arch}") {
-            sh "docker save -o docker-export-${tmp_arch}.tar ${docker_image}"
-            stash "docker-export-${tmp_arch}"
             sh "docker image rm ${docker_tags[-1]} && docker system prune -f"
           }
           deleteDir()
@@ -121,20 +118,6 @@ return {
     if(params.release) {
       deleteDir()
       stage('Release the image') {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASSWD')]) {
-          sh 'echo -n "$DOCKERHUB_PASSWD" | docker login -u "$DOCKERHUB_USER" --password-stdin'
-        }
-        for (image in compute_images) {
-          dir('tmp-image-extract') {
-            unstash "docker-export-${image['arch']}"
-            sh "docker load -i docker-export-${image['arch']}.tar"
-          }
-          for (tag in image['docker_tags']) {
-            sh "docker push ${tag}"
-          }
-          sh "docker image rm ${image['docker_tags'].join(' ')} && docker system prune -f"
-          image.remove('docker_tags')
-        }
         message = groovy.json.JsonOutput.toJson([
           type: "image",
           data: [
