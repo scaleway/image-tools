@@ -1,16 +1,34 @@
-#! /bin/bash
+#!/bin/bash
 
-old_hostname=$(hostnamectl status | grep 'hostname' | cut -d ":" -f2 | tr -d " ")
-new_hostname=$(scw-metadata HOSTNAME)
+set -euo pipefail
 
-if ! [ -s /etc/hosts ]; then
-	cp /etc/hosts.default /etc/hosts
-        sed -i "s/\bserver\b/$new_hostname/g" /etc/hosts
+: ${old_hostname:="$(hostnamectl --static  | tr -d -c '[:graph:]')"}
+: ${new_hostname:="$(scw-metadata HOSTNAME | tr -d -c '[:graph:]')"}
+readonly -- old_hostname new_hostname
+
+# Before anything risky, try to set a hostname to get a usable environment.
+
+if [[ -z "${new_hostname}" ]]; then
+	exit 2
 fi
 
-hostnamectl set-hostname $new_hostname
-if grep -q "$old_hostname" /etc/hosts; then
-    sed -i "/$old_hostname/s/\b$old_hostname\b/$new_hostname/g" /etc/hosts
+if [[ "${old_hostname}" != "${new_hostname}" ]]; then
+	hostnamectl set-hostname "${new_hostname}"
+fi
+
+# Only then attempt any file modifications, which might fail for reasons unrelated to naming.
+
+if ! [[ -s /etc/hosts ]]; then
+	</etc/hosts.default sed -e "s@server@${new_hostname}@g" >/etc/hosts
+	exit 0
+fi
+
+if [[ ! -z "${old_hostname}" ]] && \
+   [[ "${old_hostname}" != *"/"* ]] && \
+   [[ "${old_hostname}" != "localhost"* ]] && \
+   grep -m 1 -q "${old_hostname}" /etc/hosts;
+then
+	sed -i -e "s@${old_hostname}@${new_hostname}@g" /etc/hosts
 else
-    echo -e "127.0.0.1\t$new_hostname" >> /etc/hosts
+	printf "127.0.0.1\t%s\n" "${new_hostname}" >>/etc/hosts
 fi
