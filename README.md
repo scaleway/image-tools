@@ -60,6 +60,44 @@ All the rest is up to you and your creativity ! You can, for example, upload you
 
 After building, the image and associated snapshots will be available for use with your account. Note that introducing name conflicts will force you to use the ids to interact with the images through the CLI.
 
+## Building a image step by step
+
+### What image-tools does
+
+1. Building with docker your image
+1. Export the file system to a tar via docker export
+1. Serve this tar image with minimal python HTTP server ( see `scripts/assets_server.sh` )
+1. Boot a instance on Scaleway with target filesystem the http serve
+   image
+1. The script wait the instance boot-up and ask Scaleway to make
+   a snapshot
+1. Tag the snapshot as a image
+
+### Prerequisite
+
+  * `docker git jq curl make`
+  * scw-cli
+  * A scaleway account
+  * The build machine must be accessible from the outsite
+
+
+For the last one you have 4 solutions :
+1. Use a scaleway instance for building the image ( can be any kind )
+1. Use a server with a public IP
+1. Use a SSH reverse tunnel like `ssh -fR public_ip_on_server:8080:localhost:8080 user@aserver`
+1. Use `ngrok` but you need to edit the script to have a different port
+   from the outside that the one given to the python http server
+
+With 3 last solutions you need to add ENV variables : `make ... SERVE_IP=public_ip_on_server SERVE_PORT=8080 scaleway_image`
+
+### Steps
+
+1. `git clone https://github.com/scaleway/image-tools.git`
+1. `git clone https://github.com/scaleway/image-ubuntu.git` can be any
+   image you want to build
+1. `cd image-tools/`
+1. `mktemp -d` Make a directory for the build
+1. `make IMAGE_DIR=../image-ubuntu/16.04/ EXPORT_DIR=/tmp/tmp.__to_replace__ scaleway_image`
 
 ## Diving below the surface
 
