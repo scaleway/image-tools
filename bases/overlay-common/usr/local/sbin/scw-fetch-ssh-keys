@@ -18,7 +18,7 @@ if [ "$1" = "--upgrade" ]; then
 	/usr/local/bin/scw-metadata > /dev/null
 fi
 
-cat << EOF > /root/.ssh/authorized_keys
+cat << EOF > /root/.ssh/authorized_keys.new
 #
 # WARNING: Automatically generated file
 # This file will be erased at every boot
@@ -38,18 +38,21 @@ cat << EOF > /root/.ssh/authorized_keys
 EOF
 
 # add Scaleway account keys
-/usr/local/bin/scw-metadata --cached | grep SSH_PUBLIC_KEYS_.*_KEY | cut -d'=' -f 2- | tr -d \' >> /root/.ssh/authorized_keys
+/usr/local/bin/scw-metadata --cached | grep 'SSH_PUBLIC_KEYS_.*_KEY' | cut -d'=' -f 2- | tr -d \' >> /root/.ssh/authorized_keys.new
 
 # add Server tags keys
-/usr/local/bin/scw-metadata --cached | grep TAGS_.*=AUTHORIZED_KEY | cut -d'=' -f 3- | sed 's/_/\ /g' >> /root/.ssh/authorized_keys
+/usr/local/bin/scw-metadata --cached | grep 'TAGS_.*=AUTHORIZED_KEY' | cut -d'=' -f 3- | sed 's/_/\ /g' >> /root/.ssh/authorized_keys.new
 
 # Import custom keys
 if [ -f /root/.ssh/instance_keys ]; then
-	cat << EOF >> /root/.ssh/authorized_keys
+	cat << EOF >> /root/.ssh/authorized_keys.new
 # Below your custom ssh keys from '/root/.ssh/instance_keys'
 EOF
-	(cat /root/.ssh/instance_keys | grep -v "^#" || true) >> /root/.ssh/authorized_keys
+	(cat /root/.ssh/instance_keys | grep -v "^#" || true) >> /root/.ssh/authorized_keys.new
 fi
 
 # authorized_keys should only be readable by the owner and no one else
-chmod 0600 /root/.ssh/authorized_keys
+chmod 0600 /root/.ssh/authorized_keys.new
+
+# replace the existing file automatically
+mv /root/.ssh/authorized_keys.new /root/.ssh/authorized_keys
