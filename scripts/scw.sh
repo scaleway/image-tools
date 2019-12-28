@@ -140,7 +140,7 @@ boot_server() {
     server_id=$1
 
     # Try to boot the server
-    loginfo "Booting server..."
+    [ $LOG_LEVEL -gt 2 ] && echo -n "[INFO]" "Booting server..."
     maximum_boot_tries=3
     boot_timeout=600
     failed=true
@@ -158,7 +158,9 @@ boot_server() {
                     break
                 fi
                 sleep 5
+                [ $LOG_LEVEL -gt 2 ] && echo -n "."
             done
+            [ $LOG_LEVEL -gt 2 ] && echo ""
         fi
         sleep 1
         if (get_server $server_id | jq -r '.server.state' | grep -qxE 'running'); then
