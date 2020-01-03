@@ -8,7 +8,7 @@ if [ -z "$SSH_KEY_FILE" ]; then
         fi
     done
     if [ -z "$SSH_KEY_FILE" ]; then
-        logerr "Could not find any ssh identity to use"
+        logerr "Could not find any ssh identity to use, please export SSH_KEY_FILE variable"
         exit 1
     fi
 fi
