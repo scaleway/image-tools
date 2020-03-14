@@ -20,6 +20,11 @@ processes=`ps aux | wc -l`
 ip=$(scw-metadata --cached PRIVATE_IP)
 public_ip=$(scw-metadata --cached PUBLIC_IP_ADDRESS)
 
+if [ -z public_ip ]; then
+	# Fall back to using the IPv6 address
+	public_ip=$(scw-metadata --cached IPV6_ADDRESS)
+fi
+
 metadata() {
   scw-metadata --cached "$1"
 }
